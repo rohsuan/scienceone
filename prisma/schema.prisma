@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// No url field in datasource — URL is managed by prisma.config.ts (Prisma 7)
+datasource db {
+  provider = "postgresql"
+}
+
+// ---- Better Auth tables ----
+
+model User {
+  id              String            @id @default(cuid())
+  name            String
+  email           String            @unique
+  emailVerified   Boolean           @default(false)
+  image           String?
+  role            String            @default("user")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  accounts        Account[]
+  sessions        Session[]
+  purchases       Purchase[]
+  downloads       Download[]
+  readingProgress ReadingProgress[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  idToken               String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?   @db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+// ---- Domain tables ----
+
+model Book {
+  id           String         @id @default(cuid())
+  title        String
+  slug         String         @unique
+  authorName   String
+  authorBio    String?        @db.Text
+  authorImage  String?
+  synopsis     String?        @db.Text
+  coverImage   String?
+  isbn         String?        @unique
+  pageCount    Int?
+  dimensions   String?
+  printLink    String?
+  isPublished  Boolean        @default(false)
+  isOpenAccess Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  chapters     Chapter[]
+  pricing      BookPrice?
+  purchases    Purchase[]
+  categories   BookCategory[]
+  downloads    Download[]
+
+  @@map("books")
+}
+
+model BookPrice {
+  id        String   @id @default(cuid())
+  bookId    String   @unique
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  amount    Decimal  @db.Decimal(10, 2)
+  currency  String   @default("USD")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("book_prices")
+}
+
+model Chapter {
+  id            String   @id @default(cuid())
+  bookId        String
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  title         String
+  slug          String
+  position      Int
+  content       String?  @db.Text
+  isFreePreview Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([bookId, slug])
+  @@unique([bookId, position])
+  @@map("chapters")
+}
+
+model Category {
+  id    String         @id @default(cuid())
+  name  String         @unique
+  slug  String         @unique
+  books BookCategory[]
+
+  @@map("categories")
+}
+
+model BookCategory {
+  bookId     String
+  categoryId String
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([bookId, categoryId])
+  @@map("book_categories")
+}
+
+model Purchase {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  bookId          String
+  book            Book     @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  stripePaymentId String?  @unique
+  amount          Decimal  @db.Decimal(10, 2)
+  currency        String   @default("USD")
+  status          String   @default("completed")
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@map("purchases")
+}
+
+model Download {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId       String
+  book         Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  format       String
+  downloadedAt DateTime @default(now())
+
+  @@map("downloads")
+}
+
+model ReadingProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId        String
+  chapterId     String
+  scrollPercent Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@map("reading_progress")
+}
