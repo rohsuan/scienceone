@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
   const { data: session } = useSession();
+  const router = useRouter();
   const user = session?.user;
 
   const initials = user?.name
@@ -74,7 +76,13 @@ export default function Header() {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => signOut()}
+                    onClick={() =>
+                      signOut({
+                        fetchOptions: {
+                          onSuccess: () => router.push("/"),
+                        },
+                      })
+                    }
                     className="text-destructive focus:text-destructive"
                   >
                     Sign out
