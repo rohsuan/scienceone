@@ -24,8 +24,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication & Accounts
 
-- [ ] **AUTH-01**: User can create an account with email and password
-- [ ] **AUTH-02**: User can log in and maintain a session across browser refresh
+- [x] **AUTH-01**: User can create an account with email and password
+- [x] **AUTH-02**: User can log in and maintain a session across browser refresh
 - [ ] **AUTH-03**: User can view their purchased books in My Library
 - [ ] **AUTH-04**: User receives email confirmation after purchase with access details
 
@@ -92,8 +92,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete (01-01) |
+| AUTH-02 | Phase 1 | Complete (01-01) |
 | ADM-01 | Phase 2 | Pending |
 | ADM-02 | Phase 2 | Pending |
 | CAT-01 | Phase 3 | Pending |
@@ -127,4 +127,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after roadmap creation — all 27 v1 requirements mapped*
+*Last updated: 2026-02-18 after 01-01 completion — AUTH-01, AUTH-02 marked complete*

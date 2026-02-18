@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can log out from any page in the application
   4. Next.js 16 application builds and deploys without errors; Prisma schema is migrated against PostgreSQL
 **Plans**: 4 plans
-- [ ] 01-01-PLAN.md — Project scaffold, Prisma 7 schema, Better Auth config, seed data
+- [x] 01-01-PLAN.md — Project scaffold, Prisma 7 schema, Better Auth config, seed data
 - [ ] 01-02-PLAN.md — Design system (Tailwind v4 academic theme, shadcn/ui), Header, Footer, landing page
 - [ ] 01-03-PLAN.md — Auth UI (sign-up, sign-in, verify-email pages with Google OAuth)
 - [ ] 01-04-PLAN.md — Protected dashboard shell, route protection, logout, end-to-end verification
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Not started | - |
+| 1. Foundation | 1/4 | In progress | - |
 | 2. Ingest Pipeline | 0/TBD | Not started | - |
 | 3. Catalog and Discovery | 0/TBD | Not started | - |
 | 4. Browser Reader | 0/TBD | Not started | - |
