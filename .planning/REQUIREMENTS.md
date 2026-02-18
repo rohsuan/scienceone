@@ -44,8 +44,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Content Management (Admin)
 
-- [ ] **ADM-01**: Publisher can ingest manuscripts in LaTeX, Word, and Markdown formats via automated pipeline (Pandoc)
-- [ ] **ADM-02**: Pipeline produces browser-readable HTML with pre-rendered KaTeX math, PDF, and EPUB artifacts
+- [x] **ADM-01**: Publisher can ingest manuscripts in LaTeX, Word, and Markdown formats via automated pipeline (Pandoc)
+- [x] **ADM-02**: Pipeline produces browser-readable HTML with pre-rendered KaTeX math, PDF, and EPUB artifacts
 - [ ] **ADM-03**: Publisher can manage book metadata: cover image, ISBN, author bio/photo, synopsis, categories/tags, table of contents, print info (page count, dimensions), and print purchase link
 - [ ] **ADM-04**: Publisher can set access model per book (pay-per-book or open access)
 - [ ] **ADM-05**: Publisher can preview ingested content before publishing
@@ -94,8 +94,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | AUTH-01 | Phase 1 | Complete (01-01) |
 | AUTH-02 | Phase 1 | Complete (01-01) |
-| ADM-01 | Phase 2 | Pending |
-| ADM-02 | Phase 2 | Pending |
+| ADM-01 | Phase 2 | Complete |
+| ADM-02 | Phase 2 | Complete |
 | CAT-01 | Phase 3 | Pending |
 | CAT-02 | Phase 3 | Pending |
 | CAT-03 | Phase 3 | Pending |

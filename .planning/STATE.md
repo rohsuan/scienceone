@@ -10,28 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 8 (Ingest Pipeline)
-Plan: 0 of ? in current phase
-Status: Ready
-Last activity: 2026-02-18 — 01-04 complete: Dashboard shell, proxy route protection, and human-verified full auth flow
+Plan: 1 of ? in current phase
+Status: In Progress
+Last activity: 2026-02-19 — 02-01 complete: Pandoc wrapper, KaTeX server-side math renderer, chapter splitter, health reporter, Book pdfKey/epubKey migration
 
-Progress: [████░░░░░░] 13%
+Progress: [█████░░░░░] 16%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 10 min
-- Total execution time: 43 min
+- Total plans completed: 5
+- Average duration: 9 min
+- Total execution time: 48 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 43 min | 11 min |
+| 02-ingest | 1/? | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15 min), 01-02 (6 min), 01-03 (7 min), 01-04 (15 min)
-- Trend: steady
+- Last 5 plans: 01-01 (15 min), 01-02 (6 min), 01-03 (7 min), 01-04 (15 min), 02-01 (5 min)
+- Trend: fast
 
 *Updated after each plan completion*
 
@@ -59,6 +60,10 @@ Recent decisions affecting current work:
 - [01-04]: Defense-in-depth route protection: proxy.ts (getSessionCookie) + server-side auth.api.getSession both check auth to guard against CVE-2025-29927
 - [01-04]: signOut callback uses router.push('/') not redirect() — client component logout requires client-side navigation
 - [01-04]: Empty state components (EmptyLibrary, EmptyRecentlyRead) are explicit phase slots for Phase 5 and Phase 4 respectively
+- [02-01]: Pandoc spawned via spawn() not exec() with shell:false — array args prevent shell injection across all format types
+- [02-01]: KaTeX throwOnError:true with manual catch — errors collected in caller-owned errors[] array, pipeline renders [MATH ERROR] placeholder and continues
+- [02-01]: Chapter splitting uses cheerio DOM traversal not regex — handles nested HTML and Pandoc varied output safely
+- [02-01]: Health report halted flag set when mathErrors.length > 0 OR unsupportedCommands.length > 0 — downstream storage should not process broken content
 
 ### Pending Todos
 
@@ -71,9 +76,10 @@ None yet.
 - [01-01 USER SETUP]: Google OAuth placeholders — GOOGLE_CLIENT_ID/SECRET needed for Google sign-in
 - [Phase 2 readiness]: KaTeX vs MathJax decision must be made before Phase 2 begins — audit manuscripts for \label/\eqref cross-reference usage; if heavy, switch to MathJax v3
 - [Phase 2 readiness]: LaTeX package allowlist (amsmath, amsthm, tikz, physics, pgfplots) unknown until first real manuscript is processed; build allowlist during Phase 2
+- [02-01 USER SETUP]: Migration 20260218144600_add_book_artifact_keys created with --create-only (DB offline) — run `npx prisma migrate deploy` when PostgreSQL is available
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Completed 01-04-PLAN.md — Dashboard shell, proxy route protection, empty Library/RecentlyRead slots, and human-verified full auth flow (all 7 flows passed)
-Resume file: .planning/phases/02-ingest/02-01-PLAN.md
+Last session: 2026-02-19
+Stopped at: Completed 02-01-PLAN.md — Four tsx-importable pipeline modules (pandoc wrapper, KaTeX renderer, chapter splitter, health reporter) and Book pdfKey/epubKey migration
+Resume file: .planning/phases/02-ingest/02-02-PLAN.md
