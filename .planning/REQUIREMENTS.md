@@ -127,4 +127,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after 01-01 completion — AUTH-01, AUTH-02 marked complete*
+*Last updated: 2026-02-18 after 01-04 completion — AUTH-01, AUTH-02 human-verified end-to-end (all 7 flows passed)*

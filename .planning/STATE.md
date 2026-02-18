@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 1 - Foundation
+**Current focus:** Phase 2 - Ingest Pipeline
 
 ## Current Position
 
-Phase: 1 of 8 (Foundation)
-Plan: 3 of 4 in current phase
-Status: Executing
-Last activity: 2026-02-18 — 01-03 complete: Auth UI (sign-up, sign-in, verify-email pages with react-hook-form + Zod + Google OAuth)
+Phase: 2 of 8 (Ingest Pipeline)
+Plan: 0 of ? in current phase
+Status: Ready
+Last activity: 2026-02-18 — 01-04 complete: Dashboard shell, proxy route protection, and human-verified full auth flow
 
-Progress: [███░░░░░░░] 9%
+Progress: [████░░░░░░] 13%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 9 min
-- Total execution time: 28 min
+- Total plans completed: 4
+- Average duration: 10 min
+- Total execution time: 43 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 3/4 | 28 min | 9 min |
+| 01-foundation | 4/4 | 43 min | 11 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15 min), 01-02 (6 min), 01-03 (7 min)
-- Trend: accelerating
+- Last 5 plans: 01-01 (15 min), 01-02 (6 min), 01-03 (7 min), 01-04 (15 min)
+- Trend: steady
 
 *Updated after each plan completion*
 
@@ -55,6 +55,10 @@ Recent decisions affecting current work:
 - [01-03]: sessionStorage passes email from sign-up form to verify-email page for resend flow — Better Auth sendVerificationEmail requires email as parameter
 - [01-03]: Better Auth error codes (USER_ALREADY_EXISTS, INVALID_EMAIL_OR_PASSWORD, EMAIL_NOT_VERIFIED) checked alongside HTTP status codes for maximum compatibility
 - [01-03]: Auth layout is a standalone route group (auth) with its own layout.tsx — completely isolated from main layout Header/Footer
+- [01-04]: proxy.ts uses export function proxy (not middleware) — Next.js 16 renamed middleware to proxy
+- [01-04]: Defense-in-depth route protection: proxy.ts (getSessionCookie) + server-side auth.api.getSession both check auth to guard against CVE-2025-29927
+- [01-04]: signOut callback uses router.push('/') not redirect() — client component logout requires client-side navigation
+- [01-04]: Empty state components (EmptyLibrary, EmptyRecentlyRead) are explicit phase slots for Phase 5 and Phase 4 respectively
 
 ### Pending Todos
 
@@ -71,5 +75,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 01-03-PLAN.md — Auth UI (sign-up, sign-in, verify-email) with react-hook-form + Zod + Google OAuth
-Resume file: .planning/phases/01-foundation/01-04-PLAN.md
+Stopped at: Completed 01-04-PLAN.md — Dashboard shell, proxy route protection, empty Library/RecentlyRead slots, and human-verified full auth flow (all 7 flows passed)
+Resume file: .planning/phases/02-ingest/02-01-PLAN.md

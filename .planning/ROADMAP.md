@@ -12,7 +12,7 @@ ScienceOne builds from the ground up: project scaffold and auth first, then the 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Next.js 16 project scaffold, PostgreSQL schema, and user authentication
+- [x] **Phase 1: Foundation** - Next.js 16 project scaffold, PostgreSQL schema, and user authentication
 - [ ] **Phase 2: Ingest Pipeline** - Manuscript conversion to pre-rendered HTML/PDF/EPUB with KaTeX math
 - [ ] **Phase 3: Catalog and Discovery** - Public book browsing, search, detail pages, and SEO
 - [ ] **Phase 4: Browser Reader** - In-browser chapter reading with LaTeX math and navigation
@@ -34,9 +34,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Next.js 16 application builds and deploys without errors; Prisma schema is migrated against PostgreSQL
 **Plans**: 4 plans
 - [x] 01-01-PLAN.md — Project scaffold, Prisma 7 schema, Better Auth config, seed data
-- [ ] 01-02-PLAN.md — Design system (Tailwind v4 academic theme, shadcn/ui), Header, Footer, landing page
-- [ ] 01-03-PLAN.md — Auth UI (sign-up, sign-in, verify-email pages with Google OAuth)
-- [ ] 01-04-PLAN.md — Protected dashboard shell, route protection, logout, end-to-end verification
+- [x] 01-02-PLAN.md — Design system (Tailwind v4 academic theme, shadcn/ui), Header, Footer, landing page
+- [x] 01-03-PLAN.md — Auth UI (sign-up, sign-in, verify-email pages with Google OAuth)
+- [x] 01-04-PLAN.md — Protected dashboard shell, route protection, logout, end-to-end verification
 
 ### Phase 2: Ingest Pipeline
 **Goal**: The founder can convert manuscripts in LaTeX, Word, or Markdown into correctly structured book records — chapters with pre-rendered KaTeX math stored in the database, PDF and EPUB artifacts uploaded to R2 — ready for catalog display and reading
@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete | 2026-02-18 |
 | 2. Ingest Pipeline | 0/TBD | Not started | - |
 | 3. Catalog and Discovery | 0/TBD | Not started | - |
 | 4. Browser Reader | 0/TBD | Not started | - |
