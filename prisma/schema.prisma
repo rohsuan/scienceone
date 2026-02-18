@@ -96,6 +96,8 @@ model Book {
   purchases    Purchase[]
   categories   BookCategory[]
   downloads    Download[]
+  pdfKey       String?    // R2 storage key: "books/{slug}/{slug}.pdf"
+  epubKey      String?    // R2 storage key: "books/{slug}/{slug}.epub"
 
   @@map("books")
 }
