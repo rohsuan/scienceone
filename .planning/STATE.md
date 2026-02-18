@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 1 of 8 (Foundation)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-02-18 — 01-01 complete: Next.js 16 + Prisma 7 + Better Auth foundation
+Last activity: 2026-02-18 — 01-02 complete: Tailwind v4 academic design system, shadcn/ui, Header/Footer/landing page
 
-Progress: [█░░░░░░░░░] 3%
+Progress: [██░░░░░░░░] 6%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 15 min
-- Total execution time: 15 min
+- Total plans completed: 2
+- Average duration: 10 min
+- Total execution time: 21 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1/4 | 15 min | 15 min |
+| 01-foundation | 2/4 | 21 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15 min)
-- Trend: -
+- Last 5 plans: 01-01 (15 min), 01-02 (6 min)
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -48,6 +48,10 @@ Recent decisions affecting current work:
 - [01-01]: Prisma 7 prisma.config.ts lives at project root (not prisma/ subdirectory) — Prisma init behavior
 - [01-01]: Prisma 7 generated client import path is @/generated/prisma/client (not @/generated/prisma — no index.ts)
 - [01-01]: Seed users have no passwords — Better Auth manages hashing; use Better Auth API for test login accounts
+- [Phase 01-02]: shadcn canary CLI required for Tailwind v4 — stable CLI errors on @theme inline syntax
+- [Phase 01-02]: sonner replaces deprecated toast component in shadcn canary
+- [Phase 01-02]: Route group (main)/page.tsx replaces boilerplate app/page.tsx — cannot coexist
+- [Phase 01-02]: oklch color space used for academic navy/indigo palette in Tailwind v4 CSS variables
 
 ### Pending Todos
 
@@ -64,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 01-01-PLAN.md — Next.js 16 + Prisma 7 + Better Auth foundation
-Resume file: .planning/phases/01-foundation/01-02-PLAN.md
+Stopped at: Completed 01-02-PLAN.md — Tailwind v4 academic design system, shadcn/ui, layout shell, landing page
+Resume file: .planning/phases/01-foundation/01-03-PLAN.md
