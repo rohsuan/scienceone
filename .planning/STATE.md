@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 2 of 8 (Ingest Pipeline)
-Plan: 1 of ? in current phase
-Status: In Progress
-Last activity: 2026-02-19 — 02-01 complete: Pandoc wrapper, KaTeX server-side math renderer, chapter splitter, health reporter, Book pdfKey/epubKey migration
+Plan: 2 of 2 in current phase (awaiting Task 3 human-verify checkpoint)
+Status: Checkpoint — human verification required for 02-02 Task 3
+Last activity: 2026-02-19 — 02-02 tasks 1-2 complete: R2 upload module, DB write module, ingest CLI, test fixtures, dry-run verified for LaTeX/Markdown/docx
 
-Progress: [█████░░░░░] 16%
+Progress: [██████░░░░] 20%
 
 ## Performance Metrics
 
@@ -28,10 +28,10 @@ Progress: [█████░░░░░] 16%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 43 min | 11 min |
-| 02-ingest | 1/? | 5 min | 5 min |
+| 02-ingest | 2/2 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15 min), 01-02 (6 min), 01-03 (7 min), 01-04 (15 min), 02-01 (5 min)
+- Last 5 plans: 01-02 (6 min), 01-03 (7 min), 01-04 (15 min), 02-01 (5 min), 02-02 (7 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -64,6 +64,9 @@ Recent decisions affecting current work:
 - [02-01]: KaTeX throwOnError:true with manual catch — errors collected in caller-owned errors[] array, pipeline renders [MATH ERROR] placeholder and continues
 - [02-01]: Chapter splitting uses cheerio DOM traversal not regex — handles nested HTML and Pandoc varied output safely
 - [02-01]: Health report halted flag set when mathErrors.length > 0 OR unsupportedCommands.length > 0 — downstream storage should not process broken content
+- [Phase 02-ingest]: R2 client uses WHEN_REQUIRED checksum config — CRC32 causes 400 errors from Cloudflare R2 S3-compatible API
+- [Phase 02-ingest]: stripMathDelimiters() added to katex-render.ts — Pandoc wraps equation environments with $...$ in fallback mode; stripping normalises before KaTeX rendering
+- [Phase 02-ingest]: writeChapters uses prisma.$transaction(deleteMany + createMany) — atomic re-ingest prevents partial chapter state on failure
 
 ### Pending Todos
 
@@ -81,5 +84,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 02-01-PLAN.md — Four tsx-importable pipeline modules (pandoc wrapper, KaTeX renderer, chapter splitter, health reporter) and Book pdfKey/epubKey migration
-Resume file: .planning/phases/02-ingest/02-02-PLAN.md
+Stopped at: Checkpoint in 02-02-PLAN.md Task 3 (human-verify) — dry-run pipeline complete, awaiting R2 credentials and DB for full end-to-end verification
+Resume file: .planning/phases/02-ingest/02-02-PLAN.md (Task 3 checkpoint)
