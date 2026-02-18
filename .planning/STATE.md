@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 1 of 8 (Foundation)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: Executing
-Last activity: 2026-02-18 — 01-02 complete: Tailwind v4 academic design system, shadcn/ui, Header/Footer/landing page
+Last activity: 2026-02-18 — 01-03 complete: Auth UI (sign-up, sign-in, verify-email pages with react-hook-form + Zod + Google OAuth)
 
-Progress: [██░░░░░░░░] 6%
+Progress: [███░░░░░░░] 9%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 10 min
-- Total execution time: 21 min
+- Total plans completed: 3
+- Average duration: 9 min
+- Total execution time: 28 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 2/4 | 21 min | 10 min |
+| 01-foundation | 3/4 | 28 min | 9 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (15 min), 01-02 (6 min)
+- Last 5 plans: 01-01 (15 min), 01-02 (6 min), 01-03 (7 min)
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -52,6 +52,9 @@ Recent decisions affecting current work:
 - [Phase 01-02]: sonner replaces deprecated toast component in shadcn canary
 - [Phase 01-02]: Route group (main)/page.tsx replaces boilerplate app/page.tsx — cannot coexist
 - [Phase 01-02]: oklch color space used for academic navy/indigo palette in Tailwind v4 CSS variables
+- [01-03]: sessionStorage passes email from sign-up form to verify-email page for resend flow — Better Auth sendVerificationEmail requires email as parameter
+- [01-03]: Better Auth error codes (USER_ALREADY_EXISTS, INVALID_EMAIL_OR_PASSWORD, EMAIL_NOT_VERIFIED) checked alongside HTTP status codes for maximum compatibility
+- [01-03]: Auth layout is a standalone route group (auth) with its own layout.tsx — completely isolated from main layout Header/Footer
 
 ### Pending Todos
 
@@ -68,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 01-02-PLAN.md — Tailwind v4 academic design system, shadcn/ui, layout shell, landing page
-Resume file: .planning/phases/01-foundation/01-03-PLAN.md
+Stopped at: Completed 01-03-PLAN.md — Auth UI (sign-up, sign-in, verify-email) with react-hook-form + Zod + Google OAuth
+Resume file: .planning/phases/01-foundation/01-04-PLAN.md

@@ -123,7 +123,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 1/4 | In progress | - |
+| 1. Foundation | 3/4 | In Progress|  |
 | 2. Ingest Pipeline | 0/TBD | Not started | - |
 | 3. Catalog and Discovery | 0/TBD | Not started | - |
 | 4. Browser Reader | 0/TBD | Not started | - |
