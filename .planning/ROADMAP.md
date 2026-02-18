@@ -47,7 +47,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Founder can run the ingest CLI against a Word (.docx) and Markdown manuscript and receive the same structured output
   3. Ingest pipeline outputs a conversion health report flagging Pandoc warnings, broken equations, and unsupported commands — pipeline halts on errors rather than silently corrupting content
   4. Generated PDF and EPUB artifacts are uploaded to Cloudflare R2 and their storage keys are recorded in the database
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 02-01-PLAN.md — Core pipeline modules: Pandoc wrapper, KaTeX renderer, chapter splitter, health report, schema migration
+- [ ] 02-02-PLAN.md — CLI orchestration, R2 upload, DB persistence, test fixtures, end-to-end verification
 
 ### Phase 3: Catalog and Discovery
 **Goal**: Readers can browse, filter, search, and preview ScienceOne's book catalog in a browser, with open-access books immediately readable and all detail pages structured for search engine discovery
