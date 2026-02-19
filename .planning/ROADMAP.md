@@ -88,7 +88,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Open-access books are readable and downloadable by any user without an account or purchase
   4. User can view all purchased books in My Library with links to read each one
   5. User receives a purchase confirmation email with book title and access instructions within minutes of payment
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 05-01-PLAN.md — Stripe checkout flow, webhook-driven access grant, and purchase confirmation email
+- [ ] 05-02-PLAN.md — My Library dashboard integration and end-to-end purchase flow verification
 
 ### Phase 6: Secure Downloads
 **Goal**: Users with access to a book can download its PDF and EPUB files via time-limited presigned URLs; unauthenticated or unpurchased requests are rejected; print purchase links are visible on detail pages
