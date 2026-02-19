@@ -33,3 +33,35 @@ export type BookAdminDetail = NonNullable<Awaited<ReturnType<typeof getBookAdmin
 export async function getAllCategories() {
   return prisma.category.findMany({ orderBy: { name: "asc" } });
 }
+
+export async function getBookChaptersAdmin(bookId: string) {
+  return prisma.book.findUnique({
+    where: { id: bookId },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      isPublished: true,
+      chapters: {
+        orderBy: { position: "asc" },
+        select: { id: true, title: true, slug: true, position: true },
+      },
+    },
+  });
+}
+
+export async function getChapterAdmin(bookId: string, chapterSlug: string) {
+  return prisma.chapter.findFirst({
+    where: { slug: chapterSlug, bookId },
+    include: {
+      book: { select: { id: true, title: true, slug: true, isPublished: true } },
+    },
+  });
+}
+
+export async function getLatestIngestJob(bookId: string) {
+  return prisma.ingestJob.findFirst({
+    where: { bookId },
+    orderBy: { createdAt: "desc" },
+  });
+}
