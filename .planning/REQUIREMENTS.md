@@ -38,9 +38,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Downloads
 
-- [ ] **DL-01**: User can download purchased books as PDF (secured with time-limited presigned URLs)
-- [ ] **DL-02**: User can download purchased books as EPUB
-- [ ] **DL-03**: Book detail page shows print purchase link (external link to buy print edition)
+- [x] **DL-01**: User can download purchased books as PDF (secured with time-limited presigned URLs)
+- [x] **DL-02**: User can download purchased books as EPUB
+- [x] **DL-03**: Book detail page shows print purchase link (external link to buy print edition)
 
 ### Content Management (Admin)
 
@@ -111,9 +111,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAY-04 | Phase 5 | Complete |
 | AUTH-03 | Phase 5 | Complete (05-02) |
 | AUTH-04 | Phase 5 | Complete |
-| DL-01 | Phase 6 | Pending |
-| DL-02 | Phase 6 | Pending |
-| DL-03 | Phase 6 | Pending |
+| DL-01 | Phase 6 | Complete |
+| DL-02 | Phase 6 | Complete |
+| DL-03 | Phase 6 | Complete |
 | ADM-03 | Phase 7 | Pending |
 | ADM-04 | Phase 7 | Pending |
 | ADM-05 | Phase 7 | Pending |

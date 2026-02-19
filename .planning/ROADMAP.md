@@ -138,6 +138,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Catalog and Discovery | 2/2 | Complete    | 2026-02-19 |
 | 4. Browser Reader | 2/2 | Complete    | 2026-02-19 |
 | 5. Payments and Entitlement | 2/2 | Complete    | 2026-02-19 |
-| 6. Secure Downloads | 0/TBD | Not started | - |
+| 6. Secure Downloads | 1/2 | In Progress|  |
 | 7. Admin Dashboard | 0/TBD | Not started | - |
 | 8. Reader Enhancements | 0/TBD | Not started | - |

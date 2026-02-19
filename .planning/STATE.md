@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 5 - Payments and Entitlement
+**Current focus:** Phase 6 - Secure Downloads
 
 ## Current Position
 
-Phase: 5 of 8 (Payments and Entitlement) — COMPLETE
-Plan: 2 of 2 in current phase — COMPLETE; 05-02 My Library dashboard integration, end-to-end purchase flow verified
-Status: Phase 5 complete — full purchase-to-library loop closed; ready to begin Phase 6
-Last activity: 2026-02-19 — 05-02 complete: My Library component, LibraryBookCard, dashboard integration, human-verified end-to-end
+Phase: 6 of 8 (Secure Downloads) — IN PROGRESS
+Plan: 1 of 2 in current phase — COMPLETE; 06-01 Presigned URL download API, DownloadButton/DownloadDropdown components, detail page wiring
+Status: Phase 6 plan 1 complete — download API and components built; Plan 02 will wire DownloadDropdown into LibraryBookCard and reader header
+Last activity: 2026-02-19 — 06-01 complete: R2 presigned URL download route, DownloadButton, DownloadDropdown, book detail page integration
 
-Progress: [██████████████████░░] 56%
+Progress: [████████████████████░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 7 min
-- Total execution time: 88 min
+- Total execution time: 90 min
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [██████████████████░░] 56%
 | 03-catalog | 2/2 | 23 min | 12 min |
 | 04-reader | 2/2 | 11 min | 6 min |
 | 05-payments | 2/2 | 8 min | 4 min |
+| 06-secure-downloads | 1/2 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (~20 min incl. human verify), 04-01 (3 min), 04-02 (8 min), 05-01 (3 min)
+- Last 5 plans: 04-01 (3 min), 04-02 (8 min), 05-01 (3 min), 05-02 (5 min), 06-01 (2 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -97,6 +98,11 @@ Recent decisions affecting current work:
 - [05-02]: MyLibrary renders EmptyLibrary directly (not wrapped) when no purchases — avoids duplicate headings since EmptyLibrary has its own heading
 - [05-02]: My Library takes full dashboard width (not half-grid) — responsive book card grid uses its own column breakpoints
 - [05-02]: EmptyRecentlyRead moved below MyLibrary with mt-6 — reflects content priority order
+- [06-01]: window.location.href (not <a download>) for presigned URL redirect — cross-origin download requires redirect not anchor tag
+- [06-01]: Download buttons hidden (not disabled) for unauthenticated/unpurchased users on detail page
+- [06-01]: Print link relocated to right-column metadata section (near ISBN/pages/dimensions) — was in left-column pricing area
+- [06-01]: Rate limit: 10 requests per user per book per format per 60 seconds — in-memory, resets on deploy
+- [06-01]: Presigned URL expiry: 900 seconds (15 minutes); fire-and-forget audit log via void prisma.download.create()
 
 ### Pending Todos
 
@@ -114,5 +120,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 05-02-PLAN.md (My Library dashboard integration, end-to-end purchase flow verified)
-Resume file: .planning/phases/06-*/06-01-PLAN.md (Phase 6 — next phase)
+Stopped at: Completed 06-01-PLAN.md (presigned URL download API, DownloadButton/DownloadDropdown, detail page wiring)
+Resume file: .planning/phases/06-secure-downloads/06-02-PLAN.md (Phase 6 Plan 02 — wire DownloadDropdown into LibraryBookCard and reader header)
