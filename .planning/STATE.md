@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 6 - Secure Downloads
+**Current focus:** Phase 7 - Admin Dashboard
 
 ## Current Position
 
-Phase: 6 of 8 (Secure Downloads) — COMPLETE
-Plan: 2 of 2 in current phase — COMPLETE; Phase 6 fully done; all three download placement locations operational
-Status: Phase 6 complete — proceed to Phase 7
-Last activity: 2026-02-19 — 06-02 complete: DownloadDropdown wired and end-to-end verified via Rodney (all 8 items passed)
+Phase: 7 of 8 (Admin Dashboard) — IN PROGRESS
+Plan: 1 of 3 in current phase — COMPLETE; admin foundation, IngestJob schema, book data table with TanStack Table
+Status: Phase 7 Plan 1 complete — proceed to Plan 2 (book editor / ingest uploader)
+Last activity: 2026-02-19 — 07-01 complete: Admin layout, book table, create/publish/delete actions all built and verified
 
-Progress: [██████████████████████░░] 75%
+Progress: [████████████████████████░] 79%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 7 min
-- Total execution time: 102 min
+- Total execution time: 105 min
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [██████████████████████░
 | 04-reader | 2/2 | 11 min | 6 min |
 | 05-payments | 2/2 | 8 min | 4 min |
 | 06-secure-downloads | 2/2 | 12 min | 6 min |
+| 07-admin-dashboard | 1/3 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (8 min), 05-01 (3 min), 05-02 (5 min), 06-01 (2 min), 06-02 (10 min)
+- Last 5 plans: 05-01 (3 min), 05-02 (5 min), 06-01 (2 min), 06-02 (10 min), 07-01 (3 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -106,6 +107,10 @@ Recent decisions affecting current work:
 - [Phase 06-02]: Card link isolation: Link wraps only cover+text; DownloadDropdown sits outside Link as sibling — prevents navigation when clicking download
 - [Phase 06-02]: Boolean-only prop boundary: raw pdfKey/epubKey strings never passed to client components; only !!pdfKey and !!epubKey booleans cross the server/client boundary
 - [Phase 06-02]: Download hidden when no artifacts: conditional render (hasPdf || hasEpub) ensures no empty dropdown appears for books without digital files
+- [07-01]: Admin route group (admin) is completely isolated from (main) layout — no Header/Footer, same isolation pattern as (auth)
+- [07-01]: requireAdmin() helper centralizes admin role check across all server actions — avoids repetition
+- [07-01]: CreateBookDialog extracted as client component so admin/page.tsx stays as a server component calling getAllBooksAdmin() directly
+- [07-01]: IngestJob migration created with --create-only (DB offline blocker still active from 01-01)
 
 ### Pending Todos
 
@@ -123,5 +128,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 06-02-PLAN.md (DownloadDropdown wired into LibraryBookCard and ReaderTopBar; end-to-end download flow verified via Rodney — Phase 6 complete)
-Resume file: .planning/phases/07-*/07-01-PLAN.md (Phase 7 — next phase)
+Stopped at: Completed 07-01-PLAN.md (Admin layout, IngestJob model, book data table with TanStack Table, create/publish/delete actions)
+Resume file: .planning/phases/07-admin-dashboard/07-02-PLAN.md (Phase 7 Plan 2 — book editor / ingest uploader)
