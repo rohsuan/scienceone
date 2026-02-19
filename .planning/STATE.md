@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 3 - Catalog
+**Current focus:** Phase 4 - Reader
 
 ## Current Position
 
-Phase: 3 of 8 (Catalog) — COMPLETE
-Plan: 2 of 2 in current phase — COMPLETE; Phase 3 fully done
-Status: Complete — 03-01 catalog listing, 03-02 book detail + preview pages all shipped
-Last activity: 2026-02-19 — 03-02 complete: /catalog/[slug] detail page with JSON-LD, /catalog/[slug]/preview sample chapter, KaTeX CSS fix
+Phase: 4 of 8 (Reader) — IN PROGRESS
+Plan: 1 of 2 in current phase — COMPLETE; 04-01 reader layout, chapter page, ToC, access control
+Status: In progress — 04-01 reader layout and chapter page shipped; 04-02 reading progress next
+Last activity: 2026-02-19 — 04-01 complete: /read/[bookSlug]/[chapterSlug] reader with KaTeX, ToC, access control
 
-Progress: [██████████] 37%
+Progress: [████████████] 42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 8 min
-- Total execution time: 66 min
+- Total execution time: 69 min
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [██████████] 37%
 | 01-foundation | 4/4 | 43 min | 11 min |
 | 02-ingest | 2/2 | 12 min | 6 min |
 | 03-catalog | 2/2 | 23 min | 12 min |
+| 04-reader | 1/2 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (5 min), 02-02 (7 min), 03-01 (3 min), 03-02 (~20 min incl. human verify)
+- Last 5 plans: 02-02 (7 min), 03-01 (3 min), 03-02 (~20 min incl. human verify), 04-01 (3 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -76,6 +77,12 @@ Recent decisions affecting current work:
 - [03-02]: Preview page uses dangerouslySetInnerHTML for chapter content — content is trusted (pre-rendered by our own ingest pipeline, not user input)
 - [03-02]: getPreviewChapter fallback: if no isFreePreview chapter, returns position === 1 chapter — ensures preview always renders
 - [03-02]: Schema.org JSON-LD rendered as script tag inside page component return (not in <head>) — Next.js App Router pattern
+- [04-01]: TocSidebar is client component to accept onNavigate callback — used in both server layout and mobile Sheet
+- [04-01]: MobileTocDrawer uses controlled open state (useState) not SheetTrigger — enables auto-close on chapter navigation
+- [04-01]: useSelectedLayoutSegment returns [chapterSlug] segment because TocNavLink renders inside [bookSlug]/layout.tsx
+- [04-01]: KaTeX display math overflow applied to [&_.katex-display] container not .katex — prevents double-scrollbar on mobile
+- [04-01]: canRead = openAccess OR freePreview OR hasPurchased — access control in page component as defense-in-depth
+- [04-01]: React.cache deduplicates getBookChapters called in both layout and chapter page within same request
 
 ### Pending Todos
 
@@ -93,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-02-PLAN.md (book detail page + sample preview)
-Resume file: .planning/phases/04-reader/ (Phase 4 - Reader, not yet planned)
+Stopped at: Completed 04-01-PLAN.md (reader layout, chapter page, ToC, access control)
+Resume file: .planning/phases/04-reader/04-02-PLAN.md (reading progress tracking)

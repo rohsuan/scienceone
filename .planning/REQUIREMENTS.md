@@ -17,9 +17,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Reader
 
-- [ ] **READ-01**: User can read book chapters in browser with correctly rendered LaTeX math formulas (KaTeX, server-side pre-rendered)
-- [ ] **READ-02**: User can navigate between chapters via table of contents sidebar
-- [ ] **READ-03**: Reader is responsive and usable on mobile devices and tablets
+- [x] **READ-01**: User can read book chapters in browser with correctly rendered LaTeX math formulas (KaTeX, server-side pre-rendered)
+- [x] **READ-02**: User can navigate between chapters via table of contents sidebar
+- [x] **READ-03**: Reader is responsive and usable on mobile devices and tablets
 - [ ] **READ-04**: User's reading progress is saved and restored when they return
 
 ### Authentication & Accounts
@@ -101,9 +101,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAT-03 | Phase 3 | Complete |
 | CAT-04 | Phase 3 | Complete |
 | CAT-05 | Phase 3 | Complete |
-| READ-01 | Phase 4 | Pending |
-| READ-02 | Phase 4 | Pending |
-| READ-03 | Phase 4 | Pending |
+| READ-01 | Phase 4 | Complete |
+| READ-02 | Phase 4 | Complete |
+| READ-03 | Phase 4 | Complete |
 | READ-04 | Phase 4 | Pending |
 | PAY-01 | Phase 5 | Pending |
 | PAY-02 | Phase 5 | Pending |
