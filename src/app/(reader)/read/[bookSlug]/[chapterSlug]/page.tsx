@@ -6,8 +6,11 @@ import {
   getChapter,
   getBookChapters,
   hasPurchased,
+  getReadingProgress,
 } from "@/lib/reader-queries";
 import ChapterNav from "@/components/reader/ChapterNav";
+import ScrollProgressTracker from "@/components/reader/ScrollProgressTracker";
+import ReadingProgressBar from "@/components/reader/ReadingProgressBar";
 
 interface PageProps {
   params: Promise<{ bookSlug: string; chapterSlug: string }>;
@@ -50,6 +53,16 @@ export default async function ChapterPage({ params }: PageProps) {
   // Fetch book chapters for navigation (React.cache deduplicates with layout call)
   const book = await getBookChapters(bookSlug);
 
+  // Load reading progress to restore scroll position for authenticated users
+  let scrollPercent: number | undefined;
+  if (session) {
+    const progress = await getReadingProgress(session.user.id, chapter.book.id);
+    // Only restore scroll if we're on the exact saved chapter
+    if (progress && progress.chapterId === chapter.id) {
+      scrollPercent = progress.scrollPercent;
+    }
+  }
+
   return (
     <div className="px-4 sm:px-6 lg:px-12 py-8 lg:py-12">
       {/* Chapter title */}
@@ -78,6 +91,18 @@ export default async function ChapterPage({ params }: PageProps) {
           currentChapterSlug={chapterSlug}
         />
       )}
+
+      {/* Scroll tracker: saves progress with 2s debounce and restores scroll on mount */}
+      <ScrollProgressTracker
+        key={chapter.id}
+        bookId={chapter.book.id}
+        chapterId={chapter.id}
+        isAuthenticated={!!session}
+        initialScrollPercent={scrollPercent}
+      />
+
+      {/* Visual progress bar at top of content area */}
+      <ReadingProgressBar />
     </div>
   );
 }

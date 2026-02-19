@@ -54,3 +54,11 @@ export const hasPurchased = cache(
     return !!result;
   }
 );
+
+export const getReadingProgress = cache(
+  async (userId: string, bookId: string) => {
+    return prisma.readingProgress.findUnique({
+      where: { userId_bookId: { userId, bookId } },
+    });
+  }
+);
