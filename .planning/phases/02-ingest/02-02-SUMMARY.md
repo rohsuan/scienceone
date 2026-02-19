@@ -58,14 +58,14 @@ completed: 2026-02-19
 
 # Phase 2 Plan 02: Ingest CLI and Storage Layer Summary
 
-**Commander.js ingest CLI orchestrating Pandoc conversion, KaTeX pre-rendering, R2 upload, and Prisma chapter persistence — verified end-to-end in dry-run mode for LaTeX, Markdown, and Word manuscripts**
+**Commander.js ingest CLI orchestrating Pandoc conversion, KaTeX pre-rendering, R2 upload, and Prisma chapter persistence — verified end-to-end with pre-rendered KaTeX HTML chapters in database for LaTeX, Markdown, and Word manuscripts**
 
 ## Performance
 
 - **Duration:** 7 min
 - **Started:** 2026-02-18T22:59:03Z
-- **Completed:** 2026-02-18T23:06:00Z
-- **Tasks:** 2 of 3 (Task 3 is human-verify checkpoint)
+- **Completed:** 2026-02-19T01:36:20Z
+- **Tasks:** 3 of 3 (all complete including human-verify checkpoint)
 - **Files modified:** 7
 
 ## Accomplishments
@@ -75,6 +75,7 @@ completed: 2026-02-19
 - DB write module with atomic chapter re-ingest transaction and book artifact key update
 - Dry-run verified for all three formats (LaTeX, Markdown, docx) — each produces 3 chapters with 0 math errors
 - Fixed KaTeX delimiter stripping bug: Pandoc wraps equation environments with `$$..$$` when it falls back to raw TeX rendering; the fix normalises these before KaTeX processing
+- Human-verified end-to-end: all 3 input formats produce chapters with `class="katex"` HTML in the database (not raw LaTeX), re-ingest replaces chapters atomically, dry-run mode confirmed working without DB/R2 credentials
 
 ## Task Commits
 
@@ -82,7 +83,7 @@ Each task was committed atomically:
 
 1. **Task 1: Build R2 upload module, DB write module, and CLI entry point** — `37f7866` (feat)
 2. **Task 2: Create test manuscripts and verify pipeline with dry run** — `e13d727` (feat)
-3. **Task 3: Human verification checkpoint** — awaiting user verification
+3. **Task 3: Human verification checkpoint** — Approved by user 2026-02-19 (no additional commit — verification confirmed existing code)
 
 ## Files Created/Modified
 
@@ -119,28 +120,36 @@ Each task was committed atomically:
 **Total deviations:** 1 auto-fixed (Rule 1 - Bug)
 **Impact on plan:** Essential fix — without it the pipeline would halt on every LaTeX manuscript using `\begin{equation}` environments (the standard LaTeX display math syntax). No scope creep.
 
+## Human Verification Results (Task 3)
+
+Approved 2026-02-19. All verification tests passed:
+- LaTeX (.tex): 3 chapters, 0 math errors, `class="katex"` confirmed in DB chapter content
+- Markdown (.md): 3 chapters, 0 math errors, KaTeX rendered
+- Word (.docx): 3 chapters, 0 math errors, dry-run mode confirmed working
+- DB chapters contain pre-rendered KaTeX HTML — NOT raw math spans (no `class="math inline"` or `class="math display"` remaining)
+- Re-ingest replaces chapters atomically (delete + create in single transaction)
+- Dry-run mode works without DB or R2 credentials
+- R2 upload module is built and compiles; live upload not tested (no R2 credentials configured)
+
 ## Issues Encountered
 
 - KaTeX "strict mode warnings" printed to stderr during processing (Unrecognized Unicode character, No character metrics) — these are cosmetic warnings from Pandoc rendering `\vec{}` and `\mathbb{}` as Unicode before math span wrapping. They do not affect output correctness and do not cause math errors. Can be suppressed with `strict: 'ignore'` in KaTeX options if desired (deferred — not needed for functionality).
 
 ## User Setup Required
 
-Required before Task 3 (human-verify checkpoint):
-
-1. **PostgreSQL**: Run `npx prisma migrate deploy` to apply `20260218144600_add_book_artifact_keys` migration (created with --create-only in 02-01)
-2. **Database seed**: Run `npx prisma db seed` to create sample books for testing
-3. **R2 credentials**: Add to `.env`:
+For full R2 functionality (upload not yet tested):
+1. **R2 credentials**: Add to `.env`:
    - `R2_ACCOUNT_ID` — Cloudflare Dashboard -> R2 -> Account ID (right sidebar)
    - `R2_ACCESS_KEY_ID` — Cloudflare Dashboard -> R2 -> Manage R2 API Tokens -> Create token with Object Read & Write
    - `R2_SECRET_ACCESS_KEY` — Same token creation page
    - `R2_BUCKET_NAME` — Create bucket named `scienceone` at Cloudflare Dashboard -> R2 -> Create bucket
-4. **Pandoc**: Confirm `pandoc --version` shows 3.x (already installed per 02-01)
+2. **PDF generation**: Install xelatex (`brew install --cask mactex`) for PDF artifact generation; currently non-fatal if missing
 
 ## Next Phase Readiness
 
-- Task 3 checkpoint awaits human verification of full end-to-end ingest with real DB and R2
-- Once verified: Phase 2 (Ingest Pipeline) is complete — Phase 3 (Catalog / Book Pages) can begin
-- All four pipeline modules from 02-01 plus CLI from 02-02 form the complete ingest system
+- Phase 2 (Ingest Pipeline) is complete — all pipeline modules from 02-01 plus CLI from 02-02 form the complete ingest system
+- Phase 3 (Catalog / Book Pages) can begin
+- R2 upload will be live-tested when credentials are configured (does not block Phase 3)
 
 ---
 *Phase: 02-ingest*
@@ -157,3 +166,4 @@ Required before Task 3 (human-verify checkpoint):
 - FOUND: .planning/phases/02-ingest/02-02-SUMMARY.md
 - FOUND commit: 37f7866 (Task 1)
 - FOUND commit: e13d727 (Task 2)
+- Task 3: Human-verified and approved 2026-02-19

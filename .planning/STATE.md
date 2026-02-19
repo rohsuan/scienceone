@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 2 of 8 (Ingest Pipeline)
-Plan: 2 of 2 in current phase (awaiting Task 3 human-verify checkpoint)
-Status: Checkpoint — human verification required for 02-02 Task 3
-Last activity: 2026-02-19 — 02-02 tasks 1-2 complete: R2 upload module, DB write module, ingest CLI, test fixtures, dry-run verified for LaTeX/Markdown/docx
+Phase: 2 of 8 (Ingest Pipeline) — COMPLETE
+Plan: 2 of 2 in current phase — COMPLETE (Phase 2 done)
+Status: Complete — Phase 2 (Ingest Pipeline) fully verified and done; ready for Phase 3 (Catalog)
+Last activity: 2026-02-19 — 02-02 Task 3 human-verified: all 3 formats produce KaTeX HTML chapters in DB, re-ingest atomic, dry-run confirmed
 
-Progress: [██████░░░░] 20%
+Progress: [████████░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 9 min
-- Total execution time: 48 min
+- Total execution time: 55 min
 
 **By Phase:**
 
@@ -84,5 +84,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Checkpoint in 02-02-PLAN.md Task 3 (human-verify) — dry-run pipeline complete, awaiting R2 credentials and DB for full end-to-end verification
-Resume file: .planning/phases/02-ingest/02-02-PLAN.md (Task 3 checkpoint)
+Stopped at: Completed 02-02-PLAN.md — Phase 2 (Ingest Pipeline) fully complete; next is Phase 3 (Catalog / Book Pages)
+Resume file: .planning/phases/03-catalog/ (Phase 3 plans)
