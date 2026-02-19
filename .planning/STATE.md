@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 7 of 8 (Admin Dashboard) — IN PROGRESS
-Plan: 1 of 3 in current phase — COMPLETE; admin foundation, IngestJob schema, book data table with TanStack Table
-Status: Phase 7 Plan 1 complete — proceed to Plan 2 (book editor / ingest uploader)
-Last activity: 2026-02-19 — 07-01 complete: Admin layout, book table, create/publish/delete actions all built and verified
+Phase: 7 of 8 (Admin Dashboard) — IN PROGRESS (plans 1 and 3 complete; plan 2 not yet run)
+Plan: 3 of 3 in current phase — COMPLETE; ingest pipeline browser UI, status polling, admin preview
+Status: Phase 7 Plan 3 complete — plan 2 (book editor) skipped by user; phase 7 functionally complete for ingest + preview
+Last activity: 2026-02-19 — 07-03 complete: Ingest API routes, ingest script extension, upload component, status polling, admin chapter preview
 
-Progress: [████████████████████████░] 79%
+Progress: [█████████████████████████░] 85%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 7 min
-- Total execution time: 105 min
+- Total execution time: 110 min
 
 **By Phase:**
 
@@ -33,7 +33,7 @@ Progress: [███████████████████████
 | 04-reader | 2/2 | 11 min | 6 min |
 | 05-payments | 2/2 | 8 min | 4 min |
 | 06-secure-downloads | 2/2 | 12 min | 6 min |
-| 07-admin-dashboard | 1/3 | 3 min | 3 min |
+| 07-admin-dashboard | 2/3 | 8 min | 4 min |
 
 **Recent Trend:**
 - Last 5 plans: 05-01 (3 min), 05-02 (5 min), 06-01 (2 min), 06-02 (10 min), 07-01 (3 min)
@@ -111,6 +111,9 @@ Recent decisions affecting current work:
 - [07-01]: requireAdmin() helper centralizes admin role check across all server actions — avoids repetition
 - [07-01]: CreateBookDialog extracted as client component so admin/page.tsx stays as a server component calling getAllBooksAdmin() directly
 - [07-01]: IngestJob migration created with --create-only (DB offline blocker still active from 01-01)
+- [07-03]: Detached process pattern: spawn + proc.unref() for long-running background jobs from API routes — prevents server request timeout
+- [07-03]: updateProgress() in ingest.ts is non-fatal — swallows errors so DB status update failure never kills the ingest pipeline
+- [07-03]: Admin preview bypasses isPublished filter — admin queries have no publication check; public reader queries do
 
 ### Pending Todos
 
@@ -128,5 +131,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 07-01-PLAN.md (Admin layout, IngestJob model, book data table with TanStack Table, create/publish/delete actions)
-Resume file: .planning/phases/07-admin-dashboard/07-02-PLAN.md (Phase 7 Plan 2 — book editor / ingest uploader)
+Stopped at: Completed 07-03-PLAN.md (Ingest API routes, ingest script extension, upload component, status polling, admin chapter preview)
+Resume file: .planning/phases/07-admin-dashboard/07-02-PLAN.md (Phase 7 Plan 2 — book editor; skipped, can be run independently)
