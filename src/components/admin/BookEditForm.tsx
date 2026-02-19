@@ -37,6 +37,7 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
     coverImage: book.coverImage ?? null,
     isbn: book.isbn ?? null,
     pageCount: book.pageCount ?? null,
+    publishYear: book.publishYear ?? null,
     dimensions: book.dimensions ?? null,
     printLink: book.printLink ?? null,
     isOpenAccess: book.isOpenAccess,
@@ -133,6 +134,16 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
             <div className="space-y-1.5">
               <Label htmlFor="isbn">ISBN</Label>
               <Input id="isbn" {...register("isbn")} placeholder="978-..." />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="publishYear">Publication Year</Label>
+              <Input
+                id="publishYear"
+                type="number"
+                {...register("publishYear", { valueAsNumber: true })}
+                placeholder="e.g. 2024"
+              />
             </div>
 
             <div className="space-y-1.5">
