@@ -1,10 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { headers } from "next/headers";
 import { getBookBySlug } from "@/lib/book-queries";
+import { auth } from "@/lib/auth";
+import { hasPurchasedBySlug } from "@/lib/purchase-queries";
 import BookCoverImage from "@/components/catalog/BookCoverImage";
 import CategoryBadge from "@/components/catalog/CategoryBadge";
 import TableOfContents from "@/components/catalog/TableOfContents";
+import BuyButton from "@/components/catalog/BuyButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +42,11 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 
   if (!book) notFound();
 
+  const session = await auth.api.getSession({ headers: await headers() });
+  const purchased = session
+    ? await hasPurchasedBySlug(session.user.id, book.slug)
+    : false;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Book",
@@ -67,13 +76,36 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
           {/* Pricing */}
           <div className="flex flex-col gap-2">
             {book.isOpenAccess ? (
-              <Badge className="w-fit bg-green-600 hover:bg-green-700 text-white">
-                Open Access
-              </Badge>
+              <>
+                <Badge className="w-fit bg-green-600 hover:bg-green-700 text-white">
+                  Open Access
+                </Badge>
+                <Button className="w-full" asChild>
+                  <Link href={`/read/${book.slug}`}>Read Free</Link>
+                </Button>
+              </>
             ) : book.pricing ? (
-              <p className="text-sm text-muted-foreground">
-                ${Number(book.pricing.amount).toFixed(2)}
-              </p>
+              <>
+                <p className="text-sm text-muted-foreground">
+                  ${Number(book.pricing.amount).toFixed(2)}
+                </p>
+                {purchased ? (
+                  <Button className="w-full" asChild>
+                    <Link href={`/read/${book.slug}`}>Read Now</Link>
+                  </Button>
+                ) : session ? (
+                  <BuyButton
+                    bookId={book.id}
+                    price={Number(book.pricing.amount)}
+                  />
+                ) : (
+                  <Button className="w-full" asChild>
+                    <Link href={`/sign-in?redirect=/catalog/${book.slug}`}>
+                      Sign In to Purchase
+                    </Link>
+                  </Button>
+                )}
+              </>
             ) : null}
 
             {/* Read Sample button */}
