@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Ingest Pipeline** - Manuscript conversion to pre-rendered HTML/PDF/EPUB with KaTeX math (completed 2026-02-19)
 - [x] **Phase 3: Catalog and Discovery** - Public book browsing, search, detail pages, and SEO (completed 2026-02-19)
 - [x] **Phase 4: Browser Reader** - In-browser chapter reading with LaTeX math and navigation (completed 2026-02-19)
-- [ ] **Phase 5: Payments and Entitlement** - Stripe checkout, webhook-driven access grants, and My Library
+- [x] **Phase 5: Payments and Entitlement** - Stripe checkout, webhook-driven access grants, and My Library (completed 2026-02-19)
 - [ ] **Phase 6: Secure Downloads** - Purchase-verified presigned URL delivery for PDF and EPUB files
 - [ ] **Phase 7: Admin Dashboard** - Browser-based book management UI for the founder
 - [ ] **Phase 8: Reader Enhancements** - Sample preview, reading progress, and academic citation export
@@ -89,8 +89,8 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User can view all purchased books in My Library with links to read each one
   5. User receives a purchase confirmation email with book title and access instructions within minutes of payment
 **Plans**: 2 plans
-- [ ] 05-01-PLAN.md — Stripe checkout flow, webhook-driven access grant, and purchase confirmation email
-- [ ] 05-02-PLAN.md — My Library dashboard integration and end-to-end purchase flow verification
+- [x] 05-01-PLAN.md — Stripe checkout flow, webhook-driven access grant, and purchase confirmation email
+- [x] 05-02-PLAN.md — My Library dashboard integration and end-to-end purchase flow verification
 
 ### Phase 6: Secure Downloads
 **Goal**: Users with access to a book can download its PDF and EPUB files via time-limited presigned URLs; unauthenticated or unpurchased requests are rejected; print purchase links are visible on detail pages
@@ -135,7 +135,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Ingest Pipeline | 2/2 | Complete   | 2026-02-19 |
 | 3. Catalog and Discovery | 2/2 | Complete    | 2026-02-19 |
 | 4. Browser Reader | 2/2 | Complete    | 2026-02-19 |
-| 5. Payments and Entitlement | 1/2 | In Progress|  |
+| 5. Payments and Entitlement | 2/2 | Complete   | 2026-02-19 |
 | 6. Secure Downloads | 0/TBD | Not started | - |
 | 7. Admin Dashboard | 0/TBD | Not started | - |
 | 8. Reader Enhancements | 0/TBD | Not started | - |

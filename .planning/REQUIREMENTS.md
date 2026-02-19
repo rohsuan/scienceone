@@ -26,7 +26,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **AUTH-01**: User can create an account with email and password
 - [x] **AUTH-02**: User can log in and maintain a session across browser refresh
-- [ ] **AUTH-03**: User can view their purchased books in My Library
+- [x] **AUTH-03**: User can view their purchased books in My Library
 - [x] **AUTH-04**: User receives email confirmation after purchase with access details
 
 ### Payments & Monetization
@@ -109,7 +109,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAY-02 | Phase 5 | Complete |
 | PAY-03 | Phase 5 | Complete |
 | PAY-04 | Phase 5 | Complete |
-| AUTH-03 | Phase 5 | Pending |
+| AUTH-03 | Phase 5 | Complete (05-02) |
 | AUTH-04 | Phase 5 | Complete |
 | DL-01 | Phase 6 | Pending |
 | DL-02 | Phase 6 | Pending |
@@ -127,4 +127,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after 01-04 completion — AUTH-01, AUTH-02 human-verified end-to-end (all 7 flows passed)*
+*Last updated: 2026-02-19 after 05-02 completion — AUTH-03 complete (My Library dashboard integration, human-verified)*
