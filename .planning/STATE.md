@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 3 of 8 (Catalog) — In Progress
-Plan: 1 of 2 in current phase — COMPLETE; 1 remaining (03-02 book detail page)
-Status: In Progress — 03-01 catalog listing page complete; 03-02 book detail page next
-Last activity: 2026-02-19 — 03-01 complete: /catalog page with URL-driven filter/sort/search, BookCard components, next/image R2 remotePatterns
+Phase: 3 of 8 (Catalog) — COMPLETE
+Plan: 2 of 2 in current phase — COMPLETE; Phase 3 fully done
+Status: Complete — 03-01 catalog listing, 03-02 book detail + preview pages all shipped
+Last activity: 2026-02-19 — 03-02 complete: /catalog/[slug] detail page with JSON-LD, /catalog/[slug]/preview sample chapter, KaTeX CSS fix
 
-Progress: [█████████░] 31%
+Progress: [██████████] 37%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 8 min
-- Total execution time: 58 min
+- Total execution time: 66 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [█████████░] 31%
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 43 min | 11 min |
 | 02-ingest | 2/2 | 12 min | 6 min |
-| 03-catalog | 1/2 | 3 min | 3 min |
+| 03-catalog | 2/2 | 23 min | 12 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-04 (15 min), 02-01 (5 min), 02-02 (7 min), 03-01 (3 min)
+- Last 5 plans: 02-01 (5 min), 02-02 (7 min), 03-01 (3 min), 03-02 (~20 min incl. human verify)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -72,6 +72,10 @@ Recent decisions affecting current work:
 - [Phase 03-catalog]: searchParams in Next.js 16 page is a Promise — must await before reading keys
 - [Phase 03-catalog]: Suspense boundaries required around SearchInput and CatalogFilters because useSearchParams() requires Suspense in App Router
 - [Phase 03-catalog]: URL-driven filter state pattern: client components use router.replace() with URLSearchParams; server page reads awaited searchParams
+- [03-02]: KaTeX CSS must be imported in root layout (src/app/layout.tsx) — pre-rendered math HTML requires stylesheet available on page load
+- [03-02]: Preview page uses dangerouslySetInnerHTML for chapter content — content is trusted (pre-rendered by our own ingest pipeline, not user input)
+- [03-02]: getPreviewChapter fallback: if no isFreePreview chapter, returns position === 1 chapter — ensures preview always renders
+- [03-02]: Schema.org JSON-LD rendered as script tag inside page component return (not in <head>) — Next.js App Router pattern
 
 ### Pending Todos
 
@@ -89,5 +93,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 03-01-PLAN.md (catalog listing page)
-Resume file: .planning/phases/03-catalog/03-02-PLAN.md
+Stopped at: Completed 03-02-PLAN.md (book detail page + sample preview)
+Resume file: .planning/phases/04-reader/ (Phase 4 - Reader, not yet planned)

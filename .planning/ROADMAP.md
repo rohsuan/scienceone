@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Next.js 16 project scaffold, PostgreSQL schema, and user authentication
 - [x] **Phase 2: Ingest Pipeline** - Manuscript conversion to pre-rendered HTML/PDF/EPUB with KaTeX math (completed 2026-02-19)
-- [ ] **Phase 3: Catalog and Discovery** - Public book browsing, search, detail pages, and SEO
+- [x] **Phase 3: Catalog and Discovery** - Public book browsing, search, detail pages, and SEO (completed 2026-02-19)
 - [ ] **Phase 4: Browser Reader** - In-browser chapter reading with LaTeX math and navigation
 - [ ] **Phase 5: Payments and Entitlement** - Stripe checkout, webhook-driven access grants, and My Library
 - [ ] **Phase 6: Secure Downloads** - Purchase-verified presigned URL delivery for PDF and EPUB files
@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-02-18 |
 | 2. Ingest Pipeline | 2/2 | Complete   | 2026-02-19 |
-| 3. Catalog and Discovery | 1/2 | In Progress|  |
+| 3. Catalog and Discovery | 2/2 | Complete   | 2026-02-19 |
 | 4. Browser Reader | 0/TBD | Not started | - |
 | 5. Payments and Entitlement | 0/TBD | Not started | - |
 | 6. Secure Downloads | 0/TBD | Not started | - |

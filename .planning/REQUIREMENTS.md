@@ -10,10 +10,10 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Catalog & Discovery
 
 - [x] **CAT-01**: User can browse book catalog with category filters and sorting
-- [ ] **CAT-02**: User can view book detail page with cover, synopsis, author bio/photo, table of contents, ISBN, pricing, and print metadata
+- [x] **CAT-02**: User can view book detail page with cover, synopsis, author bio/photo, table of contents, ISBN, pricing, and print metadata
 - [x] **CAT-03**: User can search catalog by title, author, and subject
-- [ ] **CAT-04**: User can preview a sample chapter before purchasing
-- [ ] **CAT-05**: Book pages include Schema.org Book structured data for SEO
+- [x] **CAT-04**: User can preview a sample chapter before purchasing
+- [x] **CAT-05**: Book pages include Schema.org Book structured data for SEO
 
 ### Reader
 
@@ -97,10 +97,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADM-01 | Phase 2 | Complete |
 | ADM-02 | Phase 2 | Complete |
 | CAT-01 | Phase 3 | Complete |
-| CAT-02 | Phase 3 | Pending |
+| CAT-02 | Phase 3 | Complete |
 | CAT-03 | Phase 3 | Complete |
-| CAT-04 | Phase 3 | Pending |
-| CAT-05 | Phase 3 | Pending |
+| CAT-04 | Phase 3 | Complete |
+| CAT-05 | Phase 3 | Complete |
 | READ-01 | Phase 4 | Pending |
 | READ-02 | Phase 4 | Pending |
 | READ-03 | Phase 4 | Pending |
