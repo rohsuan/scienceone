@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 4 - Reader
+**Current focus:** Phase 5 - Payments and Entitlement
 
 ## Current Position
 
-Phase: 4 of 8 (Reader) — COMPLETE
-Plan: 2 of 2 in current phase — COMPLETE; 04-02 reading progress persistence, scroll tracker, progress bar
-Status: Complete — Phase 4 done; all reader features shipped (ToC, KaTeX, access control, reading progress)
-Last activity: 2026-02-19 — 04-02 complete: reading progress API, scroll tracker, resume redirect, visual progress bar
+Phase: 5 of 8 (Payments and Entitlement) — IN PROGRESS
+Plan: 1 of 2 in current phase — COMPLETE; 05-01 Stripe checkout, webhook, purchase confirmation email
+Status: In progress — Phase 5 Plan 1 done; Stripe checkout flow, webhook access grant, receipt email shipped
+Last activity: 2026-02-19 — 05-01 complete: Stripe SDK, checkout action, buy button, webhook handler, purchase email
 
-Progress: [██████████████] 46%
+Progress: [████████████████] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 8 min
-- Total execution time: 77 min
+- Total plans completed: 11
+- Average duration: 7 min
+- Total execution time: 80 min
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [██████████████] 46%
 | 02-ingest | 2/2 | 12 min | 6 min |
 | 03-catalog | 2/2 | 23 min | 12 min |
 | 04-reader | 2/2 | 11 min | 6 min |
+| 05-payments | 1/2 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (3 min), 03-02 (~20 min incl. human verify), 04-01 (3 min), 04-02 (8 min)
+- Last 5 plans: 03-02 (~20 min incl. human verify), 04-01 (3 min), 04-02 (8 min), 05-01 (3 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -88,6 +89,11 @@ Recent decisions affecting current work:
 - [04-02]: initialScrollPercent only set when progress.chapterId === chapter.id — no cross-chapter scroll restoration
 - [04-02]: Anonymous users always start at chapter 1 with no progress tracking — per locked decision from research
 - [04-02]: 2-second debounce via useDebouncedCallback prevents excessive API calls during active scrolling
+- [05-01]: Stripe-hosted checkout (redirect) used — not embedded Elements; no @stripe/stripe-js needed
+- [05-01]: Access granted via webhook (checkout.session.completed), never via success page redirect — prevents access without confirmed payment
+- [05-01]: request.text() must be used in webhook route (not request.json()) — Stripe signature verification requires raw body
+- [05-01]: Purchase confirmation email is fire-and-forget (void) — email failure does not block purchase completion
+- [05-01]: Duplicate webhook events handled by Prisma upsert on @@unique([userId, bookId]) — idempotent by design
 
 ### Pending Todos
 
@@ -105,5 +111,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-02-PLAN.md (reading progress persistence, scroll tracker, progress bar)
-Resume file: .planning/phases/05-payments/ (Phase 5 — Payments; purchase flow, Stripe integration, My Library)
+Stopped at: Completed 05-01-PLAN.md (Stripe checkout, webhook, purchase confirmation email)
+Resume file: .planning/phases/05-payments-and-entitlement/05-02-PLAN.md (Phase 5 Plan 2 — My Library)

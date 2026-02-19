@@ -27,14 +27,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **AUTH-01**: User can create an account with email and password
 - [x] **AUTH-02**: User can log in and maintain a session across browser refresh
 - [ ] **AUTH-03**: User can view their purchased books in My Library
-- [ ] **AUTH-04**: User receives email confirmation after purchase with access details
+- [x] **AUTH-04**: User receives email confirmation after purchase with access details
 
 ### Payments & Monetization
 
-- [ ] **PAY-01**: User can purchase full book access via Stripe checkout
-- [ ] **PAY-02**: Publisher can mark books as open access (free, no paywall)
-- [ ] **PAY-03**: Open access books are readable and downloadable without purchase
-- [ ] **PAY-04**: Purchase entitlement is granted via Stripe webhook (idempotent, not via redirect)
+- [x] **PAY-01**: User can purchase full book access via Stripe checkout
+- [x] **PAY-02**: Publisher can mark books as open access (free, no paywall)
+- [x] **PAY-03**: Open access books are readable and downloadable without purchase
+- [x] **PAY-04**: Purchase entitlement is granted via Stripe webhook (idempotent, not via redirect)
 
 ### Downloads
 
@@ -105,12 +105,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-02 | Phase 4 | Complete |
 | READ-03 | Phase 4 | Complete |
 | READ-04 | Phase 4 | Complete |
-| PAY-01 | Phase 5 | Pending |
-| PAY-02 | Phase 5 | Pending |
-| PAY-03 | Phase 5 | Pending |
-| PAY-04 | Phase 5 | Pending |
+| PAY-01 | Phase 5 | Complete |
+| PAY-02 | Phase 5 | Complete |
+| PAY-03 | Phase 5 | Complete |
+| PAY-04 | Phase 5 | Complete |
 | AUTH-03 | Phase 5 | Pending |
-| AUTH-04 | Phase 5 | Pending |
+| AUTH-04 | Phase 5 | Complete |
 | DL-01 | Phase 6 | Pending |
 | DL-02 | Phase 6 | Pending |
 | DL-03 | Phase 6 | Pending |
