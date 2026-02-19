@@ -115,7 +115,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Founder can set each book's access model (pay-per-book or open access) from the dashboard
   4. Founder can preview ingested book content — reading the chapters as a user would — before publishing the book to the public catalog
   5. Founder can publish and unpublish books; unpublished books are invisible to catalog and search
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 07-01-PLAN.md — Admin layout, route protection, IngestJob schema, book data table with create/publish/delete
+- [ ] 07-02-PLAN.md — Book metadata edit form with tabs, image uploads, category management, access model
+- [ ] 07-03-PLAN.md — Manuscript upload, ingest pipeline integration, status polling, admin preview
 
 ### Phase 8: Reader Enhancements
 **Goal**: The reading and academic experience is polished — users can export citations in standard academic formats, and reading progress is reliable across all access paths including open-access books
