@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 8 - Reader Enhancements — COMPLETE
+**Current focus:** Phase 9 - Audit Gap Closure — COMPLETE
 
 ## Current Position
 
-Phase: 8 of 8 (Reader Enhancements) — COMPLETE
+Phase: 9 of 9 (Audit Gap Closure) — COMPLETE
 Plan: 1 of 1 in current phase — ALL COMPLETE
-Status: Phase 8 complete — all 1 plans done (academic citation export with BibTeX, APA, publishYear schema)
-Last activity: 2026-02-20 — 08-01 complete: citation export with BibTeX/APA, CitationExport component, publishYear field, admin form integration
+Status: Phase 9 complete — all 1 plans done (Zod NaN-to-null, sign-in redirect, open access anonymous download)
+Last activity: 2026-02-20 — 09-01 complete: Zod NaN fix, sign-in redirect prop flow, open access anonymous download UI and API
 
 Progress: [████████████████████████████] 100%
 
@@ -41,6 +41,7 @@ Progress: [███████████████████████
 
 *Updated after each plan completion*
 | Phase 08-reader-enhancements P01 | 3 | 2 tasks | 7 files |
+| Phase 09 P01 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,7 @@ Recent decisions affecting current work:
 - [Phase 08-reader-enhancements]: publishYear Int? added to Book schema — createdAt is ingestion date, not publication year; admin override field needed for accurate academic citations
 - [Phase 08-reader-enhancements]: APA author name used as-is (not parsed to Last, First) — free-form names like multi-word surnames break if split on spaces
 - [Phase 08-reader-enhancements]: BibTeX citation key sanitized with .replace(/[^a-zA-Z0-9]/g, '') to prevent invalid keys from names like O'Brien or García
+- [Phase 09]: [09-01] z.union([z.number(), z.nan().transform(() => null)]) used instead of z.preprocess for NaN-to-null — z.preprocess makes input type unknown, breaking @hookform/resolvers type inference in Zod 4
 
 ### Pending Todos
 
@@ -138,5 +140,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 08-01-PLAN.md (Academic citation export: BibTeX, APA, CitationExport component, publishYear schema field, admin form integration)
-Resume file: Phase 8 complete (all 1 plans done). All 8 phases complete — project MVP delivered.
+Stopped at: Completed 09-01-PLAN.md (Audit gap closure: Zod NaN-to-null, sign-in redirect, open access anonymous download)
+Resume file: Phase 9 complete (all 1 plans done). All 9 phases complete — all v1 gaps closed, MVP fully delivered.

@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Secure Downloads** - Purchase-verified presigned URL delivery for PDF and EPUB files (completed 2026-02-19)
 - [x] **Phase 7: Admin Dashboard** - Browser-based book management UI for the founder (completed 2026-02-19)
 - [ ] **Phase 8: Reader Enhancements** - Sample preview, reading progress, and academic citation export
-- [ ] **Phase 9: Audit Gap Closure** - Fix admin form validation, sign-in redirect, and open access download auth
+- [x] **Phase 9: Audit Gap Closure** - Fix admin form validation, sign-in redirect, and open access download auth (completed 2026-02-19)
 
 ## Phase Details
 
@@ -159,4 +159,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Secure Downloads | 2/2 | Complete    | 2026-02-19 |
 | 7. Admin Dashboard | 3/3 | Complete    | 2026-02-19 |
 | 8. Reader Enhancements | 1/1 | Complete | 2026-02-20 |
-| 9. Audit Gap Closure | 0/1 | Not started | - |
+| 9. Audit Gap Closure | 1/1 | Complete   | 2026-02-19 |
