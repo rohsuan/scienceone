@@ -89,6 +89,7 @@ model Book {
   printLink    String?
   isPublished  Boolean        @default(false)
   isOpenAccess Boolean        @default(false)
+  publishYear  Int?                              // Publication year for citation export; falls back to createdAt year
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   chapters     Chapter[]

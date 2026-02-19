@@ -11,9 +11,11 @@ import CategoryBadge from "@/components/catalog/CategoryBadge";
 import TableOfContents from "@/components/catalog/TableOfContents";
 import BuyButton from "@/components/catalog/BuyButton";
 import DownloadButton from "@/components/catalog/DownloadButton";
+import CitationExport from "@/components/catalog/CitationExport";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import type { CitationData } from "@/lib/citation";
 
 interface BookDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -48,6 +50,15 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   const purchased = session
     ? await hasPurchasedBySlug(session.user.id, book.slug)
     : false;
+
+  const citationData: CitationData = {
+    title: book.title,
+    authorName: book.authorName,
+    isbn: book.isbn,
+    slug: book.slug,
+    publishYear: book.publishYear,
+    createdAt: book.createdAt,
+  };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -216,6 +227,10 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               </dl>
             </>
           )}
+
+          {/* Citation export */}
+          <Separator className="my-6" />
+          <CitationExport book={citationData} />
         </div>
       </div>
     </div>
