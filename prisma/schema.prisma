@@ -98,6 +98,7 @@ model Book {
   downloads    Download[]
   pdfKey       String?    // R2 storage key: "books/{slug}/{slug}.pdf"
   epubKey      String?    // R2 storage key: "books/{slug}/{slug}.epub"
+  ingestJobs   IngestJob[]
 
   @@map("books")
 }
@@ -177,6 +178,20 @@ model Download {
   downloadedAt DateTime @default(now())
 
   @@map("downloads")
+}
+
+model IngestJob {
+  id        String   @id @default(cuid())
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  r2Key     String
+  status    String   @default("pending")   // pending | processing | success | error
+  progress  String?                         // JSON: { step: string, pct: number }
+  error     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ingest_jobs")
 }
 
 model ReadingProgress {
