@@ -56,6 +56,33 @@ export async function writeChapters(
 }
 
 /**
+ * Update the status, progress, and error fields of an IngestJob record.
+ *
+ * Called by the ingest script at each pipeline step so the browser UI can
+ * poll the job and display real-time progress.
+ *
+ * @param jobId    - The IngestJob record ID
+ * @param status   - New status string: "processing" | "success" | "error"
+ * @param progress - JSON string `{ step: string, pct: number }` or null to leave unchanged
+ * @param error    - Error message / health report JSON or null to leave unchanged
+ */
+export async function updateIngestJob(
+  jobId: string,
+  status: string,
+  progress?: string | null,
+  error?: string | null,
+): Promise<void> {
+  await prisma.ingestJob.update({
+    where: { id: jobId },
+    data: {
+      status,
+      ...(progress !== undefined && { progress }),
+      ...(error !== undefined && { error }),
+    },
+  });
+}
+
+/**
  * Update a Book record with R2 artifact storage keys.
  *
  * Only updates non-null fields — pass null to leave a field unchanged.
