@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 4 of 8 (Reader) — IN PROGRESS
-Plan: 1 of 2 in current phase — COMPLETE; 04-01 reader layout, chapter page, ToC, access control
-Status: In progress — 04-01 reader layout and chapter page shipped; 04-02 reading progress next
-Last activity: 2026-02-19 — 04-01 complete: /read/[bookSlug]/[chapterSlug] reader with KaTeX, ToC, access control
+Phase: 4 of 8 (Reader) — COMPLETE
+Plan: 2 of 2 in current phase — COMPLETE; 04-02 reading progress persistence, scroll tracker, progress bar
+Status: Complete — Phase 4 done; all reader features shipped (ToC, KaTeX, access control, reading progress)
+Last activity: 2026-02-19 — 04-02 complete: reading progress API, scroll tracker, resume redirect, visual progress bar
 
-Progress: [████████████] 42%
+Progress: [██████████████] 46%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 8 min
-- Total execution time: 69 min
+- Total execution time: 77 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [████████████] 42%
 | 01-foundation | 4/4 | 43 min | 11 min |
 | 02-ingest | 2/2 | 12 min | 6 min |
 | 03-catalog | 2/2 | 23 min | 12 min |
-| 04-reader | 1/2 | 3 min | 3 min |
+| 04-reader | 2/2 | 11 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (7 min), 03-01 (3 min), 03-02 (~20 min incl. human verify), 04-01 (3 min)
+- Last 5 plans: 03-01 (3 min), 03-02 (~20 min incl. human verify), 04-01 (3 min), 04-02 (8 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -83,6 +83,11 @@ Recent decisions affecting current work:
 - [04-01]: KaTeX display math overflow applied to [&_.katex-display] container not .katex — prevents double-scrollbar on mobile
 - [04-01]: canRead = openAccess OR freePreview OR hasPurchased — access control in page component as defense-in-depth
 - [04-01]: React.cache deduplicates getBookChapters called in both layout and chapter page within same request
+- [04-02]: ScrollProgressTracker returns null — purely behavioral component with no UI of its own
+- [04-02]: key={chapter.id} on ScrollProgressTracker forces fresh remount on chapter navigation, preventing stale initialScrollPercent from restoring wrong scroll position
+- [04-02]: initialScrollPercent only set when progress.chapterId === chapter.id — no cross-chapter scroll restoration
+- [04-02]: Anonymous users always start at chapter 1 with no progress tracking — per locked decision from research
+- [04-02]: 2-second debounce via useDebouncedCallback prevents excessive API calls during active scrolling
 
 ### Pending Todos
 
@@ -100,5 +105,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-01-PLAN.md (reader layout, chapter page, ToC, access control)
-Resume file: .planning/phases/04-reader/04-02-PLAN.md (reading progress tracking)
+Stopped at: Completed 04-02-PLAN.md (reading progress persistence, scroll tracker, progress bar)
+Resume file: .planning/phases/05-payments/ (Phase 5 — Payments; purchase flow, Stripe integration, My Library)
