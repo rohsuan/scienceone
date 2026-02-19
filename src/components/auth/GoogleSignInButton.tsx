@@ -4,7 +4,7 @@ import { useState } from "react"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 
-export function GoogleSignInButton() {
+export function GoogleSignInButton({ redirectTo = "/dashboard" }: { redirectTo?: string }) {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleGoogleSignIn = async () => {
@@ -12,7 +12,7 @@ export function GoogleSignInButton() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: redirectTo,
       })
     } catch {
       // Redirect errors are expected during OAuth flow

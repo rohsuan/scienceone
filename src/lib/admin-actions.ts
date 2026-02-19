@@ -69,12 +69,21 @@ export const bookUpdateSchema = z.object({
   synopsis: z.string().optional().nullable(),
   coverImage: z.string().optional().nullable(),
   isbn: z.string().optional().nullable(),
-  pageCount: z.number().int().positive().optional().nullable(),
-  publishYear: z.number().int().positive().optional().nullable(),
+  pageCount: z.union([
+    z.number().int().positive(),
+    z.nan().transform(() => null),
+  ]).optional().nullable(),
+  publishYear: z.union([
+    z.number().int().positive(),
+    z.nan().transform(() => null),
+  ]).optional().nullable(),
   dimensions: z.string().optional().nullable(),
   printLink: z.string().optional().nullable(),
   isOpenAccess: z.boolean(),
-  price: z.number().nonnegative().optional().nullable(),
+  price: z.union([
+    z.number().nonnegative(),
+    z.nan().transform(() => null),
+  ]).optional().nullable(),
   categoryIds: z.array(z.string()),
 });
 

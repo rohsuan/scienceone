@@ -11,7 +11,17 @@ export const metadata: Metadata = {
   description: "Sign in to your ScienceOne account and continue reading.",
 }
 
-export default function SignInPage() {
+interface SignInPageProps {
+  searchParams: Promise<{ redirect?: string }>
+}
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const params = await searchParams
+  const raw = params.redirect ?? ""
+  // Only accept paths starting with / but not // (prevents open redirect)
+  const redirectTo =
+    raw.startsWith("/") && !raw.startsWith("//") ? raw : "/dashboard"
+
   return (
     <AuthCard
       title="Welcome back"
@@ -29,7 +39,7 @@ export default function SignInPage() {
       }
     >
       <div className="space-y-4">
-        <SignInForm />
+        <SignInForm redirectTo={redirectTo} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -40,7 +50,7 @@ export default function SignInPage() {
           </div>
         </div>
 
-        <GoogleSignInButton />
+        <GoogleSignInButton redirectTo={redirectTo} />
       </div>
     </AuthCard>
   )

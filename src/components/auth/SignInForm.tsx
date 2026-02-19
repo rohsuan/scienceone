@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 
-export function SignInForm() {
+export function SignInForm({ redirectTo = "/dashboard" }: { redirectTo?: string }) {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
 
@@ -58,7 +58,7 @@ export function SignInForm() {
     }
 
     if (data) {
-      router.push("/dashboard")
+      router.push(redirectTo)
     }
   }
 
