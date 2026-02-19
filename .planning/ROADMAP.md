@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Secure Downloads** - Purchase-verified presigned URL delivery for PDF and EPUB files (completed 2026-02-19)
 - [x] **Phase 7: Admin Dashboard** - Browser-based book management UI for the founder (completed 2026-02-19)
 - [ ] **Phase 8: Reader Enhancements** - Sample preview, reading progress, and academic citation export
+- [ ] **Phase 9: Audit Gap Closure** - Fix admin form validation, sign-in redirect, and open access download auth
 
 ## Phase Details
 
@@ -130,10 +131,23 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 1 plan
 - [ ] 08-01-PLAN.md — Citation export (BibTeX + APA) with publishYear schema field and admin form integration
 
+### Phase 9: Audit Gap Closure
+**Goal**: All v1 audit gaps are resolved — admin form numeric fields save correctly, sign-in redirects users back to their intended destination, and open access books are downloadable without an account
+**Depends on**: Phase 8
+**Requirements**: ADM-03, ADM-04
+**Gap Closure**: Closes gaps from v1 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Admin can edit pageCount and price fields from null to a numeric value and save successfully
+  2. Admin can toggle a book from open access to paid, enter a price, and save
+  3. User signing in from a book detail page (?redirect=/catalog/slug) is returned to that page after login
+  4. Anonymous user can download PDF/EPUB of an open access book without creating an account
+**Plans**: 1 plan
+- [ ] 09-01-PLAN.md — Fix admin form valueAsNumber, sign-in redirect consumption, open access anonymous download
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -144,4 +158,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Payments and Entitlement | 2/2 | Complete    | 2026-02-19 |
 | 6. Secure Downloads | 2/2 | Complete    | 2026-02-19 |
 | 7. Admin Dashboard | 3/3 | Complete    | 2026-02-19 |
-| 8. Reader Enhancements | 0/1 | Not started | - |
+| 8. Reader Enhancements | 1/1 | Complete | 2026-02-20 |
+| 9. Audit Gap Closure | 0/1 | Not started | - |
