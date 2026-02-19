@@ -61,7 +61,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can view a book detail page showing cover, synopsis, author bio and photo, full table of contents, ISBN, pricing, print metadata, and print purchase link
   4. User can read a free sample chapter (first chapter) of any book without an account or purchase
   5. Book detail pages include Schema.org Book structured data parseable by Google's Rich Results Test
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 03-01-PLAN.md — Catalog listing page with book grid, category filters, sorting, and live search
+- [ ] 03-02-PLAN.md — Book detail page with JSON-LD SEO, sample chapter preview, and visual verification
 
 ### Phase 4: Browser Reader
 **Goal**: Readers can open any book they have access to and read chapters in the browser with correctly rendered mathematical formulas, a table of contents sidebar for navigation, and a layout that works on mobile and desktop — with their reading position saved between sessions
@@ -127,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-02-18 |
 | 2. Ingest Pipeline | 2/2 | Complete   | 2026-02-19 |
-| 3. Catalog and Discovery | 0/TBD | Not started | - |
+| 3. Catalog and Discovery | 0/2 | Planning complete | - |
 | 4. Browser Reader | 0/TBD | Not started | - |
 | 5. Payments and Entitlement | 0/TBD | Not started | - |
 | 6. Secure Downloads | 0/TBD | Not started | - |
