@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
+import { ExternalLink } from "lucide-react";
 import { getBookBySlug } from "@/lib/book-queries";
 import { auth } from "@/lib/auth";
 import { hasPurchasedBySlug } from "@/lib/purchase-queries";
@@ -9,6 +10,7 @@ import BookCoverImage from "@/components/catalog/BookCoverImage";
 import CategoryBadge from "@/components/catalog/CategoryBadge";
 import TableOfContents from "@/components/catalog/TableOfContents";
 import BuyButton from "@/components/catalog/BuyButton";
+import DownloadButton from "@/components/catalog/DownloadButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -108,22 +110,23 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               </>
             ) : null}
 
+            {/* Download buttons — only for users with access */}
+            {((book.isOpenAccess && session) || purchased) &&
+              (book.pdfKey || book.epubKey) && (
+                <div className="flex flex-col gap-2">
+                  {book.pdfKey && (
+                    <DownloadButton bookSlug={book.slug} format="pdf" />
+                  )}
+                  {book.epubKey && (
+                    <DownloadButton bookSlug={book.slug} format="epub" />
+                  )}
+                </div>
+              )}
+
             {/* Read Sample button */}
             <Button variant="outline" size="sm" className="w-fit" asChild>
               <Link href={`/catalog/${book.slug}/preview`}>Read Sample</Link>
             </Button>
-
-            {/* Print edition link */}
-            {book.printLink && (
-              <a
-                href={book.printLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
-              >
-                Buy Print Edition
-              </a>
-            )}
           </div>
         </div>
 
@@ -172,7 +175,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
           )}
 
           {/* Print metadata */}
-          {(book.isbn || book.pageCount || book.dimensions) && (
+          {(book.isbn || book.pageCount || book.dimensions || book.printLink) && (
             <>
               <Separator className="my-6" />
               <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -192,6 +195,22 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
                   <>
                     <dt className="font-medium text-foreground">Dimensions</dt>
                     <dd>{book.dimensions}</dd>
+                  </>
+                )}
+                {book.printLink && (
+                  <>
+                    <dt className="font-medium text-foreground">Print Edition</dt>
+                    <dd>
+                      <a
+                        href={book.printLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary underline underline-offset-4 hover:text-primary/80 inline-flex items-center gap-1"
+                      >
+                        Buy Print Edition
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </dd>
                   </>
                 )}
               </dl>
