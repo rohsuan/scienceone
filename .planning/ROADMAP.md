@@ -127,7 +127,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Success Criteria** (what must be TRUE):
   1. User can export a book's citation in BibTeX format with a single click; the exported text includes title, author, publisher, year, ISBN, and URL
   2. User can export a book's citation in APA format; the formatted string is copy-pasteable
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 08-01-PLAN.md — Citation export (BibTeX + APA) with publishYear schema field and admin form integration
 
 ## Progress
 
@@ -143,4 +144,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Payments and Entitlement | 2/2 | Complete    | 2026-02-19 |
 | 6. Secure Downloads | 2/2 | Complete    | 2026-02-19 |
 | 7. Admin Dashboard | 3/3 | Complete    | 2026-02-19 |
-| 8. Reader Enhancements | 0/TBD | Not started | - |
+| 8. Reader Enhancements | 0/1 | Not started | - |
