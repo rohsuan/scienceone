@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 7 - Admin Dashboard
+**Current focus:** Phase 8 - Reader Enhancements — COMPLETE
 
 ## Current Position
 
-Phase: 7 of 8 (Admin Dashboard) — COMPLETE
-Plan: 3 of 3 in current phase — ALL COMPLETE
-Status: Phase 7 complete — all 3 plans done (admin foundation, book editor, ingest pipeline)
-Last activity: 2026-02-19 — 07-02 complete: book editor with tabbed form, presigned R2 image uploads, category select, updateBook action
+Phase: 8 of 8 (Reader Enhancements) — COMPLETE
+Plan: 1 of 1 in current phase — ALL COMPLETE
+Status: Phase 8 complete — all 1 plans done (academic citation export with BibTeX, APA, publishYear schema)
+Last activity: 2026-02-20 — 08-01 complete: citation export with BibTeX/APA, CitationExport component, publishYear field, admin form integration
 
-Progress: [██████████████████████████] 88%
+Progress: [████████████████████████████] 100%
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ Progress: [███████████████████████
 - Trend: fast
 
 *Updated after each plan completion*
+| Phase 08-reader-enhancements P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,9 @@ Recent decisions affecting current work:
 - [07-03]: Detached process pattern: spawn + proc.unref() for long-running background jobs from API routes — prevents server request timeout
 - [07-03]: updateProgress() in ingest.ts is non-fatal — swallows errors so DB status update failure never kills the ingest pipeline
 - [07-03]: Admin preview bypasses isPublished filter — admin queries have no publication check; public reader queries do
+- [Phase 08-reader-enhancements]: publishYear Int? added to Book schema — createdAt is ingestion date, not publication year; admin override field needed for accurate academic citations
+- [Phase 08-reader-enhancements]: APA author name used as-is (not parsed to Last, First) — free-form names like multi-word surnames break if split on spaces
+- [Phase 08-reader-enhancements]: BibTeX citation key sanitized with .replace(/[^a-zA-Z0-9]/g, '') to prevent invalid keys from names like O'Brien or García
 
 ### Pending Todos
 
@@ -133,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Completed 07-02-PLAN.md (Book metadata edit form, presigned R2 image uploads, category select, updateBook server action)
-Resume file: Phase 7 complete (all 3 plans done). Proceed to Phase 8.
+Last session: 2026-02-20
+Stopped at: Completed 08-01-PLAN.md (Academic citation export: BibTeX, APA, CitationExport component, publishYear schema field, admin form integration)
+Resume file: Phase 8 complete (all 1 plans done). All 8 phases complete — project MVP delivered.

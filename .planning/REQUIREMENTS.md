@@ -50,7 +50,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **ADM-04**: Publisher can set access model per book (pay-per-book or open access)
 - [x] **ADM-05**: Publisher can preview ingested content before publishing
 - [x] **ADM-06**: Publisher has a browser-based admin dashboard for uploading and managing books
-- [ ] **ADM-07**: Reader can export book citation in BibTeX and APA formats
+- [x] **ADM-07**: Reader can export book citation in BibTeX and APA formats
 
 ## v2 Requirements
 
@@ -118,7 +118,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADM-04 | Phase 7 | Complete |
 | ADM-05 | Phase 7 | Complete |
 | ADM-06 | Phase 7 | Complete |
-| ADM-07 | Phase 8 | Pending |
+| ADM-07 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 27 total
