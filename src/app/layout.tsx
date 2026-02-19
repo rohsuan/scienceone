@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lora, Inter } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en" className={`${lora.variable} ${inter.variable}`}>
       <body className="font-sans bg-white text-slate-900 antialiased">
         {children}
+        <Toaster />
       </body>
     </html>
   );
