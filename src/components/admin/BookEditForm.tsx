@@ -140,7 +140,7 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
               <Input
                 id="pageCount"
                 type="number"
-                {...register("pageCount")}
+                {...register("pageCount", { valueAsNumber: true })}
                 placeholder="e.g. 320"
               />
             </div>
@@ -242,7 +242,7 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
               type="number"
               step="0.01"
               min="0"
-              {...register("price")}
+              {...register("price", { valueAsNumber: true })}
               placeholder="e.g. 29.99"
               disabled={isOpenAccess}
               className="max-w-[200px]"
