@@ -101,7 +101,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User with purchased access can download a book's EPUB file via the same presigned URL mechanism
   3. Attempting to download a PDF or EPUB without purchase (unauthenticated or unpurchased) returns an access denied response — not a broken link
   4. Book detail page displays the print purchase link (external link to buy print edition) when one is configured
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 06-01-PLAN.md — Download API route, R2 client, DownloadButton/DownloadDropdown components, detail page integration, print link relocation
+- [ ] 06-02-PLAN.md — Wire downloads into library cards and reader header, end-to-end verification
 
 ### Phase 7: Admin Dashboard
 **Goal**: The founder can manage the entire book catalog from a browser — uploading manuscripts, editing metadata, setting access models, previewing ingested content, and publishing or unpublishing books — without touching the command line
