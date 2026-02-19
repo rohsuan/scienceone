@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** Phase 2 - Ingest Pipeline
+**Current focus:** Phase 3 - Catalog
 
 ## Current Position
 
-Phase: 2 of 8 (Ingest Pipeline) — COMPLETE
-Plan: 2 of 2 in current phase — COMPLETE (Phase 2 done)
-Status: Complete — Phase 2 (Ingest Pipeline) fully verified and done; ready for Phase 3 (Catalog)
-Last activity: 2026-02-19 — 02-02 Task 3 human-verified: all 3 formats produce KaTeX HTML chapters in DB, re-ingest atomic, dry-run confirmed
+Phase: 3 of 8 (Catalog) — In Progress
+Plan: 1 of 2 in current phase — COMPLETE; 1 remaining (03-02 book detail page)
+Status: In Progress — 03-01 catalog listing page complete; 03-02 book detail page next
+Last activity: 2026-02-19 — 03-01 complete: /catalog page with URL-driven filter/sort/search, BookCard components, next/image R2 remotePatterns
 
-Progress: [████████░░] 25%
+Progress: [█████████░] 31%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 9 min
-- Total execution time: 55 min
+- Total plans completed: 7
+- Average duration: 8 min
+- Total execution time: 58 min
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [████████░░] 25%
 |-------|-------|-------|----------|
 | 01-foundation | 4/4 | 43 min | 11 min |
 | 02-ingest | 2/2 | 12 min | 6 min |
+| 03-catalog | 1/2 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (6 min), 01-03 (7 min), 01-04 (15 min), 02-01 (5 min), 02-02 (7 min)
+- Last 5 plans: 01-04 (15 min), 02-01 (5 min), 02-02 (7 min), 03-01 (3 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -67,6 +68,10 @@ Recent decisions affecting current work:
 - [Phase 02-ingest]: R2 client uses WHEN_REQUIRED checksum config — CRC32 causes 400 errors from Cloudflare R2 S3-compatible API
 - [Phase 02-ingest]: stripMathDelimiters() added to katex-render.ts — Pandoc wraps equation environments with $...$ in fallback mode; stripping normalises before KaTeX rendering
 - [Phase 02-ingest]: writeChapters uses prisma.$transaction(deleteMany + createMany) — atomic re-ingest prevents partial chapter state on failure
+- [Phase 03-catalog]: Prisma types imported from @/generated/prisma/client (Prisma 7 generated path) — BookWhereInput and BookOrderByWithRelationInput
+- [Phase 03-catalog]: searchParams in Next.js 16 page is a Promise — must await before reading keys
+- [Phase 03-catalog]: Suspense boundaries required around SearchInput and CatalogFilters because useSearchParams() requires Suspense in App Router
+- [Phase 03-catalog]: URL-driven filter state pattern: client components use router.replace() with URLSearchParams; server page reads awaited searchParams
 
 ### Pending Todos
 
@@ -84,5 +89,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-catalog/03-CONTEXT.md
+Stopped at: Completed 03-01-PLAN.md (catalog listing page)
+Resume file: .planning/phases/03-catalog/03-02-PLAN.md

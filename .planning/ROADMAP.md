@@ -129,7 +129,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-02-18 |
 | 2. Ingest Pipeline | 2/2 | Complete   | 2026-02-19 |
-| 3. Catalog and Discovery | 0/2 | Planning complete | - |
+| 3. Catalog and Discovery | 1/2 | In Progress|  |
 | 4. Browser Reader | 0/TBD | Not started | - |
 | 5. Payments and Entitlement | 0/TBD | Not started | - |
 | 6. Secure Downloads | 0/TBD | Not started | - |
