@@ -21,14 +21,14 @@ function checkRateLimit(key: string, maxRequests = 10, windowMs = 60_000): boole
   return true;
 }
 
-export async function GET(request: Request) {
-  // a. Auth check
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+function getClientIp(request: Request): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return "unknown";
+}
 
-  // b. Parse and validate params
+export async function GET(request: Request) {
+  // a. Parse and validate params
   const { searchParams } = new URL(request.url);
   const bookSlug = searchParams.get("bookSlug");
   const format = searchParams.get("format");
@@ -43,13 +43,7 @@ export async function GET(request: Request) {
     );
   }
 
-  // c. Rate limiting
-  const rateLimitKey = `${session.user.id}:${bookSlug}:${format}`;
-  if (!checkRateLimit(rateLimitKey)) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-
-  // d. Fetch book
+  // b. Fetch book (need isOpenAccess to decide auth requirement)
   const book = await prisma.book.findUnique({
     where: { slug: bookSlug, isPublished: true },
     select: {
@@ -65,17 +59,31 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Book not found" }, { status: 404 });
   }
 
-  // e. Entitlement check
+  // c. Auth check — only required for non-open-access books
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!book.isOpenAccess && !session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // d. Entitlement check — only for paid books
   if (!book.isOpenAccess) {
     const purchase = await prisma.purchase.findUnique({
       where: {
-        userId_bookId: { userId: session.user.id, bookId: book.id },
+        userId_bookId: { userId: session!.user.id, bookId: book.id },
       },
       select: { id: true },
     });
     if (!purchase) {
       return NextResponse.json({ error: "Purchase required" }, { status: 403 });
     }
+  }
+
+  // e. Rate limiting — userId for authenticated users, IP for anonymous
+  const rateLimitKey = session
+    ? `${session.user.id}:${bookSlug}:${format}`
+    : `anon:${getClientIp(request)}:${bookSlug}:${format}`;
+  if (!checkRateLimit(rateLimitKey)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   // f. Artifact check
@@ -98,10 +106,12 @@ export async function GET(request: Request) {
     { expiresIn: 900 }
   );
 
-  // h. Audit log (fire-and-forget)
-  void prisma.download.create({
-    data: { userId: session.user.id, bookId: book.id, format },
-  });
+  // h. Audit log — only for authenticated users (Download.userId is non-nullable)
+  if (session) {
+    void prisma.download.create({
+      data: { userId: session.user.id, bookId: book.id, format },
+    });
+  }
 
   // i. Return presigned URL
   return NextResponse.json({ url });

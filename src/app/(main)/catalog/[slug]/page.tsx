@@ -121,8 +121,8 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               </>
             ) : null}
 
-            {/* Download buttons — only for users with access */}
-            {((book.isOpenAccess && session) || purchased) &&
+            {/* Download buttons — open access visible to all, paid requires purchase */}
+            {(book.isOpenAccess || purchased) &&
               (book.pdfKey || book.epubKey) && (
                 <div className="flex flex-col gap-2">
                   {book.pdfKey && (
