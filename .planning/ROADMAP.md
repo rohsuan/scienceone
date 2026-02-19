@@ -74,7 +74,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can navigate between chapters using the table of contents sidebar; current chapter is highlighted
   3. Reader layout is usable on mobile (375px) and tablet (768px) viewports — text readable, math visible, navigation accessible
   4. When user returns to a book, the reader opens to the last chapter and scroll position they were reading
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 04-01-PLAN.md — Reader layout, routing, ToC sidebar, chapter rendering with KaTeX math, mobile responsive drawer, access control
+- [ ] 04-02-PLAN.md — Reading progress API, scroll tracker, progress bar, resume navigation, visual verification
 
 ### Phase 5: Payments and Entitlement
 **Goal**: Readers can purchase paid books via Stripe checkout and immediately access them; access is granted reliably through webhook — never via redirect — and purchased books appear in the user's library with a receipt email confirming the transaction
