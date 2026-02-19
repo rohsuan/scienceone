@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 7 of 8 (Admin Dashboard) — IN PROGRESS (plans 1 and 3 complete; plan 2 not yet run)
-Plan: 3 of 3 in current phase — COMPLETE; ingest pipeline browser UI, status polling, admin preview
-Status: Phase 7 Plan 3 complete — plan 2 (book editor) skipped by user; phase 7 functionally complete for ingest + preview
-Last activity: 2026-02-19 — 07-03 complete: Ingest API routes, ingest script extension, upload component, status polling, admin chapter preview
+Phase: 7 of 8 (Admin Dashboard) — COMPLETE
+Plan: 3 of 3 in current phase — ALL COMPLETE
+Status: Phase 7 complete — all 3 plans done (admin foundation, book editor, ingest pipeline)
+Last activity: 2026-02-19 — 07-02 complete: book editor with tabbed form, presigned R2 image uploads, category select, updateBook action
 
-Progress: [█████████████████████████░] 85%
+Progress: [██████████████████████████] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 7 min
-- Total execution time: 110 min
+- Total execution time: 115 min
 
 **By Phase:**
 
@@ -33,7 +33,7 @@ Progress: [███████████████████████
 | 04-reader | 2/2 | 11 min | 6 min |
 | 05-payments | 2/2 | 8 min | 4 min |
 | 06-secure-downloads | 2/2 | 12 min | 6 min |
-| 07-admin-dashboard | 2/3 | 8 min | 4 min |
+| 07-admin-dashboard | 3/3 | 13 min | 4 min |
 
 **Recent Trend:**
 - Last 5 plans: 05-01 (3 min), 05-02 (5 min), 06-01 (2 min), 06-02 (10 min), 07-01 (3 min)
@@ -111,6 +111,9 @@ Recent decisions affecting current work:
 - [07-01]: requireAdmin() helper centralizes admin role check across all server actions — avoids repetition
 - [07-01]: CreateBookDialog extracted as client component so admin/page.tsx stays as a server component calling getAllBooksAdmin() directly
 - [07-01]: IngestJob migration created with --create-only (DB offline blocker still active from 01-01)
+- [07-02]: z.coerce.number() in Zod v4 has input type unknown — breaks @hookform/resolvers type inference; use z.number() for react-hook-form schemas
+- [07-02]: XHR used for image upload (not fetch) — XMLHttpRequest upload.progress event provides real-time progress; fetch has no streaming upload progress API
+- [07-02]: Presigned URL upload pattern: /api/admin/upload-url issues admin-only PUT keys; client POSTs for URL then XHRs directly to R2 without proxying through Next.js
 - [07-03]: Detached process pattern: spawn + proc.unref() for long-running background jobs from API routes — prevents server request timeout
 - [07-03]: updateProgress() in ingest.ts is non-fatal — swallows errors so DB status update failure never kills the ingest pipeline
 - [07-03]: Admin preview bypasses isPublished filter — admin queries have no publication check; public reader queries do
@@ -131,5 +134,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 07-03-PLAN.md (Ingest API routes, ingest script extension, upload component, status polling, admin chapter preview)
-Resume file: .planning/phases/07-admin-dashboard/07-02-PLAN.md (Phase 7 Plan 2 — book editor; skipped, can be run independently)
+Stopped at: Completed 07-02-PLAN.md (Book metadata edit form, presigned R2 image uploads, category select, updateBook server action)
+Resume file: Phase 7 complete (all 3 plans done). Proceed to Phase 8.
