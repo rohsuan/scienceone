@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Catalog and Discovery** - Public book browsing, search, detail pages, and SEO (completed 2026-02-19)
 - [x] **Phase 4: Browser Reader** - In-browser chapter reading with LaTeX math and navigation (completed 2026-02-19)
 - [x] **Phase 5: Payments and Entitlement** - Stripe checkout, webhook-driven access grants, and My Library (completed 2026-02-19)
-- [ ] **Phase 6: Secure Downloads** - Purchase-verified presigned URL delivery for PDF and EPUB files
+- [x] **Phase 6: Secure Downloads** - Purchase-verified presigned URL delivery for PDF and EPUB files (completed 2026-02-19)
 - [ ] **Phase 7: Admin Dashboard** - Browser-based book management UI for the founder
 - [ ] **Phase 8: Reader Enhancements** - Sample preview, reading progress, and academic citation export
 
@@ -138,6 +138,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Catalog and Discovery | 2/2 | Complete    | 2026-02-19 |
 | 4. Browser Reader | 2/2 | Complete    | 2026-02-19 |
 | 5. Payments and Entitlement | 2/2 | Complete    | 2026-02-19 |
-| 6. Secure Downloads | 1/2 | In Progress|  |
+| 6. Secure Downloads | 2/2 | Complete   | 2026-02-19 |
 | 7. Admin Dashboard | 0/TBD | Not started | - |
 | 8. Reader Enhancements | 0/TBD | Not started | - |

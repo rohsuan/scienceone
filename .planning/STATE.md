@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 6 of 8 (Secure Downloads) — IN PROGRESS
-Plan: 1 of 2 in current phase — COMPLETE; 06-01 Presigned URL download API, DownloadButton/DownloadDropdown components, detail page wiring
-Status: Phase 6 plan 1 complete — download API and components built; Plan 02 will wire DownloadDropdown into LibraryBookCard and reader header
-Last activity: 2026-02-19 — 06-01 complete: R2 presigned URL download route, DownloadButton, DownloadDropdown, book detail page integration
+Plan: 2 of 2 in current phase — AT CHECKPOINT; 06-02 Task 1 complete (DownloadDropdown wired into LibraryBookCard and ReaderTopBar); awaiting human verification of end-to-end download flow
+Status: Phase 6 plan 2 at checkpoint — all code complete, awaiting human-verify of all three download placement locations
+Last activity: 2026-02-19 — 06-02 Task 1 complete: DownloadDropdown wired into library cards and reader header
 
 Progress: [████████████████████░░] 60%
 
@@ -103,6 +103,8 @@ Recent decisions affecting current work:
 - [06-01]: Print link relocated to right-column metadata section (near ISBN/pages/dimensions) — was in left-column pricing area
 - [06-01]: Rate limit: 10 requests per user per book per format per 60 seconds — in-memory, resets on deploy
 - [06-01]: Presigned URL expiry: 900 seconds (15 minutes); fire-and-forget audit log via void prisma.download.create()
+- [Phase 06-02]: Card link isolation: Link wraps only cover+text; DownloadDropdown sits outside Link as sibling — prevents navigation when clicking download
+- [Phase 06-02]: Boolean-only prop boundary: raw pdfKey/epubKey strings never passed to client components; only !!pdfKey and !!epubKey booleans cross the server/client boundary
 
 ### Pending Todos
 
