@@ -23,6 +23,8 @@ export default async function BookReaderLayout({
         bookTitle={book.title}
         bookSlug={bookSlug}
         chapters={book.chapters}
+        hasPdf={!!book.pdfKey}
+        hasEpub={!!book.epubKey}
       />
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden lg:flex lg:w-64 xl:w-72 flex-col border-r border-border overflow-y-auto bg-muted/30">

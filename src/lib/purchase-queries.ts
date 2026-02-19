@@ -39,6 +39,8 @@ export const getUserPurchases = cache(async (userId: string) => {
           slug: true,
           authorName: true,
           coverImage: true,
+          pdfKey: true,   // for download button visibility
+          epubKey: true,  // for download button visibility
         },
       },
     },

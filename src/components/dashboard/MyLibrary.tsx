@@ -24,6 +24,8 @@ export default function MyLibrary({ purchases }: MyLibraryProps) {
             key={purchase.id}
             book={purchase.book}
             purchasedAt={purchase.createdAt}
+            hasPdf={!!purchase.book.pdfKey}
+            hasEpub={!!purchase.book.epubKey}
           />
         ))}
       </div>

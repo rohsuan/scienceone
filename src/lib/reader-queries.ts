@@ -9,6 +9,8 @@ export const getBookChapters = cache(async (bookSlug: string) => {
       title: true,
       slug: true,
       isOpenAccess: true,
+      pdfKey: true,   // for download button visibility in reader header
+      epubKey: true,  // for download button visibility in reader header
       chapters: {
         orderBy: { position: "asc" },
         select: {

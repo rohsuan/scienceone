@@ -4,17 +4,22 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import MobileTocDrawer from "@/components/reader/MobileTocDrawer";
 import { ChapterSummary } from "@/components/reader/TocSidebar";
+import DownloadDropdown from "@/components/catalog/DownloadDropdown";
 
 interface ReaderTopBarProps {
   bookTitle: string;
   bookSlug: string;
   chapters: ChapterSummary[];
+  hasPdf: boolean;
+  hasEpub: boolean;
 }
 
 export default function ReaderTopBar({
   bookTitle,
   bookSlug,
   chapters,
+  hasPdf,
+  hasEpub,
 }: ReaderTopBarProps) {
   return (
     <header className="flex items-center h-12 px-4 border-b border-border bg-white flex-shrink-0">
@@ -32,6 +37,15 @@ export default function ReaderTopBar({
           <span className="font-serif text-sm truncate">{bookTitle}</span>
         </Link>
       </div>
+      {(hasPdf || hasEpub) && (
+        <DownloadDropdown
+          bookSlug={bookSlug}
+          hasPdf={hasPdf}
+          hasEpub={hasEpub}
+          variant="ghost"
+          size="sm"
+        />
+      )}
     </header>
   );
 }
