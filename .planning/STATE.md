@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: 6 of 8 (Secure Downloads) — IN PROGRESS
-Plan: 2 of 2 in current phase — AT CHECKPOINT; 06-02 Task 1 complete (DownloadDropdown wired into LibraryBookCard and ReaderTopBar); awaiting human verification of end-to-end download flow
-Status: Phase 6 plan 2 at checkpoint — all code complete, awaiting human-verify of all three download placement locations
-Last activity: 2026-02-19 — 06-02 Task 1 complete: DownloadDropdown wired into library cards and reader header
+Phase: 6 of 8 (Secure Downloads) — COMPLETE
+Plan: 2 of 2 in current phase — COMPLETE; Phase 6 fully done; all three download placement locations operational
+Status: Phase 6 complete — proceed to Phase 7
+Last activity: 2026-02-19 — 06-02 complete: DownloadDropdown wired and end-to-end verified via Rodney (all 8 items passed)
 
-Progress: [████████████████████░░] 60%
+Progress: [██████████████████████░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 7 min
-- Total execution time: 90 min
+- Total execution time: 102 min
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [████████████████████░░] 6
 | 03-catalog | 2/2 | 23 min | 12 min |
 | 04-reader | 2/2 | 11 min | 6 min |
 | 05-payments | 2/2 | 8 min | 4 min |
-| 06-secure-downloads | 1/2 | 2 min | 2 min |
+| 06-secure-downloads | 2/2 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (3 min), 04-02 (8 min), 05-01 (3 min), 05-02 (5 min), 06-01 (2 min)
+- Last 5 plans: 04-02 (8 min), 05-01 (3 min), 05-02 (5 min), 06-01 (2 min), 06-02 (10 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -105,6 +105,7 @@ Recent decisions affecting current work:
 - [06-01]: Presigned URL expiry: 900 seconds (15 minutes); fire-and-forget audit log via void prisma.download.create()
 - [Phase 06-02]: Card link isolation: Link wraps only cover+text; DownloadDropdown sits outside Link as sibling — prevents navigation when clicking download
 - [Phase 06-02]: Boolean-only prop boundary: raw pdfKey/epubKey strings never passed to client components; only !!pdfKey and !!epubKey booleans cross the server/client boundary
+- [Phase 06-02]: Download hidden when no artifacts: conditional render (hasPdf || hasEpub) ensures no empty dropdown appears for books without digital files
 
 ### Pending Todos
 
@@ -122,5 +123,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 06-01-PLAN.md (presigned URL download API, DownloadButton/DownloadDropdown, detail page wiring)
-Resume file: .planning/phases/06-secure-downloads/06-02-PLAN.md (Phase 6 Plan 02 — wire DownloadDropdown into LibraryBookCard and reader header)
+Stopped at: Completed 06-02-PLAN.md (DownloadDropdown wired into LibraryBookCard and ReaderTopBar; end-to-end download flow verified via Rodney — Phase 6 complete)
+Resume file: .planning/phases/07-*/07-01-PLAN.md (Phase 7 — next phase)

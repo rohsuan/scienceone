@@ -157,3 +157,18 @@ Before using the payment flow, configure in `.env`:
 ---
 *Phase: 05-payments-and-entitlement*
 *Completed: 2026-02-19*
+
+## Self-Check: PASSED
+
+All claimed files exist and all commits verified:
+- FOUND: src/lib/stripe.ts
+- FOUND: src/lib/checkout-actions.ts
+- FOUND: src/lib/purchase-queries.ts
+- FOUND: src/components/catalog/BuyButton.tsx
+- FOUND: src/app/(main)/purchase/success/page.tsx
+- FOUND: src/app/api/webhooks/stripe/route.ts
+- FOUND: src/emails/PurchaseConfirmation.tsx
+- FOUND: src/app/(main)/catalog/[slug]/page.tsx
+- FOUND: .env.example
+- FOUND: commit e010df6 (Task 1)
+- FOUND: commit 176abec (Task 2)
