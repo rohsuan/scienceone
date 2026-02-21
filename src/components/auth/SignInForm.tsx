@@ -101,7 +101,7 @@ export function SignInForm({ redirectTo = "/dashboard" }: { redirectTo?: string 
               <div className="flex items-center justify-between">
                 <FormLabel>Password</FormLabel>
                 <Link
-                  href="#"
+                  href="/forgot-password"
                   className="text-xs text-muted-foreground hover:text-primary transition-colors"
                 >
                   Forgot password?
