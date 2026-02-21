@@ -16,23 +16,25 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
-      void resend.emails.send({
+      const { error } = await resend.emails.send({
         from: "ScienceOne <noreply@scienceone.com>",
         to: user.email,
         subject: "Reset your ScienceOne password",
         text: `Reset your password: ${url}`,
       });
+      if (error) console.error("Failed to send reset email:", error);
     },
   },
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
-      void resend.emails.send({
+      const { error } = await resend.emails.send({
         from: "ScienceOne <noreply@scienceone.com>",
         to: user.email,
         subject: "Verify your ScienceOne account",
         react: VerificationEmail({ url, name: user.name ?? "there" }),
       });
+      if (error) console.error("Failed to send verification email:", error);
     },
   },
   socialProviders: {
