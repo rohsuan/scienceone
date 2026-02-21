@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { bookUpdateSchema, type BookUpdateData, chapterContentUpdateSchema } from "@/lib/admin-schemas";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -136,15 +136,21 @@ export async function updateChapterContent(
 
     const validated = chapterContentUpdateSchema.parse(data);
 
-    // Sanitize HTML — allow KaTeX markup and data attributes
-    const clean = DOMPurify.sanitize(validated.content, {
-      ADD_TAGS: [
-        "math", "semantics", "mrow", "mi", "mo", "mn", "msup", "msub",
-        "mfrac", "mover", "munder", "msqrt", "mroot", "mtable", "mtr",
-        "mtd", "annotation", "mspace", "mtext", "menclose", "mpadded",
-      ],
-      ADD_ATTR: ["data-*", "encoding", "xmlns", "mathvariant", "stretchy", "fence", "separator"],
-      ALLOW_DATA_ATTR: true,
+    // Sanitize HTML — allow standard + KaTeX/MathML tags and attributes
+    const clean = sanitizeHtml(validated.content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+        "span", "math", "semantics", "mrow", "mi", "mo", "mn", "msup",
+        "msub", "mfrac", "mover", "munder", "msqrt", "mroot", "mtable",
+        "mtr", "mtd", "annotation", "mspace", "mtext", "menclose", "mpadded",
+      ]),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        "*": ["class", "style", "aria-hidden", "role", "data-*"],
+        math: ["xmlns"],
+        annotation: ["encoding"],
+        mo: ["mathvariant", "stretchy", "fence", "separator"],
+        mi: ["mathvariant"],
+      },
     });
 
     // Ownership check: verify chapter belongs to this book
