@@ -22,6 +22,7 @@
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@react-email/components": "^1.0.7",
+    "@react-email/render": "^2.0.4",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/pm": "^3.20.0",
     "@tiptap/react": "^3.20.0",
