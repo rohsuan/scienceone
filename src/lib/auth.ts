@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import prisma from "@/lib/prisma";
 import { VerificationEmail } from "@/emails/verification";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,

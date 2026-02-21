@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 import { Resend } from "resend";
 import { PurchaseConfirmationEmail } from "@/emails/PurchaseConfirmation";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
