@@ -131,39 +131,44 @@ export async function updateChapterContent(
   chapterSlug: string,
   data: { content: string },
 ) {
-  await requireAdmin();
+  try {
+    await requireAdmin();
 
-  const validated = chapterContentUpdateSchema.parse(data);
+    const validated = chapterContentUpdateSchema.parse(data);
 
-  // Sanitize HTML — allow KaTeX markup and data attributes
-  const clean = DOMPurify.sanitize(validated.content, {
-    ADD_TAGS: [
-      "math", "semantics", "mrow", "mi", "mo", "mn", "msup", "msub",
-      "mfrac", "mover", "munder", "msqrt", "mroot", "mtable", "mtr",
-      "mtd", "annotation", "mspace", "mtext", "menclose", "mpadded",
-    ],
-    ADD_ATTR: ["data-*", "encoding", "xmlns", "mathvariant", "stretchy", "fence", "separator"],
-    ALLOW_DATA_ATTR: true,
-  });
+    // Sanitize HTML — allow KaTeX markup and data attributes
+    const clean = DOMPurify.sanitize(validated.content, {
+      ADD_TAGS: [
+        "math", "semantics", "mrow", "mi", "mo", "mn", "msup", "msub",
+        "mfrac", "mover", "munder", "msqrt", "mroot", "mtable", "mtr",
+        "mtd", "annotation", "mspace", "mtext", "menclose", "mpadded",
+      ],
+      ADD_ATTR: ["data-*", "encoding", "xmlns", "mathvariant", "stretchy", "fence", "separator"],
+      ALLOW_DATA_ATTR: true,
+    });
 
-  // Ownership check: verify chapter belongs to this book
-  const chapter = await prisma.chapter.findFirst({
-    where: { slug: chapterSlug, bookId },
-    select: { id: true, book: { select: { slug: true } } },
-  });
-  if (!chapter) {
-    throw new Error("Chapter not found");
+    // Ownership check: verify chapter belongs to this book
+    const chapter = await prisma.chapter.findFirst({
+      where: { slug: chapterSlug, bookId },
+      select: { id: true, book: { select: { slug: true } } },
+    });
+    if (!chapter) {
+      throw new Error("Chapter not found");
+    }
+
+    await prisma.chapter.update({
+      where: { id: chapter.id },
+      data: { content: clean },
+    });
+
+    // Revalidate admin preview + reader paths
+    revalidatePath(`/admin/books/${bookId}/preview/${chapterSlug}`);
+    revalidatePath(`/admin/books/${bookId}/chapters/${chapterSlug}/edit`);
+    revalidatePath(`/read/${chapter.book.slug}/${chapterSlug}`);
+  } catch (err) {
+    console.error("updateChapterContent failed:", err);
+    throw err;
   }
-
-  await prisma.chapter.update({
-    where: { id: chapter.id },
-    data: { content: clean },
-  });
-
-  // Revalidate admin preview + reader paths
-  revalidatePath(`/admin/books/${bookId}/preview/${chapterSlug}`);
-  revalidatePath(`/admin/books/${bookId}/chapters/${chapterSlug}/edit`);
-  revalidatePath(`/read/${chapter.book.slug}/${chapterSlug}`);
 }
 
 // ---- Category actions ----

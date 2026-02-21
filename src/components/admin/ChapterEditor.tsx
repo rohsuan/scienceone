@@ -70,7 +70,8 @@ export default function ChapterEditor({
         savedContentRef.current = html;
         setIsDirty(false);
         toast.success("Chapter saved");
-      } catch {
+      } catch (err) {
+        console.error("Chapter save error:", err);
         toast.error("Failed to save chapter");
       }
     });
