@@ -7,6 +7,7 @@ import IngestUploader from "@/components/admin/IngestUploader";
 import IngestStatus from "@/components/admin/IngestStatus";
 import { ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import DownloadFileButton from "@/components/admin/DownloadFileButton";
 
 interface Props {
   params: Promise<{ bookId: string }>;
@@ -90,13 +91,17 @@ export default async function BookIngestPage({ params }: Props) {
               Preview →
             </Link>
           </div>
-          <p className="text-muted-foreground">
-            {book._count.chapters} chapter{book._count.chapters !== 1 ? "s" : ""}
+          <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
+            <span>
+              {book._count.chapters} chapter{book._count.chapters !== 1 ? "s" : ""}
+            </span>
             {latestJob && (
               <>
-                {" "}· Last ingested{" "}
-                {new Date(latestJob.createdAt).toLocaleDateString()}
-                {" "}
+                <span>·</span>
+                <span>
+                  Last ingested{" "}
+                  {new Date(latestJob.createdAt).toLocaleDateString()}
+                </span>
                 <Badge
                   variant={
                     latestJob.status === "success"
@@ -109,9 +114,11 @@ export default async function BookIngestPage({ params }: Props) {
                 >
                   {latestJob.status}
                 </Badge>
+                <span>·</span>
+                <DownloadFileButton r2Key={latestJob.r2Key} label="Download manuscript" />
               </>
             )}
-          </p>
+          </div>
         </div>
       )}
 

@@ -16,26 +16,35 @@ export async function POST(request: NextRequest) {
   const { bookId, fileName, type } = body as {
     bookId: string;
     fileName: string;
-    type: "cover" | "author";
+    type: "cover" | "author" | "pdf";
   };
 
   if (!bookId || !fileName || !type) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  if (type !== "cover" && type !== "author") {
+  if (type !== "cover" && type !== "author" && type !== "pdf") {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   }
 
-  // Extract file extension from fileName
-  const extension = fileName.split(".").pop()?.toLowerCase() ?? "jpg";
-  const r2Key = `images/${bookId}/${type}-${Date.now()}.${extension}`;
+  // Build R2 key and content type based on upload type
+  let r2Key: string;
+  let contentType: string;
+
+  if (type === "pdf") {
+    r2Key = `books/${bookId}/${bookId}-${Date.now()}.pdf`;
+    contentType = "application/pdf";
+  } else {
+    const extension = fileName.split(".").pop()?.toLowerCase() ?? "jpg";
+    r2Key = `images/${bookId}/${type}-${Date.now()}.${extension}`;
+    contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
+  }
 
   const r2Client = createR2Client();
   const command = new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
     Key: r2Key,
-    ContentType: `image/${extension === "jpg" ? "jpeg" : extension}`,
+    ContentType: contentType,
   });
 
   const uploadUrl = await getSignedUrl(r2Client, command, { expiresIn: 3600 });

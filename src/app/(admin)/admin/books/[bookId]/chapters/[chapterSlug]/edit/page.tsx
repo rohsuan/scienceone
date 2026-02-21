@@ -5,7 +5,8 @@ import { auth } from "@/lib/auth";
 import { getChapterAdmin, getBookChaptersAdmin } from "@/lib/admin-queries";
 import { Badge } from "@/components/ui/badge";
 import ChapterNavSelect from "@/components/admin/ChapterNavSelect";
-import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
+import ChapterEditor from "@/components/admin/ChapterEditor";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
   params: Promise<{ bookId: string; chapterSlug: string }>;
@@ -15,12 +16,11 @@ export async function generateMetadata({ params }: Props) {
   const { bookId, chapterSlug } = await params;
   const chapter = await getChapterAdmin(bookId, chapterSlug);
   return {
-    title: chapter ? `${chapter.title} — Preview | Admin` : "Preview | Admin",
+    title: chapter ? `Edit: ${chapter.title} | Admin` : "Edit Chapter | Admin",
   };
 }
 
-export default async function AdminChapterPreviewPage({ params }: Props) {
-  // Defense-in-depth: check admin role again (layout also checks)
+export default async function AdminChapterEditPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session || session.user.role !== "admin") {
     redirect("/");
@@ -28,14 +28,13 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
 
   const { bookId, chapterSlug } = await params;
 
-  // Fetch chapter (NO isPublished filter — admin can preview all chapters)
   const [chapter, book] = await Promise.all([
     getChapterAdmin(bookId, chapterSlug),
     getBookChaptersAdmin(bookId),
   ]);
 
   if (!chapter || !book) {
-    redirect(`/admin/books/${bookId}/preview`);
+    redirect(`/admin/books/${bookId}`);
   }
 
   const chapters = book.chapters;
@@ -55,7 +54,7 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
             {chapters.map((ch) => (
               <Link
                 key={ch.id}
-                href={`/admin/books/${bookId}/preview/${ch.slug}`}
+                href={`/admin/books/${bookId}/chapters/${ch.slug}/edit`}
                 className={[
                   "block rounded px-3 py-1.5 text-sm transition-colors",
                   ch.slug === chapterSlug
@@ -72,13 +71,6 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
 
       {/* Main content */}
       <div className="flex-1 min-w-0">
-        {/* Unpublished banner */}
-        {!book.isPublished && (
-          <div className="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-            <strong>Admin Preview</strong> — this book is not published and is not visible to readers.
-          </div>
-        )}
-
         {/* Breadcrumb + header */}
         <div className="mb-6 space-y-2">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -88,41 +80,29 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
               {book.title}
             </Link>
             <span>/</span>
-            <span className="text-foreground">Preview</span>
+            <span className="text-foreground">Edit</span>
           </div>
 
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight">{chapter.title}</h1>
-            <Badge variant="secondary">Preview</Badge>
-            <Link
-              href={`/admin/books/${bookId}/chapters/${chapterSlug}/edit`}
-              className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              title="Edit chapter"
-            >
-              <Pencil className="h-3 w-3" />
-              Edit
-            </Link>
+            <Badge variant="secondary">Edit</Badge>
           </div>
           <p className="text-sm text-muted-foreground">{book.title}</p>
         </div>
 
-        {/* Chapter content — trusted HTML from our ingest pipeline */}
-        {chapter.content ? (
-          <div
-            className="prose prose-lg max-w-3xl [&_.katex-display]:overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: chapter.content }}
-          />
-        ) : (
-          <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
-            This chapter has no content.
-          </div>
-        )}
+        {/* Editor */}
+        <ChapterEditor
+          bookId={bookId}
+          chapterSlug={chapterSlug}
+          initialContent={chapter.content ?? ""}
+          previewHref={`/admin/books/${bookId}/preview/${chapterSlug}`}
+        />
 
         {/* Prev/Next navigation */}
         <div className="mt-10 flex items-center justify-between border-t pt-6">
           {prevChapter ? (
             <Link
-              href={`/admin/books/${bookId}/preview/${prevChapter.slug}`}
+              href={`/admin/books/${bookId}/chapters/${prevChapter.slug}/edit`}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -134,7 +114,7 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
 
           {nextChapter ? (
             <Link
-              href={`/admin/books/${bookId}/preview/${nextChapter.slug}`}
+              href={`/admin/books/${bookId}/chapters/${nextChapter.slug}/edit`}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
             >
               <span>{nextChapter.title}</span>
@@ -147,7 +127,12 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
 
         {/* Mobile chapter navigation select */}
         <div className="mt-4 lg:hidden">
-          <ChapterNavSelect bookId={bookId} chapters={chapters} currentSlug={chapterSlug} />
+          <ChapterNavSelect
+            bookId={bookId}
+            chapters={chapters}
+            currentSlug={chapterSlug}
+            hrefPattern={`/admin/books/${bookId}/chapters/[slug]/edit`}
+          />
         </div>
       </div>
     </div>

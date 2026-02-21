@@ -22,7 +22,7 @@ export default function ReaderTopBar({
   hasEpub,
 }: ReaderTopBarProps) {
   return (
-    <header className="flex items-center h-12 px-4 border-b border-border bg-white flex-shrink-0">
+    <header className="flex items-center h-12 px-4 border-b border-border bg-background flex-shrink-0">
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <MobileTocDrawer
           chapters={chapters}

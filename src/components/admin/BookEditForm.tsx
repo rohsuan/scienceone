@@ -5,9 +5,11 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import Link from "next/link";
+import { FileUp } from "lucide-react";
 
 import { BookAdminDetail } from "@/lib/admin-queries";
-import { updateBook, bookUpdateSchema, type BookUpdateData } from "@/lib/admin-actions";
+import { updateBook } from "@/lib/admin-actions";
+import { bookUpdateSchema, type BookUpdateData } from "@/lib/admin-schemas";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import ImageUploadField from "@/components/admin/ImageUploadField";
+import PdfUploadField from "@/components/admin/PdfUploadField";
+import DownloadFileButton from "@/components/admin/DownloadFileButton";
 import CategorySelect from "@/components/admin/CategorySelect";
 
 interface BookEditFormProps {
@@ -43,6 +47,7 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
     isOpenAccess: book.isOpenAccess,
     price: book.pricing ? Number(book.pricing.amount) : null,
     categoryIds: book.categories.map((bc) => bc.categoryId),
+    pdfKey: book.pdfKey ?? null,
   };
 
   const {
@@ -190,6 +195,28 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
                 onUpload={(r2Key) => setValue("coverImage", r2Key, { shouldDirty: true })}
               />
             )}
+          />
+
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Manuscript</p>
+            <div className="flex items-center gap-3">
+              <Link
+                href={`/admin/books/${book.id}/ingest`}
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <FileUp className="size-4" />
+                Upload Manuscript
+              </Link>
+              {book.manuscriptKey && (
+                <DownloadFileButton r2Key={book.manuscriptKey} label="Download manuscript" />
+              )}
+            </div>
+          </div>
+
+          <PdfUploadField
+            currentKey={book.pdfKey ?? null}
+            bookId={book.id}
+            onUpload={(r2Key) => setValue("pdfKey", r2Key, { shouldDirty: true })}
           />
 
           <div className="space-y-1.5">

@@ -16,7 +16,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero section */}
-      <section className="relative bg-white px-4 py-24 sm:px-6 lg:px-8">
+      <section className="relative bg-background px-4 py-24 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <h1 className="heading-serif text-5xl font-bold tracking-tight text-primary sm:text-6xl lg:text-7xl">
             Where mathematics
@@ -65,7 +65,7 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Feature 1: Beautiful Math */}
-            <Card className="border-border/60 bg-white shadow-sm">
+            <Card className="border-border/60 bg-card shadow-sm">
               <CardHeader className="pb-3">
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <span className="text-xl" aria-hidden="true">∑</span>
@@ -84,7 +84,7 @@ export default async function HomePage() {
             </Card>
 
             {/* Feature 2: Read Anywhere */}
-            <Card className="border-border/60 bg-white shadow-sm">
+            <Card className="border-border/60 bg-card shadow-sm">
               <CardHeader className="pb-3">
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <span className="text-xl" aria-hidden="true">◻</span>
@@ -103,7 +103,7 @@ export default async function HomePage() {
             </Card>
 
             {/* Feature 3: Academic Quality */}
-            <Card className="border-border/60 bg-white shadow-sm">
+            <Card className="border-border/60 bg-card shadow-sm">
               <CardHeader className="pb-3">
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <span className="text-xl" aria-hidden="true">★</span>

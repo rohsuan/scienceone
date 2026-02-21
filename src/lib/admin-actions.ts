@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { z } from "zod";
+import { bookUpdateSchema, type BookUpdateData, chapterContentUpdateSchema } from "@/lib/admin-schemas";
+import DOMPurify from "isomorphic-dompurify";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -58,36 +59,7 @@ export async function deleteBook(bookId: string) {
   revalidatePath("/catalog");
 }
 
-// ---- Book update schema and action ----
-
-export const bookUpdateSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  slug: z.string().min(1, "Slug is required"),
-  authorName: z.string().min(1, "Author name is required"),
-  authorBio: z.string().optional().nullable(),
-  authorImage: z.string().optional().nullable(),
-  synopsis: z.string().optional().nullable(),
-  coverImage: z.string().optional().nullable(),
-  isbn: z.string().optional().nullable(),
-  pageCount: z.union([
-    z.number().int().positive(),
-    z.nan().transform(() => null),
-  ]).optional().nullable(),
-  publishYear: z.union([
-    z.number().int().positive(),
-    z.nan().transform(() => null),
-  ]).optional().nullable(),
-  dimensions: z.string().optional().nullable(),
-  printLink: z.string().optional().nullable(),
-  isOpenAccess: z.boolean(),
-  price: z.union([
-    z.number().nonnegative(),
-    z.nan().transform(() => null),
-  ]).optional().nullable(),
-  categoryIds: z.array(z.string()),
-});
-
-export type BookUpdateData = z.infer<typeof bookUpdateSchema>;
+// ---- Book update action ----
 
 export async function updateBook(bookId: string, data: BookUpdateData) {
   await requireAdmin();
@@ -111,6 +83,7 @@ export async function updateBook(bookId: string, data: BookUpdateData) {
       dimensions: validated.dimensions ?? null,
       printLink: validated.printLink ?? null,
       isOpenAccess: validated.isOpenAccess,
+      pdfKey: validated.pdfKey ?? null,
     },
   });
 
@@ -149,6 +122,48 @@ export async function updateBook(bookId: string, data: BookUpdateData) {
   if (book) {
     revalidatePath(`/catalog/${book.slug}`);
   }
+}
+
+// ---- Chapter content update action ----
+
+export async function updateChapterContent(
+  bookId: string,
+  chapterSlug: string,
+  data: { content: string },
+) {
+  await requireAdmin();
+
+  const validated = chapterContentUpdateSchema.parse(data);
+
+  // Sanitize HTML — allow KaTeX markup and data attributes
+  const clean = DOMPurify.sanitize(validated.content, {
+    ADD_TAGS: [
+      "math", "semantics", "mrow", "mi", "mo", "mn", "msup", "msub",
+      "mfrac", "mover", "munder", "msqrt", "mroot", "mtable", "mtr",
+      "mtd", "annotation", "mspace", "mtext", "menclose", "mpadded",
+    ],
+    ADD_ATTR: ["data-*", "encoding", "xmlns", "mathvariant", "stretchy", "fence", "separator"],
+    ALLOW_DATA_ATTR: true,
+  });
+
+  // Ownership check: verify chapter belongs to this book
+  const chapter = await prisma.chapter.findFirst({
+    where: { slug: chapterSlug, bookId },
+    select: { id: true, book: { select: { slug: true } } },
+  });
+  if (!chapter) {
+    throw new Error("Chapter not found");
+  }
+
+  await prisma.chapter.update({
+    where: { id: chapter.id },
+    data: { content: clean },
+  });
+
+  // Revalidate admin preview + reader paths
+  revalidatePath(`/admin/books/${bookId}/preview/${chapterSlug}`);
+  revalidatePath(`/admin/books/${bookId}/chapters/${chapterSlug}/edit`);
+  revalidatePath(`/read/${chapter.book.slug}/${chapterSlug}`);
 }
 
 // ---- Category actions ----
