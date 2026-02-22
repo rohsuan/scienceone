@@ -108,11 +108,11 @@ Plans:
   4. A published blog post page includes a JSON-LD Article schema block and Open Graph meta tags with correct title, description, and image
   5. The sitemap at /sitemap.xml includes URLs for all published blog posts (and published resources and simulations)
   6. Blog post HTML content is passed through sanitizeHtml() before being rendered — raw database HTML never reaches the DOM
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 14-01: Verify blog admin CRUD, publish workflow, and slug revalidation fix
-- [ ] 14-02: Verify blog public listing, search, filters, SEO metadata, and sitemap
+- [ ] 14-01-PLAN.md — Fix blog admin table actions (BlogRowActions + useTransition) and togglePublishBlogPost bugs (slug revalidation + publishedAt clobber)
+- [ ] 14-02-PLAN.md — Fix JSON-LD datePublished, add Shiki code highlighting, create sitemap, verify public listing/search/filters
 
 ### Phase 15: Polish and Cross-linking
 **Goal**: All content listing pages have pagination so the database is never queried without a LIMIT, and visitors browsing any content type see subject-based links to related content in the other content areas
