@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 
 ## Current Position
 
-Phase: 14 of 15 (Blog) — In progress
-Plan: 1 of 2 in current phase — Phase 14 Plan 01 complete
+Phase: 14 of 15 (Blog) — COMPLETE, advancing to Phase 15
+Plan: 2 of 2 in current phase — Phase 14 Plan 02 complete
 Status: In progress
-Last activity: 2026-02-22 — Phase 14 Plan 01 complete (blog admin actions fix)
+Last activity: 2026-02-22 — Phase 14 Plan 02 complete (blog SEO + Shiki + sitemap)
 
-Progress: [███████░░░] 65% (v1.1) — Phase 14 Plan 01 complete (1/2 plans done)
+Progress: [████████░░] 70% (v1.1) — Phase 14 complete (2/2 plans done)
 
 ## Performance Metrics
 
@@ -31,13 +31,14 @@ Progress: [███████░░░] 65% (v1.1) — Phase 14 Plan 01 compl
 | Phase 11: Resource Admin | 2 | 3 min | 1.5 min |
 | Phase 12: Resource Public/Purchase | 2 | 4 min | 2 min |
 | Phase 13: Simulations | 2 | 15 min | 7.5 min |
-| Phase 14: Blog | 1 | 3 min | 3 min |
+| Phase 14: Blog | 2 | 4 min | 2 min |
 
 *Updated after each plan completion*
 | Phase 12-resource-public-purchase P01 | 6 | 2 tasks | 3 files |
 | Phase 13-simulations P01 | 9 | 3 tasks | 9 files |
 | Phase 13-simulations P02 | 6 | 1 tasks | 0 files |
 | Phase 14-blog P01 | 3 | 2 tasks | 2 files |
+| Phase 14-blog P02 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Phase 14-01]: BlogRowActions follows ResourceRowActions verbatim — same useTransition/startTransition/try-catch pattern
 - [Phase 14-01]: publishedAt clobber guard: `publish && !existing?.publishedAt` — only sets date on first publish, preserves original on re-publish
 - [Phase 14-01]: revalidatePath(/blog/{slug}) called after toggle — blog detail page immediately accessible after publish
+- [Phase 14-02]: JSON-LD datePublished falls back to createdAt — ensures field is never undefined/dropped by JSON.stringify
+- [Phase 14-02]: highlightCodeBlocks runs before sanitizeHtml — Shiki transforms pre/code HTML, then sanitize allows class/style attributes through
+- [Phase 14-02]: Simulations use /simulations/{slug} path in sitemap; non-simulation resources use /resources/{slug}
 
 ### Pending Todos
 
@@ -83,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-22T04:03:00Z
-Stopped at: Completed 14-01-PLAN.md — Phase 14 Plan 01 complete (blog admin actions fix)
-Resume file: None — continue with Phase 14 Plan 02 (if any) or Phase 15
+Last session: 2026-02-22T03:42:30Z
+Stopped at: Completed 14-02-PLAN.md — Phase 14 Plan 02 complete (blog SEO + Shiki + sitemap), Phase 14 fully complete
+Resume file: None — continue with Phase 15 (Polish)

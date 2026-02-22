@@ -11,11 +11,11 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 - [x] **BLOG-01**: Admin can create, edit, and delete blog posts
 - [x] **BLOG-02**: Admin can publish/unpublish blog posts with draft workflow
-- [ ] **BLOG-03**: Visitor can browse published blog posts with category and subject filtering
-- [ ] **BLOG-04**: Visitor can search blog posts by keyword
-- [ ] **BLOG-05**: Blog post pages render with SEO metadata (JSON-LD, Open Graph)
-- [ ] **BLOG-06**: Blog post content is sanitized against XSS before rendering
-- [ ] **BLOG-07**: Blog posts are included in the sitemap
+- [x] **BLOG-03**: Visitor can browse published blog posts with category and subject filtering
+- [x] **BLOG-04**: Visitor can search blog posts by keyword
+- [x] **BLOG-05**: Blog post pages render with SEO metadata (JSON-LD, Open Graph)
+- [x] **BLOG-06**: Blog post content is sanitized against XSS before rendering
+- [x] **BLOG-07**: Blog posts are included in the sitemap
 
 ### Resources
 
@@ -88,11 +88,11 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 |-------------|-------|--------|
 | BLOG-01 | Phase 14 | Complete |
 | BLOG-02 | Phase 14 | Complete |
-| BLOG-03 | Phase 14 | Pending |
-| BLOG-04 | Phase 14 | Pending |
-| BLOG-05 | Phase 14 | Pending |
-| BLOG-06 | Phase 14 | Pending |
-| BLOG-07 | Phase 14 | Pending |
+| BLOG-03 | Phase 14 | Complete |
+| BLOG-04 | Phase 14 | Complete |
+| BLOG-05 | Phase 14 | Complete |
+| BLOG-06 | Phase 14 | Complete |
+| BLOG-07 | Phase 14 | Complete |
 | RES-01 | Phase 11 | Complete |
 | RES-02 | Phase 11 | Complete |
 | RES-03 | Phase 12 | Complete |
