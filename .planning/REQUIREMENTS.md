@@ -86,38 +86,38 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BLOG-01 | — | Pending |
-| BLOG-02 | — | Pending |
-| BLOG-03 | — | Pending |
-| BLOG-04 | — | Pending |
-| BLOG-05 | — | Pending |
-| BLOG-06 | — | Pending |
-| BLOG-07 | — | Pending |
-| RES-01 | — | Pending |
-| RES-02 | — | Pending |
-| RES-03 | — | Pending |
-| RES-04 | — | Pending |
-| RES-05 | — | Pending |
-| RES-06 | — | Pending |
-| RES-07 | — | Pending |
-| RES-08 | — | Pending |
-| RES-09 | — | Pending |
-| RES-10 | — | Pending |
-| SIM-01 | — | Pending |
-| SIM-02 | — | Pending |
-| SIM-03 | — | Pending |
-| SIM-04 | — | Pending |
-| SIM-05 | — | Pending |
-| SIM-06 | — | Pending |
-| XLINK-01 | — | Pending |
-| XLINK-02 | — | Pending |
-| XLINK-03 | — | Pending |
+| BLOG-01 | Phase 14 | Pending |
+| BLOG-02 | Phase 14 | Pending |
+| BLOG-03 | Phase 14 | Pending |
+| BLOG-04 | Phase 14 | Pending |
+| BLOG-05 | Phase 14 | Pending |
+| BLOG-06 | Phase 14 | Pending |
+| BLOG-07 | Phase 14 | Pending |
+| RES-01 | Phase 11 | Pending |
+| RES-02 | Phase 11 | Pending |
+| RES-03 | Phase 12 | Pending |
+| RES-04 | Phase 12 | Pending |
+| RES-05 | Phase 12 | Pending |
+| RES-06 | Phase 12 | Pending |
+| RES-07 | Phase 12 | Pending |
+| RES-08 | Phase 12 | Pending |
+| RES-09 | Phase 12 | Pending |
+| RES-10 | Phase 15 | Pending |
+| SIM-01 | Phase 13 | Pending |
+| SIM-02 | Phase 13 | Pending |
+| SIM-03 | Phase 13 | Pending |
+| SIM-04 | Phase 13 | Pending |
+| SIM-05 | Phase 13 | Pending |
+| SIM-06 | Phase 13 | Pending |
+| XLINK-01 | Phase 15 | Pending |
+| XLINK-02 | Phase 15 | Pending |
+| XLINK-03 | Phase 15 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 (awaiting roadmap)
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-22*
-*Last updated: 2026-02-22 after initial definition*
+*Last updated: 2026-02-22 after roadmap creation*
