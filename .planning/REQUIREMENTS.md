@@ -24,9 +24,9 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 - [ ] **RES-03**: Visitor can browse published resources with filtering by subject, type, and level
 - [ ] **RES-04**: Visitor can search resources by keyword
 - [ ] **RES-05**: Visitor can download free resources without purchase
-- [ ] **RES-06**: Paid resources display price and a purchase button
-- [ ] **RES-07**: Paid resource checkout via Stripe works end-to-end
-- [ ] **RES-08**: Stripe webhook creates ResourcePurchase records correctly
+- [x] **RES-06**: Paid resources display price and a purchase button
+- [x] **RES-07**: Paid resource checkout via Stripe works end-to-end
+- [x] **RES-08**: Stripe webhook creates ResourcePurchase records correctly
 - [ ] **RES-09**: Purchased resources can be downloaded via presigned R2 URL
 - [ ] **RES-10**: Resource and blog listings have pagination
 
@@ -98,9 +98,9 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 | RES-03 | Phase 12 | Pending |
 | RES-04 | Phase 12 | Pending |
 | RES-05 | Phase 12 | Pending |
-| RES-06 | Phase 12 | Pending |
-| RES-07 | Phase 12 | Pending |
-| RES-08 | Phase 12 | Pending |
+| RES-06 | Phase 12 | Complete |
+| RES-07 | Phase 12 | Complete |
+| RES-08 | Phase 12 | Complete |
 | RES-09 | Phase 12 | Pending |
 | RES-10 | Phase 15 | Pending |
 | SIM-01 | Phase 13 | Pending |
