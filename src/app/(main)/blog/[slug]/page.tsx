@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getBlogPostBySlug } from "@/lib/blog-queries";
+import { getBlogPostBySlug, getRelatedResources } from "@/lib/blog-queries";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { highlightCodeBlocks } from "@/lib/highlight-code";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,13 @@ const CATEGORY_LABELS: Record<string, string> = {
   COMPUTATION: "Computation",
   RESOURCES: "Resources",
   AI_IN_EDUCATION: "AI in Education",
+};
+
+const RESOURCE_TYPE_LABELS: Record<string, string> = {
+  LESSON_PLAN: "Lesson Plan",
+  PROBLEM_SET: "Problem Set",
+  COURSE_MODULE: "Course Module",
+  LAB_GUIDE: "Lab Guide",
 };
 
 interface BlogPostPageProps {
@@ -45,6 +52,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const post = await getBlogPostBySlug(slug);
 
   if (!post) notFound();
+
+  const subjectIds = post.subjects.map(({ subject }) => subject.id);
+  const relatedResources = await getRelatedResources(subjectIds);
 
   const highlightedContent = post.content
     ? await highlightCodeBlocks(post.content)
@@ -164,6 +174,35 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </Badge>
             ))}
           </div>
+        </>
+      )}
+
+      {/* Related Resources */}
+      {relatedResources.length > 0 && (
+        <>
+          <Separator className="my-8" />
+          <section>
+            <h2 className="font-serif text-xl font-semibold mb-4">Related Resources</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {relatedResources.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/resources/${r.slug}`}
+                  className="block border rounded-lg p-4 hover:border-primary hover:bg-muted/30 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <p className="font-semibold text-sm leading-snug">{r.title}</p>
+                    <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded shrink-0">
+                      {RESOURCE_TYPE_LABELS[r.type] ?? r.type}
+                    </span>
+                  </div>
+                  {r.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">{r.description}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </section>
         </>
       )}
     </div>

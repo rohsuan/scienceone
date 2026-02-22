@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getResourceBySlug } from "@/lib/resource-queries";
+import { getResourceBySlug, getRelatedLabGuides } from "@/lib/resource-queries";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +38,8 @@ export default async function SimulationDetailPage({
   if (!resource || resource.type !== "SIMULATION") notFound();
 
   const simulation = resource.simulation;
+  const subjectIds = resource.subjects.map(({ subject }) => subject.id);
+  const relatedLabGuides = await getRelatedLabGuides(subjectIds, resource.id);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -113,6 +115,25 @@ export default async function SimulationDetailPage({
                 className="prose prose-sm prose-neutral dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(simulation.parameterDocs) }}
               />
+            </div>
+          )}
+
+          {/* Related Lab Guides */}
+          {relatedLabGuides.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-sm mb-3">Related Lab Guides</h3>
+              <ul className="space-y-2">
+                {relatedLabGuides.map((lg) => (
+                  <li key={lg.id}>
+                    <Link
+                      href={`/resources/${lg.slug}`}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      {lg.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

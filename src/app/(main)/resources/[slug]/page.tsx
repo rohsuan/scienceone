@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
-import { getResourceBySlug } from "@/lib/resource-queries";
-import { hasResourcePurchase } from "@/lib/resource-queries";
+import { getResourceBySlug, hasResourcePurchase, getRelatedBlogPosts } from "@/lib/resource-queries";
 import { auth } from "@/lib/auth";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { Badge } from "@/components/ui/badge";
@@ -71,6 +70,9 @@ export default async function ResourceDetailPage({
   const canAccess = resource.isFree || purchased;
   // Only show pricing for active prices — treat inactive pricing as null
   const activePricing = resource.pricing?.isActive ? resource.pricing : null;
+
+  const subjectIds = resource.subjects.map(({ subject }) => subject.id);
+  const relatedPosts = await getRelatedBlogPosts(subjectIds);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -181,6 +183,37 @@ export default async function ResourceDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Related Articles */}
+      {relatedPosts.length > 0 && (
+        <>
+          <Separator className="my-8" />
+          <h2 className="font-serif text-xl font-semibold mb-4">Related Articles</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {relatedPosts.map((p) => (
+              <Link
+                key={p.id}
+                href={`/blog/${p.slug}`}
+                className="block border rounded-lg p-4 hover:border-primary hover:bg-muted/30 transition-colors"
+              >
+                <p className="font-semibold text-sm leading-snug mb-1">{p.title}</p>
+                {p.excerpt && (
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{p.excerpt}</p>
+                )}
+                {p.publishedAt && (
+                  <time className="text-xs text-muted-foreground">
+                    {new Date(p.publishedAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                )}
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
