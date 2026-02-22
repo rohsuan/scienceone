@@ -43,10 +43,10 @@
   1. Running `prisma migrate deploy` (or `prisma db push`) succeeds with no errors and all new tables (Resource, BlogPost, Simulation, Subject, ResourcePurchase) appear in the database
   2. The SubjectSelect component renders a dropdown of seeded subjects (Physics, Mathematics, Chemistry, Computer Science) in an admin form without errors
   3. A shared `sanitizeHtml()` utility exists and is applied at all four dangerouslySetInnerHTML sites (blog content, resource content, simulation teacherGuide, simulation parameterDocs) — no raw HTML from the database reaches the DOM unsanitized
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 10-01: Verify migration, seed subjects, and wire sanitizeHtml utility
+- [ ] 10-01-PLAN.md — Verify migration, seed subjects, and wire sanitizeHtml utility
 
 ### Phase 11: Resource Admin
 **Goal**: Admin can fully manage resources — create, edit, publish, delete, upload files and cover images to R2, assign subjects, and configure simulations — using a verified admin form with no silent failures
