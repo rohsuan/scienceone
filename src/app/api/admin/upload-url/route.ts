@@ -13,17 +13,20 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { bookId, fileName, type } = body as {
-    bookId: string;
+  const { bookId, resourceId, fileName, type } = body as {
+    bookId?: string;
+    resourceId?: string;
     fileName: string;
-    type: "cover" | "author" | "pdf";
+    type: "cover" | "author" | "pdf" | "resource-cover" | "resource-file" | "blog-cover" | "blog-author";
   };
 
-  if (!bookId || !fileName || !type) {
+  const entityId = bookId || resourceId;
+  if (!entityId || !fileName || !type) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  if (type !== "cover" && type !== "author" && type !== "pdf") {
+  const validTypes = ["cover", "author", "pdf", "resource-cover", "resource-file", "blog-cover", "blog-author"];
+  if (!validTypes.includes(type)) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   }
 
@@ -32,11 +35,34 @@ export async function POST(request: NextRequest) {
   let contentType: string;
 
   if (type === "pdf") {
-    r2Key = `books/${bookId}/${bookId}-${Date.now()}.pdf`;
+    r2Key = `books/${entityId}/${entityId}-${Date.now()}.pdf`;
     contentType = "application/pdf";
+  } else if (type === "resource-cover") {
+    const extension = fileName.split(".").pop()?.toLowerCase() ?? "jpg";
+    r2Key = `images/resources/${entityId}/cover-${Date.now()}.${extension}`;
+    contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
+  } else if (type === "resource-file") {
+    const extension = fileName.split(".").pop()?.toLowerCase() ?? "bin";
+    r2Key = `resources/${entityId}/${Date.now()}.${extension}`;
+    // Determine content type from extension
+    const mimeTypes: Record<string, string> = {
+      pdf: "application/pdf",
+      zip: "application/zip",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      tex: "application/x-tex",
+      ipynb: "application/x-ipynb+json",
+    };
+    contentType = mimeTypes[extension] ?? "application/octet-stream";
+  } else if (type === "blog-cover" || type === "blog-author") {
+    const extension = fileName.split(".").pop()?.toLowerCase() ?? "jpg";
+    const subtype = type === "blog-cover" ? "cover" : "author";
+    r2Key = `images/blog/${entityId}/${subtype}-${Date.now()}.${extension}`;
+    contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
   } else {
     const extension = fileName.split(".").pop()?.toLowerCase() ?? "jpg";
-    r2Key = `images/${bookId}/${type}-${Date.now()}.${extension}`;
+    r2Key = `images/${entityId}/${type}-${Date.now()}.${extension}`;
     contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
   }
 

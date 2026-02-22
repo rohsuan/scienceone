@@ -99,6 +99,30 @@
   }
 }
 
+/* Code blocks: override prose dark pre background by resetting the
+   CSS variables that the typography plugin reads, plus direct overrides. */
+.prose {
+  --tw-prose-pre-bg: #f6f8fa;
+  --tw-prose-pre-code: #24292e;
+}
+
+.code-block-wrapper pre,
+.prose pre {
+  background-color: #f6f8fa !important;
+  color: #24292e !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
 @layer utilities {
   /* Academic heading utility: use Lora serif for headings */
   .heading-serif {

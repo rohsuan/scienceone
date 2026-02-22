@@ -11,6 +11,8 @@ import {
 import ChapterNav from "@/components/reader/ChapterNav";
 import ScrollProgressTracker from "@/components/reader/ScrollProgressTracker";
 import ReadingProgressBar from "@/components/reader/ReadingProgressBar";
+import CodeBlockEnhancer from "@/components/reader/CodeBlockEnhancer";
+import { highlightCodeBlocks } from "@/lib/highlight-code";
 
 interface PageProps {
   params: Promise<{ bookSlug: string; chapterSlug: string }>;
@@ -63,6 +65,8 @@ export default async function ChapterPage({ params }: PageProps) {
     }
   }
 
+  const highlightedContent = await highlightCodeBlocks(chapter.content ?? "");
+
   return (
     <div className="px-4 sm:px-6 lg:px-12 py-8 lg:py-12">
       {/* Chapter title */}
@@ -80,8 +84,9 @@ export default async function ChapterPage({ params }: PageProps) {
           [&_.katex-display]:overflow-y-hidden
           [&_.katex-display]:pb-2
         "
-        dangerouslySetInnerHTML={{ __html: chapter.content ?? "" }}
+        dangerouslySetInnerHTML={{ __html: highlightedContent }}
       />
+      <CodeBlockEnhancer />
 
       {/* Prev/Next chapter navigation */}
       {book && (

@@ -10,12 +10,48 @@ export default function Footer() {
           <div className="space-y-3">
             <p className="font-serif text-lg font-semibold text-primary">ScienceOne</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Scholarly books for curious minds
+              Scholarly books, resources, and simulations for curious minds
             </p>
           </div>
 
-          {/* Spacer on desktop */}
-          <div className="hidden md:block" />
+          {/* Explore column */}
+          <div>
+            <p className="text-sm font-medium text-foreground mb-4">Explore</p>
+            <ul className="space-y-3">
+              <li>
+                <Link
+                  href="/catalog"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Catalog
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/resources"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Resources
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/simulations"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Simulations
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
+            </ul>
+          </div>
 
           {/* Links column */}
           <div>

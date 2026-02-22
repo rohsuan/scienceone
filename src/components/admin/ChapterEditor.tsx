@@ -3,6 +3,13 @@
 import { useEffect, useCallback, useTransition, useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { createLowlight } from "lowlight";
+import python from "highlight.js/lib/languages/python";
+import javascript from "highlight.js/lib/languages/javascript";
+import bash from "highlight.js/lib/languages/bash";
+import json from "highlight.js/lib/languages/json";
+import { Markdown } from "@tiptap/markdown";
 import { toast } from "sonner";
 import Link from "next/link";
 import {
@@ -17,7 +24,17 @@ import {
   Save,
   Eye,
   Sigma,
+  Code,
+  Code2,
 } from "lucide-react";
+
+import "highlight.js/styles/github-dark.css";
+
+const lowlight = createLowlight();
+lowlight.register("python", python);
+lowlight.register("javascript", javascript);
+lowlight.register("bash", bash);
+lowlight.register("json", json);
 
 import { updateChapterContent } from "@/lib/admin-actions";
 import { KatexInline, KatexBlock } from "@/components/admin/tiptap-katex";
@@ -41,13 +58,17 @@ export default function ChapterEditor({
   const [isPending, startTransition] = useTransition();
   const [isDirty, setIsDirty] = useState(false);
   const [latexOpen, setLatexOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"wysiwyg" | "markdown">("wysiwyg");
+  const [markdownContent, setMarkdownContent] = useState("");
   const savedContentRef = useRef(initialContent);
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ codeBlock: false }),
+      CodeBlockLowlight.configure({ lowlight, defaultLanguage: "python" }),
       KatexInline,
       KatexBlock,
+      Markdown,
     ],
     content: initialContent,
     immediatelyRender: false,
@@ -61,8 +82,28 @@ export default function ChapterEditor({
     },
   });
 
+  const syncMarkdownToEditor = useCallback(() => {
+    if (!editor) return;
+    editor.commands.setContent(markdownContent, { contentType: "markdown" });
+  }, [editor, markdownContent]);
+
+  const handleToggleView = useCallback(() => {
+    if (!editor) return;
+    if (viewMode === "wysiwyg") {
+      setMarkdownContent(editor.getMarkdown());
+      setViewMode("markdown");
+    } else {
+      syncMarkdownToEditor();
+      setViewMode("wysiwyg");
+    }
+  }, [editor, viewMode, syncMarkdownToEditor]);
+
   const handleSave = useCallback(() => {
     if (!editor) return;
+    // If in markdown mode, sync to editor first
+    if (viewMode === "markdown") {
+      editor.commands.setContent(markdownContent, { contentType: "markdown" });
+    }
     const html = editor.getHTML();
     startTransition(async () => {
       try {
@@ -75,7 +116,7 @@ export default function ChapterEditor({
         toast.error("Failed to save chapter");
       }
     });
-  }, [editor, bookId, chapterSlug]);
+  }, [editor, bookId, chapterSlug, viewMode, markdownContent]);
 
   // Keyboard shortcut: Cmd/Ctrl+S
   useEffect(() => {
@@ -102,6 +143,8 @@ export default function ChapterEditor({
 
   if (!editor) return null;
 
+  const isMarkdown = viewMode === "markdown";
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
@@ -109,6 +152,7 @@ export default function ChapterEditor({
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive("bold")}
+          disabled={isMarkdown}
           title="Bold"
         >
           <Bold className="h-4 w-4" />
@@ -116,6 +160,7 @@ export default function ChapterEditor({
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
           active={editor.isActive("italic")}
+          disabled={isMarkdown}
           title="Italic"
         >
           <Italic className="h-4 w-4" />
@@ -126,6 +171,7 @@ export default function ChapterEditor({
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           active={editor.isActive("heading", { level: 2 })}
+          disabled={isMarkdown}
           title="Heading 2"
         >
           <Heading2 className="h-4 w-4" />
@@ -133,6 +179,7 @@ export default function ChapterEditor({
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           active={editor.isActive("heading", { level: 3 })}
+          disabled={isMarkdown}
           title="Heading 3"
         >
           <Heading3 className="h-4 w-4" />
@@ -143,6 +190,7 @@ export default function ChapterEditor({
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           active={editor.isActive("bulletList")}
+          disabled={isMarkdown}
           title="Bullet List"
         >
           <List className="h-4 w-4" />
@@ -150,6 +198,7 @@ export default function ChapterEditor({
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           active={editor.isActive("orderedList")}
+          disabled={isMarkdown}
           title="Ordered List"
         >
           <ListOrdered className="h-4 w-4" />
@@ -159,14 +208,14 @@ export default function ChapterEditor({
 
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().undo()}
+          disabled={isMarkdown || !editor.can().undo()}
           title="Undo"
         >
           <Undo className="h-4 w-4" />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().redo()}
+          disabled={isMarkdown || !editor.can().redo()}
           title="Redo"
         >
           <Redo className="h-4 w-4" />
@@ -176,13 +225,37 @@ export default function ChapterEditor({
 
         <ToolbarButton
           onClick={() => setLatexOpen(true)}
+          disabled={isMarkdown}
           title="Insert LaTeX"
         >
           <Sigma className="h-4 w-4" />
         </ToolbarButton>
 
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          active={editor.isActive("codeBlock")}
+          disabled={isMarkdown}
+          title="Code Block"
+        >
+          <Code2 className="h-4 w-4" />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={handleToggleView}
+          active={isMarkdown}
+          title={isMarkdown ? "Switch to WYSIWYG" : "Switch to Markdown"}
+        >
+          <Code className="h-4 w-4" />
+        </ToolbarButton>
+
         {/* Spacer */}
         <div className="flex-1" />
+
+        {isMarkdown && (
+          <Badge variant="outline" className="text-blue-600 border-blue-300">
+            Markdown
+          </Badge>
+        )}
 
         {isDirty && (
           <Badge variant="outline" className="text-yellow-600 border-yellow-300">
@@ -205,7 +278,19 @@ export default function ChapterEditor({
 
       {/* Editor */}
       <div className="rounded-lg border p-6">
-        <EditorContent editor={editor} />
+        {isMarkdown ? (
+          <textarea
+            className="w-full min-h-[400px] font-mono text-sm bg-transparent focus:outline-none resize-y"
+            value={markdownContent}
+            onChange={(e) => {
+              setMarkdownContent(e.target.value);
+              setIsDirty(true);
+            }}
+            spellCheck={false}
+          />
+        ) : (
+          <EditorContent editor={editor} />
+        )}
       </div>
 
       <LaTeXDialog

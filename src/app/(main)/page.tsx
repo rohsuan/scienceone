@@ -83,41 +83,51 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            {/* Feature 2: Read Anywhere */}
+            {/* Feature 2: Resource Library */}
             <Card className="border-border/60 bg-card shadow-sm">
               <CardHeader className="pb-3">
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <span className="text-xl" aria-hidden="true">◻</span>
+                  <span className="text-xl" aria-hidden="true">📚</span>
                 </div>
                 <CardTitle className="heading-serif text-xl text-foreground">
-                  Read Anywhere
+                  Resource Library
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Works on any device — laptop, tablet, or phone. No
-                  downloads, no plugins. Open your book and start reading
-                  instantly.
+                  Lesson plans, problem sets, lab guides, and course modules
+                  designed for AP and university-level physics education.
                 </p>
+                <Link
+                  href="/resources"
+                  className="text-sm text-primary underline underline-offset-4 hover:text-primary/80 mt-2 inline-block"
+                >
+                  Browse resources
+                </Link>
               </CardContent>
             </Card>
 
-            {/* Feature 3: Academic Quality */}
+            {/* Feature 3: Interactive Simulations */}
             <Card className="border-border/60 bg-card shadow-sm">
               <CardHeader className="pb-3">
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <span className="text-xl" aria-hidden="true">★</span>
+                  <span className="text-xl" aria-hidden="true">⚡</span>
                 </div>
                 <CardTitle className="heading-serif text-xl text-foreground">
-                  Academic Quality
+                  Interactive Simulations
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Curated, peer-reviewed content from leading STEM authors.
-                  Every book meets the standards you expect from academic
-                  publishing.
+                  Explore physics concepts through adjustable, real-time
+                  simulations — projectile motion, wave interference, and more.
                 </p>
+                <Link
+                  href="/simulations"
+                  className="text-sm text-primary underline underline-offset-4 hover:text-primary/80 mt-2 inline-block"
+                >
+                  Try simulations
+                </Link>
               </CardContent>
             </Card>
           </div>

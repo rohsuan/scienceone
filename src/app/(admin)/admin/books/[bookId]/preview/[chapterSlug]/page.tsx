@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth";
 import { getChapterAdmin, getBookChaptersAdmin } from "@/lib/admin-queries";
 import { Badge } from "@/components/ui/badge";
 import ChapterNavSelect from "@/components/admin/ChapterNavSelect";
+import CodeBlockEnhancer from "@/components/reader/CodeBlockEnhancer";
+import { highlightCodeBlocks } from "@/lib/highlight-code";
 import { ChevronLeft, ChevronRight, Pencil } from "lucide-react";
 
 interface Props {
@@ -108,10 +110,13 @@ export default async function AdminChapterPreviewPage({ params }: Props) {
 
         {/* Chapter content — trusted HTML from our ingest pipeline */}
         {chapter.content ? (
-          <div
-            className="prose prose-lg max-w-3xl [&_.katex-display]:overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: chapter.content }}
-          />
+          <>
+            <div
+              className="prose prose-lg max-w-3xl [&_.katex-display]:overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: await highlightCodeBlocks(chapter.content) }}
+            />
+            <CodeBlockEnhancer />
+          </>
         ) : (
           <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground text-sm">
             This chapter has no content.

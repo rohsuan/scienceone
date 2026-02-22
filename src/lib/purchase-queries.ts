@@ -46,3 +46,26 @@ export const getUserPurchases = cache(async (userId: string) => {
     },
   });
 });
+
+export const getUserResourcePurchases = cache(async (userId: string) => {
+  return prisma.resourcePurchase.findMany({
+    where: { userId, status: "completed" },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      amount: true,
+      currency: true,
+      createdAt: true,
+      resource: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          type: true,
+          coverImage: true,
+          fileKey: true,
+        },
+      },
+    },
+  });
+});

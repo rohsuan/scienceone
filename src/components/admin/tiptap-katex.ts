@@ -1,4 +1,5 @@
 import { Node } from "@tiptap/core";
+import katex from "katex";
 
 /** Parse rawHTML into a DOM element, falling back to an empty span. */
 function buildDom(rawHTML: string | null, fallbackClass: string): HTMLElement {
@@ -9,6 +10,17 @@ function buildDom(rawHTML: string | null, fallbackClass: string): HTMLElement {
     el.className = fallbackClass;
     return el;
   })();
+}
+
+/**
+ * Extract the original LaTeX source from KaTeX's rendered HTML.
+ * KaTeX embeds it inside `<annotation encoding="application/x-tex">`.
+ */
+function extractLatex(rawHTML: string): string {
+  const match = rawHTML.match(
+    /<annotation[^>]*encoding="application\/x-tex"[^>]*>([\s\S]*?)<\/annotation>/,
+  );
+  return match ? match[1] : "";
 }
 
 /**
@@ -57,6 +69,44 @@ export const KatexInline = Node.create({
       dom: buildDom(node.attrs.rawHTML, "katex"),
     });
   },
+
+  markdownTokenizer: {
+    name: "katexInline",
+    level: "inline" as const,
+    start: (src: string) => {
+      const idx = src.indexOf("$");
+      // Skip $$ (handled by block tokenizer)
+      if (idx >= 0 && src[idx + 1] === "$") return -1;
+      return idx;
+    },
+    tokenize(src: string) {
+      // Match $...$ but not $$
+      const match = src.match(/^\$([^\$]+?)\$/);
+      if (!match) return;
+      return {
+        type: "katexInline",
+        raw: match[0],
+        text: match[1],
+      };
+    },
+  },
+
+  parseMarkdown(token) {
+    const latex = token.text ?? "";
+    const rendered = katex.renderToString(latex, {
+      displayMode: false,
+      throwOnError: false,
+    });
+    return {
+      type: "katexInline",
+      attrs: { rawHTML: rendered },
+    };
+  },
+
+  renderMarkdown(node) {
+    const latex = extractLatex(node.attrs?.rawHTML || "");
+    return `$${latex}$`;
+  },
 });
 
 /**
@@ -93,5 +143,38 @@ export const KatexBlock = Node.create({
     return ({ node }) => ({
       dom: buildDom(node.attrs.rawHTML, "katex-display"),
     });
+  },
+
+  markdownTokenizer: {
+    name: "katexBlock",
+    level: "block" as const,
+    start: (src: string) => src.indexOf("$$"),
+    tokenize(src: string) {
+      const match = src.match(/^\$\$([\s\S]+?)\$\$/);
+      if (!match) return;
+      return {
+        type: "katexBlock",
+        raw: match[0],
+        text: match[1].trim(),
+      };
+    },
+  },
+
+  parseMarkdown(token) {
+    const latex = token.text ?? "";
+    const rendered = katex.renderToString(latex, {
+      displayMode: true,
+      throwOnError: false,
+    });
+    const rawHTML = `<span class="katex-display">${rendered}</span>`;
+    return {
+      type: "katexBlock",
+      attrs: { rawHTML },
+    };
+  },
+
+  renderMarkdown(node) {
+    const latex = extractLatex(node.attrs?.rawHTML || "");
+    return `$$${latex}$$\n\n`;
   },
 });
