@@ -148,4 +148,4 @@ Plans:
 | 12. Resource Public and Purchase | 2/2 | Complete    | 2026-02-22 | - |
 | 13. Simulations | 2/2 | Complete    | 2026-02-22 | - |
 | 14. Blog | 2/2 | Complete   | 2026-02-22 | - |
-| 15. Polish and Cross-linking | v1.1 | 0/2 | Not started | - |
+| 15. Polish and Cross-linking | 1/2 | In Progress|  | - |

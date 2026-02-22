@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Educators and students can discover STEM content — books, resources, simulations, and articles — with properly rendered math, directly in their browser
-**Current focus:** v1.1 Content Hub — Phase 14: Blog
+**Current focus:** v1.1 Content Hub — Phase 15: Polish and Cross-Linking
 
 ## Current Position
 
-Phase: 14 of 15 (Blog) — COMPLETE, advancing to Phase 15
-Plan: 2 of 2 in current phase — Phase 14 Plan 02 complete
+Phase: 15 of 15 (Polish and Cross-Linking) — In progress
+Plan: 1 of 2 in current phase — Phase 15 Plan 01 complete
 Status: In progress
-Last activity: 2026-02-22 — Phase 14 Plan 02 complete (blog SEO + Shiki + sitemap)
+Last activity: 2026-02-22 — Phase 15 Plan 01 complete (pagination for resource and blog listing pages)
 
-Progress: [████████░░] 70% (v1.1) — Phase 14 complete (2/2 plans done)
+Progress: [█████████░] 85% (v1.1) — Phase 15 Plan 01 complete (1/2 plans done)
 
 ## Performance Metrics
 
@@ -32,6 +32,7 @@ Progress: [████████░░] 70% (v1.1) — Phase 14 complete (2/2
 | Phase 12: Resource Public/Purchase | 2 | 4 min | 2 min |
 | Phase 13: Simulations | 2 | 15 min | 7.5 min |
 | Phase 14: Blog | 2 | 4 min | 2 min |
+| Phase 15: Polish | 1 | 2 min | 2 min |
 
 *Updated after each plan completion*
 | Phase 12-resource-public-purchase P01 | 6 | 2 tasks | 3 files |
@@ -39,6 +40,7 @@ Progress: [████████░░] 70% (v1.1) — Phase 14 complete (2/2
 | Phase 13-simulations P02 | 6 | 1 tasks | 0 files |
 | Phase 14-blog P01 | 3 | 2 tasks | 2 files |
 | Phase 14-blog P02 | 1 | 2 tasks | 2 files |
+| Phase 15-polish P01 | 2 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -72,6 +74,9 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Phase 14-02]: JSON-LD datePublished falls back to createdAt — ensures field is never undefined/dropped by JSON.stringify
 - [Phase 14-02]: highlightCodeBlocks runs before sanitizeHtml — Shiki transforms pre/code HTML, then sanitize allows class/style attributes through
 - [Phase 14-02]: Simulations use /simulations/{slug} path in sitemap; non-simulation resources use /resources/{slug}
+- [Phase 15-01]: Pagination component uses conditional rendering (not disabled) to avoid asChild + disabled anchor pitfall
+- [Phase 15-01]: PAGE_SIZE = 12 exported from each query module so listing pages can compute totalPages without separate constant import
+- [Phase 15-01]: simulations/page.tsx destructures { items } from updated getPublishedResources — no pagination added (simulations are few)
 
 ### Pending Todos
 
@@ -87,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-22T03:42:30Z
-Stopped at: Completed 14-02-PLAN.md — Phase 14 Plan 02 complete (blog SEO + Shiki + sitemap), Phase 14 fully complete
-Resume file: None — continue with Phase 15 (Polish)
+Last session: 2026-02-22T05:21:22Z
+Stopped at: Completed 15-01-PLAN.md — Phase 15 Plan 01 complete (pagination for resource and blog listing pages)
+Resume file: None — continue with Phase 15 Plan 02
