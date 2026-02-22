@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { bookUpdateSchema, type BookUpdateData, chapterContentUpdateSchema } from "@/lib/admin-schemas";
-import sanitizeHtml from "sanitize-html";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -136,22 +136,8 @@ export async function updateChapterContent(
 
     const validated = chapterContentUpdateSchema.parse(data);
 
-    // Sanitize HTML — allow standard + KaTeX/MathML tags and attributes
-    const clean = sanitizeHtml(validated.content, {
-      allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-        "span", "math", "semantics", "mrow", "mi", "mo", "mn", "msup",
-        "msub", "mfrac", "mover", "munder", "msqrt", "mroot", "mtable",
-        "mtr", "mtd", "annotation", "mspace", "mtext", "menclose", "mpadded",
-      ]),
-      allowedAttributes: {
-        ...sanitizeHtml.defaults.allowedAttributes,
-        "*": ["class", "style", "aria-hidden", "role", "data-*"],
-        math: ["xmlns"],
-        annotation: ["encoding"],
-        mo: ["mathvariant", "stretchy", "fence", "separator"],
-        mi: ["mathvariant"],
-      },
-    });
+    // Sanitize HTML using shared utility (same config as public rendering)
+    const clean = sanitizeHtml(validated.content);
 
     // Ownership check: verify chapter belongs to this book
     const chapter = await prisma.chapter.findFirst({
