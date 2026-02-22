@@ -32,12 +32,12 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 ### Simulations
 
-- [ ] **SIM-01**: Simulation gallery page with subject filtering
-- [ ] **SIM-02**: Simulation detail pages embed interactive canvas simulations
-- [ ] **SIM-03**: Simulations load via next/dynamic (SSR-safe, no React.lazy)
-- [ ] **SIM-04**: Simulation canvas is responsive across desktop, tablet, and mobile
-- [ ] **SIM-05**: Teacher guide and parameter docs display on simulation pages
-- [ ] **SIM-06**: Three simulations work correctly (projectile motion, wave interference, spring-mass)
+- [x] **SIM-01**: Simulation gallery page with subject filtering
+- [x] **SIM-02**: Simulation detail pages embed interactive canvas simulations
+- [x] **SIM-03**: Simulations load via next/dynamic (SSR-safe, no React.lazy)
+- [x] **SIM-04**: Simulation canvas is responsive across desktop, tablet, and mobile
+- [x] **SIM-05**: Teacher guide and parameter docs display on simulation pages
+- [x] **SIM-06**: Three simulations work correctly (projectile motion, wave interference, spring-mass)
 
 ### Cross-Linking
 
@@ -103,12 +103,12 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 | RES-08 | Phase 12 | Complete |
 | RES-09 | Phase 12 | Complete |
 | RES-10 | Phase 15 | Pending |
-| SIM-01 | Phase 13 | Pending |
-| SIM-02 | Phase 13 | Pending |
-| SIM-03 | Phase 13 | Pending |
-| SIM-04 | Phase 13 | Pending |
-| SIM-05 | Phase 13 | Pending |
-| SIM-06 | Phase 13 | Pending |
+| SIM-01 | Phase 13 | Complete |
+| SIM-02 | Phase 13 | Complete |
+| SIM-03 | Phase 13 | Complete |
+| SIM-04 | Phase 13 | Complete |
+| SIM-05 | Phase 13 | Complete |
+| SIM-06 | Phase 13 | Complete |
 | XLINK-01 | Phase 15 | Pending |
 | XLINK-02 | Phase 15 | Pending |
 | XLINK-03 | Phase 15 | Pending |

@@ -146,6 +146,6 @@ Plans:
 | 10. Infrastructure | 1/1 | Complete    | 2026-02-22 | - |
 | 11. Resource Admin | 2/2 | Complete    | 2026-02-22 | - |
 | 12. Resource Public and Purchase | 2/2 | Complete    | 2026-02-22 | - |
-| 13. Simulations | v1.1 | 0/2 | Not started | - |
+| 13. Simulations | 1/2 | In Progress|  | - |
 | 14. Blog | v1.1 | 0/2 | Not started | - |
 | 15. Polish and Cross-linking | v1.1 | 0/2 | Not started | - |
