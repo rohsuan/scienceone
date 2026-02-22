@@ -91,11 +91,11 @@ Plans:
   3. All three simulations (projectile motion, wave interference, spring-mass) are interactive: Play/Reset controls respond and sliders change simulation parameters
   4. The simulation canvas is not hardcoded to 600px — it scales correctly on a phone-sized viewport (375px) and an iPad-sized viewport (768px)
   5. Teacher guide and parameter documentation text appears on each simulation detail page
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 13-01: Convert React.lazy to next/dynamic, fix canvas responsive layout, audit RAF cancellation
-- [ ] 13-02: Verify all three simulations end-to-end with Rodney
+- [ ] 13-01-PLAN.md — Split registry to fix SSR errors, make canvases responsive via ResizeObserver, seed simulation DB records
+- [ ] 13-02-PLAN.md — Verify all three simulations end-to-end with Rodney browser automation
 
 ### Phase 14: Blog
 **Goal**: Admin can create and publish blog posts, visitors can browse and read them with correct SEO metadata, all content is sanitized before rendering, and the sitemap includes blog posts
