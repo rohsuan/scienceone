@@ -1,172 +1,258 @@
 # Feature Research
 
-**Domain:** Online STEM book publishing platform (mathematics and physics)
-**Researched:** 2026-02-18
-**Confidence:** MEDIUM — Strong signals from Cambridge Core, Perlego, VitalSource, LiveCarta, and open-source math publishing (MathJax, PreTeXt). Some claims verified via official docs; table stakes confirmed by multiple platforms. Anti-features are LOW confidence (pattern extrapolation from feature-creep literature).
+**Domain:** STEM Education Platform — Blog, Resource Library, Interactive Physics Simulations (v1.1 additions)
+**Researched:** 2026-02-22
+**Confidence:** HIGH for table stakes (verified against PhET, TPT, OER Commons, schema.org docs); MEDIUM for differentiators (pattern from multiple platforms, some extrapolation); LOW for anti-features (domain pattern + first-pass code inspection)
+
+---
+
+## Scope Note
+
+This file covers ONLY the v1.1 additions: blog, resource library, and interactive simulations. The v1.0 book platform features are documented in an earlier FEATURES.md iteration. The existing first-pass code for all three domains has been inspected; this file maps what is already built vs. what is missing to be production-quality.
 
 ---
 
 ## Feature Landscape
 
-### Table Stakes (Users Expect These)
+### Blog
 
-Features users assume exist. Missing these = product feels incomplete.
+#### Table Stakes (Users Expect These)
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Browser-based book reader | Every modern platform delivers in-browser reading; PDF-only feels 2005 | MEDIUM | Must handle math rendering — MathJax or KaTeX required |
-| LaTeX/MathJax formula rendering | Core product for STEM — broken math = broken product | MEDIUM | MathJax v3 is de facto standard; KaTeX faster but less complete |
-| Book catalog with browse/filter | Users need to find books by subject, author, level | LOW | Filter by category/topic/difficulty; sort by date, title |
-| Book detail page | Author, cover, synopsis, ISBN, TOC, pricing info — standard bookstore pattern | LOW | Must include structured data (schema.org/Book) for SEO |
-| Table of contents navigation | STEM books are long; readers jump to chapters constantly | LOW | Sticky sidebar or drawer; chapter/section hierarchy |
-| PDF download | Professionals and students expect offline-capable PDF — it's the contract format for academic content | LOW | Requires access control check before serving file |
-| EPUB download | Standard for e-readers (Kindle-compatible); expected by professional audiences | MEDIUM | Math in EPUB requires images or MathML; more complex than PDF |
-| Search within catalog | Users arrive knowing what they want; search is the primary discovery path | LOW | Full-text search on title, author, subject, keywords |
-| Shopping cart / checkout | Single-book purchase is the expected model for professional STEM content | MEDIUM | Stripe for payments; webhook-driven access grant |
-| Purchase receipt + access confirmation | Users need proof of purchase and a clear path back to their content | LOW | Email receipt + persistent "my library" view |
-| User account / authentication | Required for purchase history, download access, and gating paid content | MEDIUM | Email/password minimum; OAuth (Google) is strong expectation |
-| "My Library" / purchased books view | Users need to re-access what they bought; no account = no repeat reading | LOW | List of owned books with download and read links |
-| Mobile-responsive reader | 40%+ of academic reading happens on tablets/phones; non-responsive = unusable | MEDIUM | Especially critical for math: equations must reflow or scroll |
-| Secure file delivery | Publishers require that PDF/EPUB downloads are not public URLs | LOW | Signed, time-limited download URLs (S3 presigned or equivalent) |
-| Open access book support | Growing expectation in academic publishing; funders often mandate it | LOW | Mark books as free; same reader UX, no checkout step |
-| Book cover image | Visual identity; catalog without covers feels like a database, not a bookstore | LOW | High-resolution cover; consistent aspect ratio |
-| Author bio and photo | Expected on every academic publisher page (Cambridge, Springer pattern) | LOW | Short bio, optional headshot, institution affiliation |
+| Feature | Why Expected | Complexity | Status in Code | Notes |
+|---------|--------------|------------|----------------|-------|
+| Article listing page with cards | Every blog has a listing page; cards with title, excerpt, cover, date, author are the universal pattern | LOW | BUILT — BlogPostCard, /blog | Complete |
+| Category filtering | Readers arrive via interest area (Teaching, Computation, etc.); uncategorized blogs feel like a dump | LOW | BUILT — BlogFilters | 4 categories hardcoded in enum |
+| Full-text search | "Find me that article about harmonic oscillators" — users search by keyword, not just category | LOW | BUILT — title/excerpt search | Already works |
+| Article detail page | Title, content, author byline, date, cover image, subject tags — the minimum viable article page | LOW | BUILT — /blog/[slug] | Complete |
+| Excerpt on cards | Readers scan before committing; missing excerpt = higher bounce from listing | LOW | BUILT | Optional field, sensible |
+| Author attribution | STEM credibility is tied to author identity; anonymous articles feel unreliable | LOW | BUILT — name + photo + bio | Complete |
+| Open Graph / SEO metadata | Blog articles spread via social sharing; og:title, og:image, og:description are table stakes for sharing | LOW | BUILT — generateMetadata | OG tags present |
+| Article JSON-LD structured data | Google rich results (sitelinks, article carousels) require Article schema; missing = SEO penalty | LOW | BUILT — schema.org/Article | JSON-LD in page |
+| Slug-based clean URLs | /blog/my-article-title not /blog?id=123 — URL is expected to be human-readable | LOW | BUILT | Slug-based routing |
+| Published/draft workflow | Admin needs to draft before publishing; public page only shows published | LOW | BUILT — isPublished flag | Missing: admin preview of draft |
+| Subject/topic tags on articles | Cross-links to resource library by subject; teachers filter by Physics, Math, etc. | LOW | BUILT — subjects M2M | Shared Subject model |
+| Empty state messages | "No posts match your search" with a clear reset path — users notice when this is missing | LOW | BUILT | Implemented |
+| Pagination or infinite scroll | At >20 posts, listing must paginate; without it the page becomes slow and hard to navigate | MEDIUM | MISSING | Currently loads all posts; no LIMIT |
+| RSS feed | Tech-savvy educators and aggregators subscribe to RSS; absence signals an unmaintained platform | MEDIUM | MISSING | Not implemented |
 
----
-
-### Differentiators (Competitive Advantage)
-
-Features that set the product apart. Not required, but valuable.
+#### Differentiators (Blog — Competitive Advantage)
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| LaTeX source ingestion pipeline | ScienceOne's input is LaTeX, Word, Markdown — most platforms require manual reformatting; automated pipeline reduces publisher labor dramatically | HIGH | Pandoc + MathJax preprocessing; LaTeX → HTML is the hard path; MathJax not 100% compatible with all LaTeX macros |
-| Pay-per-chapter / pay-per-section | LiveCarta pioneered this for higher ed; lets readers buy only what they need — reduces price objection for students | HIGH | Requires granular content segmentation and purchase tracking |
-| Reading customization (font, dark mode) | Perlego, VitalSource both offer this; for long-form technical reading, dark mode and font control significantly reduce eye strain | MEDIUM | Font size, line spacing, dark/light/sepia themes |
-| In-browser highlights and bookmarks | Perlego's signature feature; academics markup heavily; highlights stored per-user, per-book | HIGH | Requires backend storage per user; sync across devices is table stakes once highlights exist |
-| Citation export (BibTeX, APA, MLA) | STEM readers cite constantly; one-click BibTeX export from a book page saves real time | LOW | Cambridge Core does this; schema.org metadata powers it |
-| Reading progress tracking | Motivates completion; lets readers resume exactly where they stopped | MEDIUM | Progress stored server-side; requires user account |
-| Schema.org Book structured data + SEO | Google Search shows buy/read actions directly in results; dramatically improves organic discoverability for academic searchers | LOW | JSON-LD on every book page; ReadAction and BorrowAction markup |
-| Admin ingestion dashboard | Founder manages the catalog; a clean upload workflow (LaTeX zip, Word doc, Markdown) with processing status visibility removes friction on the supply side | HIGH | File upload → processing queue → preview → publish |
-| Preview / sample chapter | Reduces purchase hesitation; standard in STEM publishing (Springer, Cambridge both offer chapter previews) | MEDIUM | First chapter or X% of content accessible without purchase |
-| Print edition metadata (ISBN, print info) | Professional STEM audiences cross-reference with print editions; showing print ISBN, edition, page count builds trust | LOW | Data field only; links to Amazon/publisher print listings optional |
-| Discount codes / institutional pricing | Universities buying access for students is a real channel; coupon system unlocks bulk deals | MEDIUM | Stripe promo codes; access duration control |
+| KaTeX math in blog posts | Other blogs force educators to screenshot equations; inline math renders properly for STEM readers | MEDIUM | MISSING — content is HTML but math not pre-rendered; TipTap+KaTeX pattern from ChapterEditor could carry over |
+| Subject-based cross-links to resources | "Related resources on this topic" at bottom of article — turns blog readers into resource library customers | LOW | MISSING — data model supports it (shared subjects) but no UI |
+| Reading time estimate | "5-minute read" sets expectations; reduces bounce for educators with limited planning periods | LOW | MISSING — trivial to compute (word count / 200 wpm) |
+| Prev/Next article navigation | After reading, reader should see adjacent posts; without it they dead-end | LOW | MISSING — no nav between articles |
+| Canonical URL on articles | Required if content is ever cross-posted; also best practice for duplicate-content prevention | LOW | PARTIALLY — OG URL present but no <link rel="canonical"> |
 
----
-
-### Anti-Features (Commonly Requested, Often Problematic)
-
-Features that seem good but create problems.
+#### Anti-Features (Blog)
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Author self-service upload portal | "Let authors submit their own books" | ScienceOne explicitly has a curator model; self-service brings quality control problems, abuse, spam, and a support burden that kills focus for a <100-book catalog | Founder-managed ingestion dashboard; keep the supply chain curated |
-| DRM / copy-protect PDF | "Prevent piracy" | Academic STEM audiences strongly resent DRM; professional researchers share files, annotate, archive; DRM drives users to piracy or competing platforms (VitalSource's DRM is the #1 user complaint). At <100 books, piracy risk is low | Use license-bound watermarking (name + email embedded in PDF) instead; much lower friction |
-| Subscription / all-access model | "Recurring revenue is better" | For <20 books at launch, unlimited subscription doesn't have enough value to justify the price; mixed monetization (open access + paid) makes pricing strategy incoherent if you add subscription on top | Stick to pay-per-book and open access; revisit subscription only after catalog exceeds 50 books |
-| Social features (reviews, ratings, follows) | "Make it community-driven" | Requires moderation infrastructure; STEM audience is small and professional; academic credibility comes from author reputation and publisher brand, not user ratings | Display author credentials and institutional affiliations prominently instead |
-| Real-time collaborative annotation | "Let study groups share highlights" | Multiplayer annotation is technically complex (CRDTs, WebSockets, conflict resolution); for a <100-book platform this is a distraction | Ship single-user highlights first; revisit after product-market fit |
-| LMS integration (Canvas, Moodle) | "Universities will buy if we integrate with their LMS" | LMS LTI 1.3 integration is a significant engineering effort; institutional sales cycles are 6-18 months; wrong priority for early stage | Focus on direct consumer sales; add LMS only when first institutional deal is closing |
-| AI chatbot / ask-a-question | "Let readers ask questions about the book content" | RAG over STEM content with heavy math is not solved; hallucinations on physics/math problems are dangerous for educational material | Provide excellent table of contents, search, and citation tools instead |
-| Offline reading mode | "Let readers read without internet" | Service worker + offline-cached books with math rendering is very complex; math rendering libraries (MathJax) don't cache cleanly; PDF download satisfies the actual user need | Ensure PDF download works well; that IS the offline solution |
+| Comments section | "Let teachers discuss articles" | Requires moderation, spam handling, notification emails; academic STEM audience prefers asynchronous discussion elsewhere; support burden with zero business model benefit | Keep a contact/feedback email link; let discourse happen on Twitter/LinkedIn |
+| User-submitted guest posts | "Community content expands reach" | Curator model is ScienceOne's brand; self-serve submissions bring quality control problems and review burden for a solo operator | If collaborators emerge, give them admin access and maintain editorial control |
+| Newsletter subscription (Mailchimp/ConvertKit) | "Build a list" | Requires GDPR compliance, unsubscribe flows, and ongoing editorial commitment; premature for v1.1 | Add RSS first; newsletter can be built later when content cadence is proven |
+| Social share buttons | "More sharing = more traffic" | Add JavaScript weight and privacy issues (tracking pixels); Google/social crawlers already pick up OG tags | OG tags already handle social previews; readers who want to share copy the URL |
+
+---
+
+### Resource Library
+
+#### Table Stakes (Users Expect These)
+
+| Feature | Why Expected | Complexity | Status in Code | Notes |
+|---------|--------------|------------|----------------|-------|
+| Resource listing page with cards | Card grid is the universal pattern for TPT, OER Commons, and every resource marketplace | LOW | BUILT — ResourceCard, /resources | Complete |
+| Filter by subject | Teachers arrive with a discipline in mind (Physics, Calculus, etc.); subject filter is non-negotiable | LOW | BUILT — subject pill filters | Shared Subject model |
+| Filter by type | Lesson Plan vs. Problem Set vs. Lab Guide are fundamentally different use cases; conflating them frustrates users | LOW | BUILT — type dropdown | 5 types |
+| Filter by level | AP vs. intro university vs. advanced university determines fit; teachers will not dig through wrong-level content | LOW | BUILT — level dropdown | 3 levels |
+| Sort by title / newest / popular | Title A-Z for browsing; newest for returning users; most popular for discovery | LOW | BUILT — sort dropdown | viewCount tracks popularity |
+| Full-text search | Teachers search by topic keyword, not just filter; "find me a Newton's law problem set" needs keyword search | LOW | BUILT — title/description/subject search | Works |
+| Resource detail page | Title, description, type/level badges, subject tags, cover image, download or purchase button | LOW | BUILT — /resources/[slug] | Complete |
+| Free vs. paid signaling | "Free" badge or price must be visible on the card and detail page; hidden pricing creates distrust | LOW | BUILT — Free badge + price on card | Complete |
+| Secure file download | Files must be behind auth/purchase check; direct R2 URL exposure is a security failure | LOW | BUILT — /api/resource-download presigned URL | R2 presigned, 900s expiry |
+| Purchase flow for paid resources | Stripe checkout + webhook entitlement — same pattern as books; needed for paid resources | MEDIUM | BUILT — resource checkout + webhook | Implemented |
+| Post-purchase access | After purchase, the download button should immediately appear; no re-login or page hunt | LOW | BUILT — hasResourcePurchase check | Works |
+| "My Resources" in dashboard | Purchased resources must be findable; not showing them = users contact support | LOW | BUILT — dashboard MyResources section | Complete |
+| Empty state messages | "No resources match filters" with clear reset — users notice broken empty states | LOW | BUILT | Implemented |
+| Pagination | At >30 resources, listing must paginate or lazy-load; without it performance degrades | MEDIUM | MISSING | Currently loads all; no LIMIT |
+
+#### Differentiators (Resource Library)
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Content preview / description rich text | A plain-text description sells nothing; HTML content with headings and bullets (already wired) lets admin describe what's inside the resource | LOW | PARTIALLY BUILT — HTML content field exists; no rich editor for admin (raw textarea) |
+| Cross-link to related simulations | A "Projectile Motion" lesson plan should surface the Projectile Motion simulation; closes the loop for teachers | LOW | MISSING — data model supports it (shared subjects) but no UI |
+| Free sample / preview page | Teacher will not pay for a resource they haven't seen; a preview or sample page reduces purchase hesitation | HIGH | MISSING — schema doesn't support partial-file preview |
+| Download format labeling | "PDF, 14 pages" or "ZIP, includes worksheets" tells the teacher exactly what they get | LOW | MISSING — fileName stored but file type and page count not displayed |
+| View count display | Social proof ("1,243 views") builds trust on newer platforms; visible on detail page already | LOW | BUILT — viewCount shown on detail page | Already exists |
+| Admin isPublished toggle separate from isFree | Resource can be drafted (not yet public) independently of whether it will be free or paid | LOW | BUILT — isPublished + isFree are separate fields | Complete |
+
+#### Anti-Features (Resource Library)
+
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Teacher ratings and reviews | "Community vetting increases trust" | Requires moderation, conflict-of-interest controls, and sufficient volume to be statistically meaningful; 20 resources with 2 ratings each is meaningless and looks abandoned | Display view count as social proof; let author credentials signal quality |
+| Bulk download / cart | "Let teachers download multiple resources at once" | Adds zip-generation complexity, server load, and a shopping cart flow for a curator with <50 resources | Each resource is independently purchased; "My Resources" list is the library |
+| User-uploaded resources | "Crowdsource the library" | Same argument as guest blog posts; curator model is the brand; quality control is not delegatable at v1.1 | Maintain admin-only upload; revisit if/when community is proven |
+
+---
+
+### Interactive Physics Simulations
+
+#### Table Stakes (Users Expect These)
+
+| Feature | Why Expected | Complexity | Status in Code | Notes |
+|---------|--------------|------------|----------------|-------|
+| Simulation gallery page | PhET, Wolfram Demonstrations — galleries are the universal entry point | LOW | BUILT — /simulations | Complete |
+| Filter by subject | Teachers browsing mechanics vs. waves vs. thermodynamics need subject filtering | LOW | BUILT — subject filter (reuses ResourceFilters) | Works |
+| Simulation card with preview | Play icon or screenshot thumbnail + title + description — the PhET gallery pattern | LOW | BUILT — SimulationCard | Card with hover-Play icon |
+| Simulation detail page | Embed the interactive component; title, description, subject tags, teacher guide | LOW | BUILT — /simulations/[slug] | Complete |
+| Playback controls (Play, Reset) | Every simulation users expect a way to start, stop, and reset; running without these is unusable | LOW | BUILT — all three simulations have Launch/Reset | Pattern established |
+| Adjustable parameter sliders | The simulation's scientific value is in letting users vary parameters (angle, velocity, frequency); static = just a video | LOW | BUILT — sliders in all three simulations | Core pattern |
+| Real-time parameter readout | Labels showing current values (t=2.3s, x=14.1m) during animation; without these teachers can't explain what's happening | LOW | BUILT — canvas text labels in ProjectileMotion | Present |
+| Teacher guide section | PhET explicitly provides teacher guides; educators expect "how to use this in class" documentation | LOW | BUILT — teacherGuide field + HTML render | Schema complete; admin must populate |
+| Free access (no paywall) | PhET has established the norm: physics simulations should be free; a paywall would feel predatory to the K-12/university market | LOW | BUILT — SimulationCard hardcodes "Free" badge | Simulations always free by convention |
+| Subject tags | "Mechanics > Projectile Motion" hierarchy tells the teacher where this fits in the curriculum | LOW | BUILT — subject badges on detail page | Shared Subject model |
+| Parameter documentation sidebar | What does the "gravity" slider actually do? What are the realistic range values? Documented parameters prevent misuse | LOW | BUILT — parameterDocs field + sidebar render | Admin must populate |
+
+#### Differentiators (Simulations — Competitive Advantage)
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| "Show Code" panel with live values | Existing ProjectileMotion has this already; showing the Python equations with current slider values is a unique STEM teaching differentiator — connects simulation to coursework | LOW | BUILT — ProjectileMotion only; WaveInterference and SpringMass may not have it |
+| Admin componentKey registry | Dynamic lazy-loading means new simulations can be added without changing routes; componentKey drives everything | LOW | BUILT — SIMULATION_REGISTRY with lazy imports | Architecture is correct |
+| Responsive canvas layout | Canvas is fixed-width (600px) in current code; on mobile the simulation is cropped or overflows | MEDIUM | MISSING — canvas width hardcoded; needs CSS scaling or viewport-relative dimensions |
+| Simulation-to-resource cross-link | "Download the matching Lab Guide" on the simulation page drives resource purchases | LOW | MISSING — data model supports it (same slug base) but no UI link |
+| Screenshot/thumbnail for gallery | SimulationCard shows a blue gradient placeholder when no coverImage; a real screenshot is more engaging | LOW | MISSING — admin must upload a cover image; no auto-screenshot |
+
+#### Anti-Features (Simulations)
+
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Embed/iframe API for third-party use | "Let teachers embed simulations in their LMS" | iframe embedding creates CORS complexity, content-security-policy conflicts, and removes traffic from the platform | Deep-link directly to the simulation page; teachers can open in a new tab during class |
+| Save simulation state (user presets) | "Let teachers save a specific parameter configuration for their class" | Requires user account, serialization, and a UI for managing presets; premature for <10 simulations | Teachers can bookmark the URL; add preset URL params if multiple save-states are needed |
+| Real-time multiplayer simulations | "Let students adjust parameters simultaneously" | WebSocket infrastructure, conflict resolution, and session management for a feature that most classroom physics demos don't need | Keep simulations stateless and single-user; each student gets their own instance |
 
 ---
 
 ## Feature Dependencies
 
 ```
-User Account / Authentication
-    └──requires──> My Library (purchased books list)
-    └──requires──> Highlights & Bookmarks
-    └──requires──> Reading Progress
+Blog
+    Blog listing page
+        └──requires──> BlogPostCard component
+        └──requires──> BlogFilters (category + subject + sort)
+        └──requires──> ResourceSearchInput (reused from resources)
 
-Book Catalog (browse/search)
-    └──requires──> Book Detail Page
-                       └──requires──> Book Cover Image
-                       └──requires──> Author Bio
-                       └──requires──> Table of Contents (metadata)
-                       └──requires──> Schema.org structured data
+    Blog article page
+        └──requires──> BlogPost.content (HTML)
+        └──produces──> SEO (JSON-LD Article schema already present)
+        └──enhances──> Subject cross-links to Resource Library (not built)
+        └──enhances──> Prev/Next navigation (not built)
 
-Checkout / Payment
-    └──requires──> User Account
-    └──requires──> Book Detail Page (pricing info)
-    └──produces──> Access Grant (unlocks reader + downloads)
+    Admin blog management
+        └──requires──> BlogPostTable (listing)
+        └──requires──> BlogPostEditForm (create/edit)
+        └──requires──> ImageUploadField (cover image, R2)
 
-Browser Reader
-    └──requires──> MathJax/KaTeX rendering
-    └──requires──> Access Gate (purchased or open access)
-    └──enhances──> Highlights & Bookmarks (needs account)
-    └──enhances──> Reading Progress (needs account)
-    └──enhances──> Table of Contents navigation
+Resource Library
+    Resource listing page
+        └──requires──> ResourceCard
+        └──requires──> ResourceFilters (subject + type + level + sort)
+        └──requires──> ResourceSearchInput
 
-PDF / EPUB Download
-    └──requires──> Access Grant
-    └──requires──> Secure file delivery (signed URLs)
+    Resource detail page
+        └──requires──> hasResourcePurchase (auth + purchase check)
+        └──requires──> /api/resource-download (presigned R2 URL)
+        └──requires──> ResourceBuyButton → createResourceCheckoutSession
+        └──requires──> Stripe webhook (resource purchase entitlement)
 
-Admin Ingestion Pipeline
-    └──requires──> Manuscript formats (LaTeX, Word, Markdown)
-    └──produces──> Browser-renderable HTML + math
-    └──produces──> PDF artifact
-    └──produces──> EPUB artifact
-    └──produces──> Book metadata record in catalog
+    Purchase flow
+        └──requires──> User authenticated (Better Auth session)
+        └──requires──> Resource.pricing (ResourcePrice record)
+        └──produces──> ResourcePurchase record
+        └──produces──> Email confirmation (Resend)
 
-Pay-per-chapter
-    └──requires──> Browser Reader (chapter-level content segmentation)
-    └──requires──> Checkout / Payment (chapter-level products)
-    └──conflicts──> Pay-per-book (mixed model adds UX complexity)
+    Admin resource management
+        └──requires──> ResourceTable (listing)
+        └──requires──> ResourceEditForm (create/edit)
+        └──requires──> FileUploadField (file R2 upload)
+        └──requires──> ImageUploadField (cover image R2)
 
-Preview / Sample Chapter
-    └──requires──> Browser Reader
-    └──requires──> Access Gate (partial — first chapter free)
-    └──enhances──> Book Detail Page (embed preview inline)
+Simulations
+    Simulation gallery
+        └──requires──> SimulationCard
+        └──requires──> ResourceFilters (subject only — reused)
+
+    Simulation detail page
+        └──requires──> SimulationEmbed
+        └──requires──> SIMULATION_REGISTRY (componentKey lookup)
+        └──requires──> Simulation.teacherGuide (admin-populated)
+        └──requires──> Simulation.parameterDocs (admin-populated)
+
+    Simulation components
+        └──requires──> React lazy + Suspense (dynamic loading)
+        └──requires──> Canvas API (requestAnimationFrame, 2D context)
+        └──requires──> Admin componentKey selection (dropdown from SIMULATION_KEYS)
+
+Cross-feature
+    Subject model (shared)
+        └──used by──> Blog (BlogPostSubject)
+        └──used by──> Resources (ResourceSubject)
+        └──enables──> Cross-links between blog posts and resources on same subject (not built)
+
+    Resource type SIMULATION
+        └──routing──> /simulations/[slug] (redirected in /resources/[slug])
+        └──detail──> SimulationEmbed + Simulation sub-record
+        └──NOT shown in──> resource listing (filtered from /resources by ResourceCard redirect)
 ```
 
 ### Dependency Notes
 
-- **User Account requires My Library**: Once a user buys a book, they need a persistent place to find it. My Library is not optional once purchases exist.
-- **Checkout produces Access Grant**: The access grant (linking a user to a purchased book) is the critical join between payment and content delivery. Must be webhook-driven (Stripe webhooks) to be reliable.
-- **Admin Ingestion Pipeline produces everything**: The pipeline that takes manuscript input and produces HTML reader content, PDF, EPUB, and metadata is the highest-risk dependency. All reader features depend on it working correctly.
-- **Pay-per-chapter conflicts with pay-per-book**: Offering both simultaneously for the same book creates confusing pricing. Decide per-book which model applies.
-- **MathJax/KaTeX is a hard dependency for the reader**: The browser reader is broken without math rendering. This is not a later enhancement; it ships with the reader.
+- **Pagination depends on nothing but is blocked by** the current "load all" query pattern; adding LIMIT + offset is self-contained.
+- **RSS feed is independent** of all other features; it is a pure read path from published BlogPost records.
+- **KaTeX in blog** depends on the same pattern used in ChapterEditor (TipTap + tiptap-katex); the infrastructure exists but is not wired to blog content editing.
+- **Cross-links (blog-to-resources, sim-to-lab-guide)** depend on shared Subject slugs already in the DB; they need only a query and UI, no schema changes.
+- **Canvas responsive layout** is self-contained within each simulation component; fixing one establishes the pattern for all.
+- **Admin preview of draft posts** requires only a link from the admin edit page to the public post URL; it is a one-line addition.
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1)
+Context: v1.1 is shipping first-pass code that already exists. The MVP question is "what must be working before this is announced?" not "what should be built from scratch?"
 
-Minimum viable product — what's needed to publish books and earn revenue.
+### Ship Without These (Blocking Issues — Must Fix)
 
-- [ ] **Book catalog with browse and search** — without discovery, there are no sales
-- [ ] **Book detail page** (cover, synopsis, author bio, TOC, ISBN, pricing) — the conversion page
-- [ ] **User account and authentication** — required for purchase and download access
-- [ ] **Checkout / payment (pay-per-book)** — the revenue mechanism
-- [ ] **My Library (purchased books)** — users must be able to re-access what they bought
-- [ ] **Browser-based reader with MathJax math rendering** — the core value delivery for STEM
-- [ ] **PDF download (secured)** — professionals expect it; PDF is the "real" copy for archiving
-- [ ] **Open access book support** — some books will be free; the platform must handle both models
-- [ ] **Admin ingestion dashboard** — founder must be able to publish books without engineering help
-- [ ] **Schema.org Book structured data** — organic SEO discoverability from day one
+- [ ] **Pagination on blog listing** — loading all posts is a latency/scalability problem; add LIMIT 12 + "load more" or cursor pagination
+- [ ] **Pagination on resource listing** — same issue
+- [ ] **Canvas responsive layout** — 600px hardcoded canvas breaks on mobile; STEM teachers use iPads and phones to demo in class
+- [ ] **Admin draft preview** — admin cannot verify how a post looks before publishing; this is a blocking UX gap
 
-### Add After Validation (v1.x)
+### Add Promptly (High Value, Low Cost)
 
-Features to add once core is working.
+- [ ] **Reading time estimate on blog cards and article pages** — trivial compute (word count / 200), high perceived polish
+- [ ] **Prev/Next article navigation on blog posts** — readers dead-end without it; 30-minute implementation
+- [ ] **RSS feed for blog** — educators and aggregators subscribe; validates platform as maintained
+- [ ] **Download format/file size label on resource detail** — "PDF • 2.4 MB" sets expectations; data is in fileName already
+- [ ] **Subject cross-links: blog-to-resources** — "More resources on Mechanics" at bottom of blog post; drives resource discovery
+- [ ] **Subject cross-links: simulation-to-lab-guide** — "Download the Lab Guide" on simulation page; drives paid resource sales
 
-- [ ] **EPUB download** — add when PDF download is stable and user requests confirm need
-- [ ] **Sample chapter / preview** — add when conversion data shows hesitation at checkout
-- [ ] **Reading progress tracking** — add when engagement data shows readers returning
-- [ ] **Dark mode / reading customization** — add when reading sessions exceed 10 minutes average (signals deep engagement worth optimizing)
-- [ ] **Citation export (BibTeX, APA)** — add when professional/academic users self-identify
-- [ ] **Pay-per-chapter** — evaluate after catalog has multi-chapter books and chapter-level demand signals appear
+### Defer (Good but Not Blocking)
 
-### Future Consideration (v2+)
+- [ ] **KaTeX math in blog posts** — most blog content will be prose; add only when the author needs to write equations
+- [ ] **"Show Code" panel consistency** — WaveInterference and SpringMass may not have it; add when simulations are reviewed
+- [ ] **Screenshot thumbnails for simulations** — admin uploads cover images; prompt with guidance, not automation
+- [ ] **Canonical URL tag** — low SEO risk for a new platform; add as part of any general SEO pass
 
-Features to defer until product-market fit is established.
+### Explicitly Out of Scope (v1.1)
 
-- [ ] **In-browser highlights and bookmarks** — high complexity, high value; needs enough repeat readers to justify backend storage infrastructure
-- [ ] **Discount codes / institutional pricing** — add when first university contact approaches
-- [ ] **Print edition metadata linking** — cosmetic at v1; add when catalog is mature
-- [ ] **AI search / recommendation** — defer until catalog is large enough for recommendations to be meaningful (50+ books minimum)
-- [ ] **LMS integration (LTI 1.3)** — only when first institutional deal is imminent
+- [ ] **Comments on blog** — moderation burden; not in scope
+- [ ] **User-uploaded resources** — curator model; not in scope
+- [ ] **Simulation embed/iframe API** — LMS complexity; not in scope
+- [ ] **Newsletter subscription** — premature; RSS first
+- [ ] **Guest blog posts** — curator model; not in scope
 
 ---
 
@@ -174,68 +260,65 @@ Features to defer until product-market fit is established.
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Browser reader + MathJax | HIGH | MEDIUM | P1 |
-| Book catalog + search | HIGH | LOW | P1 |
-| Book detail page | HIGH | LOW | P1 |
-| User accounts | HIGH | MEDIUM | P1 |
-| Checkout / pay-per-book | HIGH | MEDIUM | P1 |
-| My Library | HIGH | LOW | P1 |
-| PDF download (secured) | HIGH | LOW | P1 |
-| Admin ingestion pipeline | HIGH (internal) | HIGH | P1 |
-| Open access support | MEDIUM | LOW | P1 |
-| Schema.org SEO markup | MEDIUM | LOW | P1 |
-| EPUB download | MEDIUM | MEDIUM | P2 |
-| Sample chapter preview | HIGH | MEDIUM | P2 |
-| Reading progress | MEDIUM | MEDIUM | P2 |
-| Dark mode / reader settings | MEDIUM | MEDIUM | P2 |
-| Citation export | MEDIUM | LOW | P2 |
-| Pay-per-chapter | MEDIUM | HIGH | P2 |
-| Highlights / bookmarks | HIGH | HIGH | P3 |
-| Discount codes | MEDIUM | MEDIUM | P3 |
-| LMS integration | HIGH (institutional) | HIGH | P3 |
-| AI recommendations | LOW | HIGH | P3 |
+| Blog listing + article pages | HIGH | — (BUILT) | P1 — verify |
+| Resource library listing + detail | HIGH | — (BUILT) | P1 — verify |
+| Simulation gallery + detail + embed | HIGH | — (BUILT) | P1 — verify |
+| Blog/resource admin CRUD | HIGH | — (BUILT) | P1 — verify |
+| Stripe purchase flow for resources | HIGH | — (BUILT) | P1 — verify |
+| Secure file download | HIGH | — (BUILT) | P1 — verify |
+| Pagination (blog + resources) | HIGH | LOW | P1 — must fix |
+| Canvas responsive layout | HIGH | MEDIUM | P1 — must fix |
+| Admin draft preview link | HIGH | LOW | P1 — must fix |
+| Reading time estimate | MEDIUM | LOW | P2 |
+| Prev/Next blog navigation | MEDIUM | LOW | P2 |
+| RSS feed | MEDIUM | LOW | P2 |
+| File format label on resource | MEDIUM | LOW | P2 |
+| Subject cross-links (blog to resource) | HIGH | LOW | P2 |
+| Subject cross-links (sim to lab guide) | HIGH | LOW | P2 |
+| KaTeX math in blog posts | MEDIUM | MEDIUM | P3 |
+| Show Code panel in all simulations | MEDIUM | LOW | P3 |
+| Canonical URL meta tag | LOW | LOW | P3 |
 
 **Priority key:**
-- P1: Must have for launch
-- P2: Should have, add when possible
-- P3: Nice to have, future consideration
+- P1: Must work for launch — either already built (verify) or a blocking gap (fix)
+- P2: Add promptly — high value, low cost, ship in first iteration
+- P3: Nice to have — defer until after core is stable
 
 ---
 
 ## Competitor Feature Analysis
 
-| Feature | Cambridge Core | Perlego | VitalSource | ScienceOne Approach |
-|---------|---------------|---------|-------------|---------------------|
-| Math rendering | MathJax/MathML | Limited (most books are not math-heavy) | MathJax on web viewer | MathJax v3 — non-negotiable for STEM |
-| Browser reader | Yes (chapter-level HTML) | Yes (reflowable EPUB) | Yes (web viewer) | Yes — HTML-first for math fidelity |
-| PDF download | Yes (paid/institutional) | No (subscription blocks DL) | Yes (limited pages) | Yes — unrestricted for purchased books |
-| EPUB download | Yes | No | Yes | Yes (v1.x) |
-| Dark mode | Partial | Yes | Yes | v1.x — after core reader ships |
-| Highlights/notes | Yes | Yes (full feature) | Yes | v2+ — high complexity |
-| Citation export | Yes (20+ formats) | Yes | No | v1.x — low effort, high value for academics |
-| Search in book | Yes | Yes ("Find in Book") | Yes | v1 reader (browser native find sufficient initially) |
-| Pay-per-book | Yes (per chapter/book) | No (subscription only) | Yes | Yes — primary revenue model |
-| Pay-per-chapter | Yes | No | No | v1.x — evaluate after launch |
-| Open access | Yes | No | No | Yes — first-class model alongside paid |
-| Admin catalog mgmt | Enterprise (not custom) | Publisher portal | Publisher portal | Custom admin dashboard (curator model) |
-| LaTeX ingestion | Not automated | Not automated | Not automated | Core differentiator — automated pipeline |
-| Sample chapter | Yes | Yes (preview pages) | Yes | v1.x |
+| Feature | PhET (simulations) | Teachers Pay Teachers (resources) | Medium / Substack (blog) | ScienceOne Approach |
+|---------|-------------------|-----------------------------------|--------------------------|---------------------|
+| Category/subject filtering | By subject (5 disciplines) | By grade, subject, format, price | By tag + publication | Subject pills + type/level dropdowns |
+| Search | Full-text + filters combined | Full-text prominent | Full-text | Keyword search + URL params |
+| Resource card metadata | Subject badges + HTML5 badge | Grade, format, rating, price | Read time, claps, pub date | Type + level + subject + free/price badge |
+| Teacher guide | Yes — dedicated section per sim | Not standardized (seller discretion) | N/A | teacherGuide field + HTML render |
+| Parameter docs | Sim-specific help text | N/A | N/A | parameterDocs sidebar |
+| Free/paid signaling | All free | Clearly labeled, filter by free | Free tiers | "Free" badge vs price display |
+| Reading time | N/A | N/A | Yes — prominent | Missing; easy to add |
+| RSS | N/A | N/A | Yes (Substack native) | Missing for blog |
+| SEO / JSON-LD | Yes | Yes (rich snippets) | Yes | Article JSON-LD present; sim/resource OG tags |
+| Pagination | Yes (50 per page) | Yes (20 per page) | Yes (infinite) | Missing — currently loads all |
+| Mobile responsive | Yes (HTML5 canvas scales) | Yes | Yes | Canvas is 600px fixed — needs fix |
+| Admin CRUD | N/A (open contrib model) | Seller dashboard | Publisher dashboard | Admin dashboard (tabbed form) |
 
 ---
 
 ## Sources
 
-- [Cambridge Core platform](https://www.cambridge.org/core/) — browser reader, citation tools, navigation patterns (MEDIUM confidence, observed features)
-- [Perlego ebook features and tools](https://help.perlego.com/en/articles/4450175-ebook-features-and-tools) — comprehensive reader feature list (HIGH confidence, official help doc)
-- [VitalSource eTextBook formats](https://support.vitalsource.com/hc/en-us/articles/115003965568-What-eTextBook-format-do-you-provide) — PDF vs EPUB, DRM approach (HIGH confidence, official support doc)
-- [LiveCarta Pay-by-Chapter](https://livecarta.com/digital-experience-platform-higher-education/) — pay-per-chapter model in academic publishing (MEDIUM confidence, platform marketing)
-- [MathJax official site](https://www.mathjax.org/) — math rendering for browser (HIGH confidence, official)
-- [Accessible Open Textbooks in Math-Heavy Disciplines, Richard Zach, March 2025](https://richardzach.org/2025/03/accessible-open-textbooks-in-math-heavy-disciplines/) — MathJax, PreTeXt, accessibility requirements (HIGH confidence, current specialist analysis)
-- [Google Book Schema structured data](https://developers.google.com/search/docs/appearance/structured-data/book) — SEO/discoverability requirements (HIGH confidence, official Google docs)
-- [Pandoc LaTeX-to-HTML workflows](https://pandoc.org/MANUAL.html) — manuscript conversion pipeline (HIGH confidence, official)
-- [VitalSource DRM complaints](https://support.vitalsource.com/) — DRM as anti-feature confirmed by heavy user complaints (MEDIUM confidence, support forum pattern)
-- [KITABOO digital publishing platform](https://kitaboo.com/) — industry monetization patterns (LOW confidence, vendor marketing)
+- [PhET Interactive Simulations — Teaching Resources](https://phet.colorado.edu/en/teaching-resources) — simulation gallery patterns, teacher guide format, free model (MEDIUM confidence, observed)
+- [PhET category browse](https://phet.colorado.edu/en/simulations/category/physics) — filter taxonomy: Physics, Math & Statistics, Chemistry, Earth & Space, Biology (MEDIUM confidence, observed)
+- [Teachers Pay Teachers — How to download or buy resources](https://help.teacherspayteachers.com/hc/en-us/articles/360042469472-How-do-I-download-or-buy-TPT-resources) — "My Purchases" pattern, immediate post-purchase access expectation (HIGH confidence, official help doc)
+- [Article Schema best practices 2025 — SEO-Wiki](https://www.seo-day.de/wiki/on-page-seo/html-optimierung/strukturierte-daten/article-schema.php?lang=en) — datePublished, dateModified, author, E-E-A-T signals (HIGH confidence, SEO reference)
+- [Google Structured Data for Blogs 2026](https://comms.thisisdefinition.com/insights/ultimate-guide-to-structured-data-for-seo) — Article schema, JSON-LD, AI Overviews compatibility (MEDIUM confidence)
+- [Yoast — Estimated reading time feature](https://yoast.com/features/estimated-reading-time/) — reading time UX patterns, ~200 wpm calculation standard (HIGH confidence, official Yoast docs)
+- [Google Search Central — Pagination best practices](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading) — rel=prev/next deprecated 2019; focus on canonical and clear nav (HIGH confidence, official Google docs)
+- [OER Commons](https://oercommons.org/) — subject/grade/type filter taxonomy for educational resource libraries (MEDIUM confidence, known platform)
+- [Interactive HTML5 Canvas simulations — Weber State Physics](https://physics.weber.edu/schroeder/html5/tutorialpacket.pdf) — Play/Pause/Reset control patterns, requestAnimationFrame standard (HIGH confidence, academic source)
+- ScienceOne first-pass codebase inspection — all source files in src/app/(main)/, src/components/, src/lib/, src/simulations/ (HIGH confidence, direct observation)
 
 ---
-*Feature research for: Online STEM book publishing platform (ScienceOne)*
-*Researched: 2026-02-18*
+
+*Feature research for: ScienceOne v1.1 — Blog, Resource Library, Interactive Simulations*
+*Researched: 2026-02-22*

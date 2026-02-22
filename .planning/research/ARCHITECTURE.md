@@ -1,427 +1,389 @@
 # Architecture Research
 
-**Domain:** Online STEM book publishing platform with LaTeX rendering and payment gating
-**Researched:** 2026-02-18
-**Confidence:** MEDIUM-HIGH
+**Domain:** STEM education platform — blog, resource library, interactive simulations integrated into existing v1.0 book platform
+**Researched:** 2026-02-22
+**Confidence:** HIGH (all findings from direct codebase inspection of existing and new code; no inference required)
 
-## Standard Architecture
+---
 
-### System Overview
+## Context: What Already Exists (v1.0)
+
+This is a subsequent-milestone research file. The v1.0 architecture is in production:
+- Next.js 16 App Router with 4 route groups: `(main)`, `(auth)`, `(admin)`, `(reader)`
+- Prisma 7 ORM on PostgreSQL, no datasource URL in schema (managed by `prisma.config.ts`)
+- Better Auth for sessions (cookie-based, `user.role` field for admin check)
+- Cloudflare R2 for file storage (presigned URLs, 900s GET expiry)
+- Stripe Checkout + webhook for book purchases
+- Server actions with Zod validation (React Hook Form + `zodResolver`)
+- shadcn/ui components, Tailwind v4
+
+The v1.1 milestone adds three feature areas. First-pass code exists and is untested.
+
+---
+
+## System Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Browser / Client                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐   │
-│  │  Catalog UI  │  │  Book Reader │  │  Checkout / Auth UI      │   │
-│  │  (browse,    │  │  (chapter    │  │  (Stripe Elements,       │   │
-│  │   search,    │  │   nav, math  │  │   login, account)        │   │
-│  │   metadata)  │  │   display)   │  │                          │   │
-│  └──────┬───────┘  └──────┬───────┘  └────────────┬─────────────┘   │
-└─────────┼─────────────────┼──────────────────────-┼─────────────────┘
-          │                 │                        │
-┌─────────▼─────────────────▼────────────────────────▼─────────────────┐
-│                         Next.js App (Monolith)                        │
-│                                                                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────┐    │
-│  │  Page/Route  │  │  API Routes  │  │  Server Components       │    │
-│  │  Handlers    │  │  (purchase,  │  │  (RSC — auth-gated,      │    │
-│  │  (SSR/SSG)   │  │   webhook,   │  │   content hydration)     │    │
-│  │              │  │   download)  │  │                          │    │
-│  └──────┬───────┘  └──────┬───────┘  └────────────┬─────────────┘    │
-│         │                 │                        │                  │
-│  ┌──────▼─────────────────▼────────────────────────▼──────────────┐  │
-│  │               Data Access Layer (DAL)                           │  │
-│  │  access checks → purchase lookup → content gating              │  │
-│  └───────────────────────────────────────────────────────────────-┘  │
-└───────────────┬─────────────────────────────────────────────────────-┘
-                │
-    ┌───────────┼──────────────────────────────────┐
-    │           │                                  │
-┌───▼───┐  ┌────▼──────────────┐         ┌────────▼──────────────────┐
-│ Neon  │  │  Object Storage   │         │   External Services       │
-│  /    │  │ (S3/R2 — private  │         │                           │
-│Postgres│  │  PDFs, EPUBs,     │         │  ┌────────┐  ┌─────────┐  │
-│(data) │  │  cover images,    │         │  │Stripe  │  │  Email  │  │
-│       │  │  source files)    │         │  │(payments│  │(Resend/ │  │
-│       │  │                   │         │  │webhooks)│  │Postmark)│  │
-└───────┘  └───────────────────┘         │  └────────┘  └─────────┘  │
-                                         │  ┌────────────────────┐    │
-                                         │  │  Manuscript Ingest │    │
-                                         │  │  (offline Pandoc + │    │
-                                         │  │   KaTeX pipeline)  │    │
-                                         │  └────────────────────┘    │
-                                         └───────────────────────────-┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Next.js 16 App Router                            │
+├─────────────────┬──────────────────────┬────────────────────────────────┤
+│  (main) routes  │   (admin) routes     │  (auth) + (reader) unchanged   │
+│                 │                      │                                 │
+│  /blog          │  /admin/blog         │  Better Auth handles sessions   │
+│  /blog/[slug]   │  /admin/blog/[id]    │  (reader) handles book access   │
+│  /resources     │  /admin/resources    │                                 │
+│  /resources/    │  /admin/resources/   │                                 │
+│    [slug]       │    [id]              │                                 │
+│  /simulations   │                      │                                 │
+│  /simulations/  │                      │                                 │
+│    [slug]       │                      │                                 │
+│  /purchase/     │                      │                                 │
+│    resource-    │                      │                                 │
+│    success      │                      │                                 │
+├─────────────────┴──────────────────────┴────────────────────────────────┤
+│                        Server Action Layer                               │
+│                                                                          │
+│  blog-admin-actions.ts       resource-admin-actions.ts                   │
+│  blog-admin-queries.ts       resource-admin-queries.ts                   │
+│  blog-queries.ts             resource-queries.ts                         │
+│                              resource-checkout-actions.ts                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                          API Route Layer                                 │
+│                                                                          │
+│  /api/admin/upload-url   (MODIFIED: added resource-cover, resource-file, │
+│                           blog-cover, blog-author upload types)          │
+│  /api/resource-download  (NEW: auth + purchase check + R2 presigned GET) │
+│  /api/webhooks/stripe    (MODIFIED: handles resourceId alongside bookId) │
+├─────────────────────────────────────────────────────────────────────────┤
+│                       Data / Storage Layer                               │
+│                                                                          │
+│  PostgreSQL via Prisma 7               Cloudflare R2                     │
+│                                                                          │
+│  ┌──────────────┐  ┌────────────────┐  images/resources/{id}/cover-*    │
+│  │  BlogPost    │  │   Resource     │  images/blog/{id}/cover-*         │
+│  │  BlogPost    │  │   Resource     │  images/blog/{id}/author-*        │
+│  │  Subject     │  │   Price        │  resources/{id}/{ts}.{ext}        │
+│  │  (shared)    │  │   ResourcePur- │                                   │
+│  │              │  │   chase        │  (books/ keys unchanged from v1.0) │
+│  └──────────────┘  │   Simulation   │                                   │
+│                    │   Subject      │  External: Stripe, Resend          │
+│                    └────────────────┘  (both extended, not replaced)    │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Responsibilities
+---
 
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| Catalog UI | Browse books, search, filter, display metadata, cover, synopsis | Next.js pages with SSG/ISR |
-| Book Reader | Chapter-by-chapter reading with math rendering, TOC navigation, progress | Next.js page with pre-rendered HTML + KaTeX CSS |
-| Auth UI | Login, registration, account management | NextAuth.js or Clerk |
-| Checkout UI | Pay-per-view and pay-per-book purchase flows | Stripe Elements or Stripe Checkout redirect |
-| API Routes | Stripe webhooks, presigned URL generation, access checks | Next.js Route Handlers (App Router) |
-| Data Access Layer | All DB queries with embedded access checks — never skipped | Prisma + server-side functions |
-| Postgres (Neon) | Canonical store: users, books, purchases, chapters, metadata | PostgreSQL via Prisma ORM |
-| Object Storage | Private binary files: PDFs, EPUBs, source manuscripts; public: cover images | AWS S3 or Cloudflare R2 |
-| Stripe | Payment processing, webhook events (charge.succeeded) to update DB | Stripe Node SDK |
-| Manuscript Ingest Pipeline | Offline admin tool: converts LaTeX/Word/Markdown → structured HTML + KaTeX pre-rendered math | Pandoc + custom KaTeX Node.js script |
+## Component Inventory: New vs Modified
+
+### New Files (v1.1 adds)
+
+| File | Responsibility |
+|------|---------------|
+| `src/lib/blog-queries.ts` | Public read queries for blog (list, detail, recent); `isPublished: true` filter enforced |
+| `src/lib/blog-admin-queries.ts` | Admin read queries (all posts including drafts) |
+| `src/lib/blog-admin-actions.ts` | Server actions: create, update, delete, togglePublish blog posts |
+| `src/lib/blog-admin-schemas.ts` | Zod schema for BlogPostUpdateData |
+| `src/lib/resource-queries.ts` | Public read queries + purchase entitlement check + fire-and-forget view count increment |
+| `src/lib/resource-admin-queries.ts` | Admin read queries for resources |
+| `src/lib/resource-admin-actions.ts` | Server actions: CRUD + simulation upsert/cleanup + subject sync |
+| `src/lib/resource-admin-schemas.ts` | Zod schema for ResourceUpdateData (includes simulation fields) |
+| `src/lib/resource-checkout-actions.ts` | Server action: create Stripe checkout session for paid resource |
+| `src/lib/simulation-registry.ts` | Static map of componentKey → React.lazy() simulation component |
+| `src/app/api/resource-download/route.ts` | GET: auth check, purchase check (paid resources), in-memory rate limiter, R2 presigned GET |
+| `src/app/(main)/blog/page.tsx` | Blog listing with category/subject/sort/search URL params |
+| `src/app/(main)/blog/[slug]/page.tsx` | Blog post detail with JSON-LD Article structured data |
+| `src/app/(main)/blog/loading.tsx` | Loading skeleton |
+| `src/app/(main)/resources/page.tsx` | Resource listing with subject/type/level/sort/search URL params |
+| `src/app/(main)/resources/[slug]/page.tsx` | Resource detail: free download or buy button; redirects SIMULATION type |
+| `src/app/(main)/resources/loading.tsx` | Loading skeleton |
+| `src/app/(main)/simulations/page.tsx` | Simulation listing (Resource type=SIMULATION filter) |
+| `src/app/(main)/simulations/[slug]/page.tsx` | Simulation detail with SimulationEmbed |
+| `src/app/(main)/simulations/loading.tsx` | Loading skeleton |
+| `src/app/(main)/purchase/resource-success/page.tsx` | Post-purchase success page (fetches Stripe session to confirm payment) |
+| `src/app/(admin)/admin/blog/page.tsx` | BlogPostTable with CreateBlogPostDialog |
+| `src/app/(admin)/admin/blog/[postId]/page.tsx` | BlogPostEditForm page |
+| `src/app/(admin)/admin/resources/page.tsx` | ResourceTable with CreateResourceDialog |
+| `src/app/(admin)/admin/resources/[resourceId]/page.tsx` | ResourceEditForm page (passes SIMULATION_KEYS for dropdown) |
+| `src/components/admin/BlogPostEditForm.tsx` | React Hook Form + Zod; tabs: Details, Content, Publishing |
+| `src/components/admin/BlogPostTable.tsx` | Data table for blog posts |
+| `src/components/admin/BlogPostTableColumns.tsx` | Column definitions |
+| `src/components/admin/CreateBlogPostDialog.tsx` | Modal to create draft blog post |
+| `src/components/admin/ResourceEditForm.tsx` | React Hook Form + Zod; tabs: Details, Content, Publishing, Simulation (conditional) |
+| `src/components/admin/ResourceTable.tsx` | Data table for resources |
+| `src/components/admin/ResourceTableColumns.tsx` | Column definitions |
+| `src/components/admin/CreateResourceDialog.tsx` | Modal to create draft resource |
+| `src/components/admin/FileUploadField.tsx` | XHR upload with progress bar; generates resource-file presigned PUT |
+| `src/components/admin/SubjectSelect.tsx` | Multi-select with inline subject creation via createSubject server action |
+| `src/components/blog/BlogPostCard.tsx` | Card for blog listing grid |
+| `src/components/blog/BlogFilters.tsx` | Client filter bar (category, subject, sort via URL params) |
+| `src/components/resources/ResourceCard.tsx` | Card for resource listing; routes SIMULATION type to /simulations/ |
+| `src/components/resources/ResourceFilters.tsx` | Client filter bar (subject, type, level, sort via URL params) |
+| `src/components/resources/ResourceSearchInput.tsx` | Client search input (URL param based, reused on blog page) |
+| `src/components/resources/ResourceBuyButton.tsx` | Client button calling createResourceCheckoutSession server action |
+| `src/components/simulations/SimulationCard.tsx` | Card for simulation listing |
+| `src/components/simulations/SimulationEmbed.tsx` | Client: registry lookup, Suspense wrapper, fallback skeleton |
+| `src/simulations/ProjectileMotion.tsx` | Canvas-based projectile simulation; self-contained client component |
+| `src/simulations/WaveInterference.tsx` | Canvas-based wave simulation; self-contained client component |
+| `src/simulations/SpringMass.tsx` | Canvas-based spring-mass simulation; self-contained client component |
+
+### Modified Files (v1.1 changes existing)
+
+| File | What Changed |
+|------|-------------|
+| `src/app/api/admin/upload-url/route.ts` | Added type union branches: `resource-cover`, `resource-file`, `blog-cover`, `blog-author`; accepts `resourceId` alongside `bookId` as entity identifier |
+| `src/app/api/webhooks/stripe/route.ts` | Added `resourceId` metadata path; creates `ResourcePurchase` record and sends purchase email for resource purchases |
+| `src/lib/purchase-queries.ts` | Added `getUserResourcePurchases()` for dashboard "My Resources" section |
+| `src/components/admin/AdminSidebar.tsx` | Added Resources and Blog nav sections |
+| `src/app/(main)/dashboard/page.tsx` | Added "My Resources" grid showing paid resource purchases |
+| `src/app/(main)/page.tsx` | Added Resource Library and Simulations feature cards in the features section |
 
 ---
 
 ## Recommended Project Structure
 
 ```
-scienceone/
-├── app/                        # Next.js App Router
-│   ├── (catalog)/              # Public book browsing routes
-│   │   ├── page.tsx            # Homepage / catalog
-│   │   ├── books/[slug]/       # Book detail page
-│   │   └── categories/[cat]/   # Category browse
-│   ├── (reader)/               # Gated reading routes
-│   │   └── books/[slug]/read/  # Reader with auth + purchase check
-│   │       └── [chapter]/
-│   ├── (auth)/                 # Login / signup
-│   ├── (account)/              # Purchase history, downloads
-│   ├── (admin)/                # Founder-only book management
+src/
+├── app/
+│   ├── (main)/
+│   │   ├── blog/
+│   │   │   ├── page.tsx               # list — reads searchParams for filters
+│   │   │   ├── [slug]/page.tsx        # detail — JSON-LD Article, no auth required
+│   │   │   └── loading.tsx
+│   │   ├── resources/
+│   │   │   ├── page.tsx               # list — subject/type/level/sort/q filters
+│   │   │   ├── [slug]/page.tsx        # detail — buy button or download; redirects SIMULATION
+│   │   │   └── loading.tsx
+│   │   ├── simulations/
+│   │   │   ├── page.tsx               # list — type=SIMULATION filter applied to resource query
+│   │   │   ├── [slug]/page.tsx        # detail — SimulationEmbed + teacher guide
+│   │   │   └── loading.tsx
+│   │   └── purchase/
+│   │       └── resource-success/page.tsx
+│   ├── (admin)/admin/
+│   │   ├── blog/
+│   │   │   ├── page.tsx               # BlogPostTable + CreateBlogPostDialog
+│   │   │   └── [postId]/page.tsx      # BlogPostEditForm
+│   │   └── resources/
+│   │       ├── page.tsx               # ResourceTable + CreateResourceDialog
+│   │       └── [resourceId]/page.tsx  # ResourceEditForm + SIMULATION_KEYS prop
 │   └── api/
-│       ├── stripe/
-│       │   ├── checkout/       # Create checkout session
-│       │   └── webhook/        # Fulfillment webhook
-│       └── downloads/[id]/     # Generate presigned URL for PDF/EPUB
+│       └── resource-download/route.ts # presigned GET URL for resource files
 │
 ├── lib/
-│   ├── dal/                    # Data Access Layer — all DB reads
-│   │   ├── books.ts            # getBook(), listBooks(), etc.
-│   │   ├── purchases.ts        # hasPurchasedBook(), getUserAccess()
-│   │   └── users.ts
-│   ├── stripe.ts               # Stripe client singleton
-│   ├── s3.ts                   # S3/R2 client, presigned URL helpers
-│   └── auth.ts                 # Session helpers
+│   ├── blog-queries.ts                # public reads (isPublished enforced)
+│   ├── blog-admin-queries.ts          # admin reads (no isPublished filter)
+│   ├── blog-admin-actions.ts          # server actions: CRUD + togglePublish
+│   ├── blog-admin-schemas.ts          # Zod: BlogPostUpdateData
+│   ├── resource-queries.ts            # public reads + view count + purchase check
+│   ├── resource-admin-queries.ts      # admin reads
+│   ├── resource-admin-actions.ts      # server actions: CRUD + simulation upsert + subject sync
+│   ├── resource-admin-schemas.ts      # Zod: ResourceUpdateData (incl. simulation fields)
+│   ├── resource-checkout-actions.ts   # Stripe checkout server action
+│   └── simulation-registry.ts        # componentKey → React.lazy() map
 │
-├── components/
-│   ├── reader/                 # Book reader components
-│   │   ├── ChapterContent.tsx  # Renders pre-built HTML with math
-│   │   ├── TableOfContents.tsx
-│   │   └── ReaderNav.tsx
-│   ├── catalog/                # Catalog cards, search
-│   └── checkout/               # Purchase buttons, access gates
+├── simulations/                       # one file per physics simulation (client components)
+│   ├── ProjectileMotion.tsx
+│   ├── WaveInterference.tsx
+│   └── SpringMass.tsx
 │
-├── prisma/
-│   ├── schema.prisma           # Data model
-│   └── migrations/
-│
-└── scripts/
-    └── ingest/                 # Offline manuscript pipeline
-        ├── convert.ts          # Pandoc + KaTeX rendering
-        ├── import-book.ts      # Uploads content to DB + S3
-        └── generate-pdf.ts     # PDF generation (if needed)
+└── components/
+    ├── admin/
+    │   ├── BlogPostEditForm.tsx        # React Hook Form; 3 tabs
+    │   ├── BlogPostTable.tsx
+    │   ├── BlogPostTableColumns.tsx
+    │   ├── CreateBlogPostDialog.tsx
+    │   ├── ResourceEditForm.tsx        # 3-4 tabs (Simulation tab conditional on type)
+    │   ├── ResourceTable.tsx
+    │   ├── ResourceTableColumns.tsx
+    │   ├── CreateResourceDialog.tsx
+    │   ├── FileUploadField.tsx         # XHR with progress bar
+    │   └── SubjectSelect.tsx           # multi-select + inline subject creation
+    ├── blog/
+    │   ├── BlogPostCard.tsx
+    │   └── BlogFilters.tsx
+    ├── resources/
+    │   ├── ResourceCard.tsx            # links to /simulations/ if type=SIMULATION
+    │   ├── ResourceFilters.tsx
+    │   ├── ResourceSearchInput.tsx     # reused on blog page
+    │   └── ResourceBuyButton.tsx
+    └── simulations/
+        ├── SimulationCard.tsx
+        └── SimulationEmbed.tsx         # registry lookup + Suspense
 ```
 
 ### Structure Rationale
 
-- **app/(reader)/:** Separate route group isolates gated content; Server Components enforce access at render time.
-- **lib/dal/:** Centralizing all DB access here means access checks cannot be bypassed — no component fetches data directly.
-- **scripts/ingest/:** Manuscript processing is an admin-only offline pipeline, not a user-facing feature. Keeping it in `scripts/` prevents coupling to the web app.
-- **api/stripe/webhook/:** Webhook endpoint is the single source of truth for fulfilling purchases — never trust client-side Stripe success redirects.
+- **`src/simulations/`** sits outside `components/` because these are physics programs, not UI building blocks. They have no props, no shared logic — each is a standalone canvas-based interactive.
+- **`lib/{feature}-queries.ts` vs `lib/{feature}-admin-queries.ts`** — public reads enforce `isPublished: true` and use `React.cache()`. Admin reads fetch all records including drafts, no caching. These must remain separate files to prevent draft content leaking to public pages.
+- **`lib/{feature}-admin-actions.ts`** — each feature has its own server action file with a local `requireAdmin()` helper. Not shared to avoid coupling feature modules.
+- **`components/{feature}/`** — mirrors the route groups. Prevents naming collisions (`ResourceCard` vs `BookCard`).
 
 ---
 
 ## Architectural Patterns
 
-### Pattern 1: Server-Side Math Pre-Rendering (KaTeX)
+### Pattern 1: Simulation as Resource Subtype
 
-**What:** LaTeX expressions in manuscripts are converted to HTML+CSS at ingest time using `katex.renderToString()` (Node.js). The resulting HTML is stored in the database. The reader page delivers already-rendered math — no client-side JS required for math display.
+**What:** `Simulation` is a 1:1 child record of `Resource` — not an independent entity. Every simulation is a `Resource` with `type: SIMULATION` plus a linked `Simulation` row holding `componentKey`, `teacherGuide`, and `parameterDocs`. This means purchase infrastructure, file delivery, admin CRUD, filtering, and subjects all apply to simulations without duplication.
 
-**When to use:** Always, for this domain. STEM content is math-dense; client-side rendering of 200+ equations per page is slow and blocks interactivity.
+**When to use:** Every new simulation — create a Resource via the admin UI, select type=SIMULATION, then the Simulation tab appears automatically. The simulation record is upserted on save and deleted if the type changes away from SIMULATION.
 
-**Trade-offs:**
-- Pro: Fast reader load; math identical across all browsers; no client JavaScript dependency.
-- Pro: Math is accessible to screen readers via MathML output mode.
-- Con: Re-ingest required if KaTeX rendering needs updating (rare).
-- Con: Larger HTML stored in DB compared to raw LaTeX strings.
+**Trade-offs:** Simulations must redirect from `/resources/[slug]` to `/simulations/[slug]`. The resource detail page handles this with an inline redirect (`redirect('/simulations/' + slug)`). This is one extra HTTP hop but keeps the data model clean.
 
 **Example:**
 ```typescript
-// scripts/ingest/convert.ts
-import katex from 'katex';
-
-function renderMathInHtml(rawHtml: string): string {
-  // Replace $$...$$ (display math) and $...$ (inline math)
-  return rawHtml
-    .replace(/\$\$(.+?)\$\$/gs, (_, tex) =>
-      katex.renderToString(tex, { displayMode: true, throwOnError: false })
-    )
-    .replace(/\$(.+?)\$/g, (_, tex) =>
-      katex.renderToString(tex, { displayMode: false, throwOnError: false })
-    );
+// resource-admin-actions.ts
+if (validated.type === "SIMULATION" && validated.componentKey) {
+  await prisma.simulation.upsert({
+    where: { resourceId },
+    create: { resourceId, componentKey: validated.componentKey, ... },
+    update: { componentKey: validated.componentKey, ... },
+  });
+} else if (validated.type !== "SIMULATION") {
+  // Clean up simulation record when type changes away from SIMULATION
+  await prisma.simulation.deleteMany({ where: { resourceId } });
 }
 ```
 
-### Pattern 2: Data Access Layer with Embedded Access Checks
+### Pattern 2: Static Component Registry for Safe Dynamic Rendering
 
-**What:** All data reads go through a `lib/dal/` module. Purchase checks are built into the fetch functions, not bolted on in middleware or page components.
+**What:** `simulation-registry.ts` maps string keys to `React.lazy()` components. The `componentKey` stored in the database selects which canvas component to render. `SIMULATION_KEYS` is exported and imported in the admin page to populate the component selector dropdown — the registry is the single source of truth.
 
-**When to use:** Mandatory for any content with payment gating. The 2025 CVE-2025-29927 demonstrated that Next.js middleware can be bypassed via header injection — purchase enforcement must happen at the data layer.
+**When to use:** Every new simulation requires: (1) create `src/simulations/NewSimulation.tsx`, (2) add entry to the registry. These are an atomic two-file change.
 
-**Trade-offs:**
-- Pro: Access control cannot be accidentally omitted — it is part of getting the data.
-- Pro: Works correctly in Server Components, API routes, and RSC streaming.
-- Con: Slightly more verbose than ad-hoc checks.
+**Trade-offs:** Each new simulation requires a code deploy. This is correct — simulations are interactive physics engines, not content. The benefit is no `eval()`, no dynamic imports from user-controlled strings, no security surface.
 
 **Example:**
 ```typescript
-// lib/dal/purchases.ts
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+// simulation-registry.ts
+export const SIMULATION_REGISTRY: Record<string, LazyExoticComponent<ComponentType>> = {
+  "projectile-motion": lazy(() => import("@/simulations/ProjectileMotion")),
+  "wave-interference": lazy(() => import("@/simulations/WaveInterference")),
+  "spring-mass": lazy(() => import("@/simulations/SpringMass")),
+};
 
-export async function getChapterContent(bookSlug: string, chapterSlug: string) {
-  const session = await auth();
-  if (!session?.userId) return { error: 'unauthenticated' };
-
-  const book = await prisma.book.findUnique({ where: { slug: bookSlug } });
-  if (!book) return { error: 'not_found' };
-
-  if (book.accessModel !== 'open') {
-    const purchase = await prisma.purchase.findFirst({
-      where: { userId: session.userId, bookId: book.id, status: 'fulfilled' }
-    });
-    if (!purchase) return { error: 'not_purchased' };
-  }
-
-  return prisma.chapter.findUnique({ where: { bookId_slug: { bookId: book.id, slug: chapterSlug } } });
-}
+// SimulationEmbed.tsx — runtime lookup
+const SimComponent = SIMULATION_REGISTRY[componentKey];
+if (!SimComponent) return <ErrorState />;
+return <Suspense fallback={<Skeleton />}><SimComponent /></Suspense>;
 ```
 
-### Pattern 3: Stripe Webhook as Fulfillment Source of Truth
+### Pattern 3: Shared Subject Taxonomy Across Content Types
 
-**What:** Purchase flow: user clicks buy → Stripe Checkout session created via API → user pays → Stripe sends `checkout.session.completed` webhook → webhook handler marks purchase fulfilled in DB. The client-side success redirect only shows a "thank you" page; it does not grant access.
+**What:** The `Subject` model is shared between `Resource` (via `ResourceSubject`) and `BlogPost` (via `BlogPostSubject`). Both admin forms use the same `SubjectSelect` component, which supports inline subject creation via the `createSubject` server action. Public filter bars on `/resources` and `/blog` both call `getSubjects()` from `resource-queries.ts`.
 
-**When to use:** Always, for any payment gating. Relying on success URL callbacks is insecure and unreliable (network drop = access never granted).
+**When to use:** Any future content type that needs subject tagging should join the same `Subject` table. Do not create parallel subject systems.
 
-**Trade-offs:**
-- Pro: Reliable — survives browser close, network failures, duplicate webhooks (idempotency).
-- Pro: Secure — webhook is signed with Stripe secret; cannot be spoofed.
-- Con: Small delay between payment and access (usually < 2 seconds).
+**Trade-offs:** Subjects created in the resource admin appear immediately in the blog admin and vice versa — this is the desired cross-content behavior. Subject deletion is not currently implemented, which prevents orphan cleanup but also prevents accidental data loss during the build phase.
+
+### Pattern 4: URL-Param–Driven Filtering
+
+**What:** All filter/search state lives in URL search params. Filter components call `router.replace()` on change. Page components read `searchParams` as a Promise (Next.js 16 async pattern) and pass values directly to Prisma `where` clauses. No client-side filter state.
+
+**When to use:** All public listing pages (`/blog`, `/resources`, `/simulations`). Do not use `useState` for filter state in these components.
+
+**Trade-offs:** Filters are bookmarkable and shareable. Server re-renders on each filter change — at current data volumes (tens to low hundreds of items) this is faster than maintaining a client-side filter state machine. Add ISR or pagination if lists grow to hundreds of items.
 
 **Example:**
 ```typescript
-// app/api/stripe/webhook/route.ts
-import Stripe from 'stripe';
-import { prisma } from '@/lib/prisma';
-
-export async function POST(req: Request) {
-  const sig = req.headers.get('stripe-signature')!;
-  const event = stripe.webhooks.constructEvent(
-    await req.text(), sig, process.env.STRIPE_WEBHOOK_SECRET!
-  );
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const { bookId, userId, accessType } = session.metadata!;
-
-    await prisma.purchase.upsert({
-      where: { stripeSessionId: session.id },
-      create: { userId, bookId, accessType, status: 'fulfilled', stripeSessionId: session.id },
-      update: { status: 'fulfilled' },
-    });
-  }
-
-  return new Response('ok');
+// ResourceFilters.tsx
+function setParam(key: string, value: string | null) {
+  const params = new URLSearchParams(searchParams.toString());
+  if (value) params.set(key, value); else params.delete(key);
+  router.replace(`${pathname}?${params.toString()}`, { scroll: false });
 }
 ```
 
-### Pattern 4: Presigned URLs for File Downloads
+### Pattern 5: Extended Upload-URL Route (Single Route, Multiple Types)
 
-**What:** PDF and EPUB files live in a private S3/R2 bucket. When a user with a valid purchase requests a download, the API checks the purchase, then generates a short-lived presigned URL (15 minutes) and redirects the browser to it.
+**What:** The existing `/api/admin/upload-url` route was extended (not duplicated) to handle four new upload types: `resource-cover`, `resource-file`, `blog-cover`, `blog-author`. Each type maps to a distinct R2 key prefix and content type. The route accepts either `bookId` or `resourceId` as the entity identifier.
 
-**When to use:** Always for downloadable paid content. Never store public S3 URLs.
+**When to use:** Add any new upload type to the type union in this single route. Do not create parallel upload routes.
 
-**Trade-offs:**
-- Pro: Files are never publicly accessible; download links expire.
-- Pro: No bandwidth cost to the app server — S3 streams directly to user.
-- Con: Slightly more complex than a direct file URL.
-
-### Pattern 5: Pandoc-Based Manuscript Ingest Pipeline
-
-**What:** An offline admin script accepts LaTeX, Word (DOCX), or Markdown files and converts them to structured HTML via Pandoc. Math is then pre-rendered with KaTeX. The resulting HTML is chunked into chapters and stored in Postgres.
-
-**When to use:** Every time a new book is added to the catalog. Not user-facing.
-
-**Trade-offs:**
-- Pro: Single pipeline handles all three input formats (LaTeX, Word, Markdown).
-- Pro: Pandoc is battle-tested for document conversion; LaTeX→HTML math passthrough works well.
-- Con: Pandoc requires a system installation (not a pure Node.js solution).
-- Con: Complex LaTeX macros or custom packages may require manual cleanup after conversion.
+**Trade-offs:** The route grows by if/else branches. Currently 7 type branches — manageable. The alternative (separate routes per content type) creates more API surface to secure and maintain.
 
 ---
 
-## Data Flow
+## Data Flows
 
-### Reader Content Flow (most critical path)
-
-```
-User visits /books/[slug]/read/[chapter]
-    ↓
-Next.js Server Component renders
-    ↓
-lib/dal/purchases.ts: getChapterContent(slug, chapter)
-    ├── auth() → check session
-    ├── prisma.book.findUnique → load book + access model
-    ├── prisma.purchase.findFirst → verify user has fulfilled purchase (if not open access)
-    └── prisma.chapter.findUnique → return pre-rendered HTML
-    ↓
-Server Component renders HTML (math already rendered as HTML+CSS from KaTeX)
-    ↓
-Browser displays page — no JS needed for math
-KaTeX CSS loaded from CDN for font/style only
-```
-
-### Purchase Flow
+### Resource Purchase Flow
 
 ```
-User clicks "Buy Book" ($X)
+User clicks "Buy" on /resources/[slug]
     ↓
-POST /api/stripe/checkout
-    → Create Stripe Checkout Session with bookId, userId in metadata
-    → Return session URL
+ResourceBuyButton (client) calls createResourceCheckoutSession (server action)
     ↓
-Browser redirects to Stripe-hosted checkout
+Server action: auth check → fetch resource+pricing from DB (server-side, never trust client price)
+    → check for existing ResourcePurchase (redirect if already owned)
+    → stripe.checkout.sessions.create() with metadata: { userId, resourceId, resourceSlug }
+    → redirect() to Stripe hosted checkout
     ↓
-User pays
+Stripe sends POST to /api/webhooks/stripe on payment completion
     ↓
-Stripe → POST /api/stripe/webhook (checkout.session.completed)
-    → Verify Stripe signature
-    → Upsert Purchase record (status: fulfilled)
+Webhook: reads metadata.resourceId → prisma.resourcePurchase.upsert()
+    → send confirmation email via Resend (fire-and-forget, void)
     ↓
-User redirected to /books/[slug] with success message
+Stripe redirects to /purchase/resource-success?session_id=...
     ↓
-Next visit to /books/[slug]/read → DAL finds purchase → access granted
+Success page: stripe.checkout.sessions.retrieve() to confirm payment_status === "paid"
 ```
 
-### Download Flow
+### File Download Flow
 
 ```
-User clicks "Download PDF"
+User clicks download link: /api/resource-download?resourceId=...
     ↓
-GET /api/downloads/[bookId]?format=pdf
+Route: fetch resource from DB (isPublished, fileKey)
     ↓
-API Route:
-    1. auth() → verify session
-    2. DAL: hasPurchasedBook(userId, bookId) → must be true
-    3. s3.getSignedUrl(fileKey, 900) → 15-minute presigned URL
-    4. return 302 redirect to presigned URL
+If resource.isFree = false:
+    → check Better Auth session
+    → check ResourcePurchase exists for (userId, resourceId)
+    → return 401/403 if either check fails
     ↓
-Browser fetches PDF directly from S3/R2
+In-memory rate limit check (10 req/min per userId+resourceId key)
+    ↓
+getSignedUrl(R2, GetObjectCommand { Key: resource.fileKey, ResponseContentDisposition: "attachment;..." }, { expiresIn: 900 })
+    ↓
+Return JSON { url } — browser follows URL to R2 directly
 ```
 
-### Manuscript Ingest Flow (admin, offline)
+### Simulation Render Flow
 
 ```
-Admin provides: manuscript file (LaTeX/DOCX/MD) + metadata JSON
+Server renders /simulations/[slug]
     ↓
-scripts/ingest/convert.ts
-    → pandoc -f [format] -t html → raw HTML
-    → Split HTML into chapters by heading structure
-    → For each chapter: renderMathInHtml() with KaTeX
-    → Validate output
+getResourceBySlug(slug) → Prisma: Resource + Simulation (componentKey)
+    + fire-and-forget view count increment
     ↓
-scripts/ingest/import-book.ts
-    → Create Book record in Postgres (metadata, slug, access model, price)
-    → Create Chapter records (slug, title, pre-rendered HTML, order)
-    → Upload PDF/EPUB to private S3 bucket
-    → Upload cover image to public S3/CDN path
+Page passes componentKey as prop to SimulationEmbed (client component boundary)
     ↓
-Book is live in catalog
+SimulationEmbed: SIMULATION_REGISTRY[componentKey] → LazyComponent
+    ↓
+React.Suspense shows skeleton while JS chunk downloads
+    ↓
+Canvas simulation mounts, requestAnimationFrame loop starts
+    ↓
+User interacts with sliders → simulation state updates → canvas redraws
 ```
 
----
-
-## Database Schema (Core Tables)
+### Blog Content Flow
 
 ```
-User
-  id, email, passwordHash, createdAt
-
-Book
-  id, slug, title, subtitle, authorName, authorBio
-  synopsis, coverImageUrl, isbn, categories[]
-  publishedAt, printInfo
-  accessModel: enum(open | pay_per_view | pay_per_book)
-  price: decimal (null if open)
-  pdfFileKey, epubFileKey  ← S3 object keys, never public URLs
-
-Chapter
-  id, bookId → Book, slug, title, order, htmlContent, wordCount
-
-Purchase
-  id, userId → User, bookId → Book
-  accessType: enum(book | chapter)
-  chapterId → Chapter (nullable, for pay-per-view)
-  status: enum(pending | fulfilled | refunded)
-  stripeSessionId (unique — idempotency key)
-  createdAt, fulfilledAt
+Admin creates draft: CreateBlogPostDialog → createBlogPost server action
+    ↓
+Admin edits in BlogPostEditForm:
+    → React Hook Form + Zod validation client-side
+    → updateBlogPost server action
+    → blogPostUpdateSchema.parse(data) server-side
+    → prisma.blogPost.update()
+    → subject sync: deleteMany + createMany (full replace, not diff)
+    → revalidatePath("/blog") + revalidatePath("/blog/[slug]")
+    ↓
+Public access:
+    → getBlogPostBySlug(slug) — where: { slug, isPublished: true }
+    → Page renders JSON-LD Article schema.org structured data
+    → No auth required for reading
 ```
-
----
-
-## Scaling Considerations
-
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0-20 books, <1k users | Single Next.js monolith on Vercel + Neon (free tier). No special caching needed. |
-| 20-100 books, 1k-10k users | Add ISR for catalog pages. Consider Redis for session caching if auth latency shows. Keep monolith. |
-| 100k+ users | CDN edge caching for catalog and reader HTML. Read replica for Postgres. Potential chapter HTML caching in Redis or edge KV. |
-
-### Scaling Priorities
-
-1. **First bottleneck — DB reads on reader pages:** Each chapter load hits Postgres for the purchase check + chapter HTML. Add ISR with per-user cache revalidation or move chapter HTML to Vercel KV/Redis at ~10k daily active readers.
-2. **Second bottleneck — S3 download throughput:** At high volume, use Cloudflare R2 (no egress fees) instead of AWS S3. Switch is a one-line config change if abstracted behind `lib/s3.ts`.
-
----
-
-## Anti-Patterns
-
-### Anti-Pattern 1: Middleware-Only Access Control
-
-**What people do:** Gate all reading routes in Next.js middleware with a session check, assuming middleware is sufficient.
-
-**Why it's wrong:** CVE-2025-29927 (March 2025) showed that Next.js middleware can be bypassed by adding the `x-middleware-subrequest` header. Additionally, middleware runs on Edge Runtime with no direct database access, making purchase verification impossible there.
-
-**Do this instead:** Use Server Components and the Data Access Layer for all access checks. Middleware can redirect unauthenticated users to login, but it cannot be the only check for purchased content.
-
-### Anti-Pattern 2: Client-Side Math Rendering for Math-Dense Content
-
-**What people do:** Load MathJax or KaTeX on the client and render LaTeX strings that are stored in the database on every page view.
-
-**Why it's wrong:** STEM books commonly have 100-300 equations per chapter. Client-side rendering stalls interactivity for 1.8-4+ seconds per page load (KaTeX 1.8s, MathJax 4.2s in 2025 benchmarks with 500 equations). Mobile and low-power devices are disproportionately impacted.
-
-**Do this instead:** Pre-render all math to HTML at ingest time with `katex.renderToString()`. Store rendered HTML in DB. Serve static HTML — only KaTeX CSS (not JS) is needed on the client.
-
-### Anti-Pattern 3: Storing Public File URLs in the Database
-
-**What people do:** Upload PDFs/EPUBs to S3 with public access and store the full URL in the database.
-
-**Why it's wrong:** Any user who extracts the URL from the DOM or network request can share or access paid content without paying. Public URLs do not expire.
-
-**Do this instead:** Store only the S3 object key (e.g., `books/calculus-one/calculus-one.pdf`) in the database. Generate presigned URLs (15-minute expiry) at download time, after verifying purchase.
-
-### Anti-Pattern 4: Trusting Stripe Success Redirects for Access Grant
-
-**What people do:** Mark a purchase as fulfilled when the browser lands on the Stripe success URL (`?session_id=xxx`).
-
-**Why it's wrong:** Success redirects can be manipulated, missed (network drop), or replayed. If the server grants access based on the redirect, purchases can be faked.
-
-**Do this instead:** Fulfill purchases exclusively in the Stripe webhook handler (`checkout.session.completed`). Use `upsert` with `stripeSessionId` as the idempotency key to safely handle duplicate webhook deliveries.
-
-### Anti-Pattern 5: Single Manuscript Format Support
-
-**What people do:** Build the ingest pipeline for LaTeX only (the "obvious" format for STEM), then discover authors submit DOCX files.
-
-**Why it's wrong:** The project explicitly targets multiple input formats (LaTeX, Word, Markdown). Building format-specific parsers is expensive to maintain.
-
-**Do this instead:** Use Pandoc as the universal converter for all three formats. All paths produce the same intermediate HTML. KaTeX rendering is applied to the HTML regardless of source format.
 
 ---
 
@@ -431,61 +393,108 @@ Purchase
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Stripe | REST API (SDK) + webhook (signed POST) | Use `stripe.webhooks.constructEvent()` to verify signatures. Never trust client |
-| AWS S3 / Cloudflare R2 | AWS SDK v3 (`@aws-sdk/client-s3`, `@aws-sdk/s3-request-presigner`) | R2 is S3-compatible; prefer R2 for zero egress fees |
-| Pandoc | CLI invocation via `node-pandoc` npm wrapper or `child_process.exec` | Pandoc must be installed on the machine running ingest scripts |
-| KaTeX | Node.js npm package (`katex`) — `renderToString()` at ingest time | CSS served from CDN on client (`katex/dist/katex.min.css`) |
-| Email (Resend or Postmark) | REST API, triggered from webhook handler | Send purchase confirmation after fulfillment |
+| Stripe | Checkout session creation (server action) + webhook verification (route handler) | Resource and book purchases handled by same webhook; differentiated by presence of `metadata.resourceId` vs `metadata.bookId` |
+| Cloudflare R2 | Presigned PUT for admin uploads; presigned GET for user downloads | Resource files: 900s GET expiry (same as book PDFs). Blog/resource images served directly from R2 public URL stored as R2 key |
+| Resend | Fire-and-forget email on purchase completion | Resource purchases reuse `PurchaseConfirmationEmail` template; `bookSlug`/`bookTitle` fields are repurposed for resource data |
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Client UI ↔ Next.js Server | HTTP (RSC protocol / fetch) | Server Components fetch directly; Client Components use fetch/SWR |
-| Next.js ↔ Postgres | Prisma ORM (connection pooled via PgBouncer/Neon pooler) | Use Neon's connection pooler for serverless functions |
-| Next.js ↔ S3 | AWS SDK v3 — only from server-side code | Never expose AWS credentials to client |
-| Next.js ↔ Stripe | Stripe Node SDK — server-side only; Stripe.js client for payment UI | Stripe secret key stays server-side |
-| Ingest Scripts ↔ Next.js App | Shared Prisma schema + S3 bucket | Scripts write to same DB the app reads from; no runtime coupling |
+| Simulation registry → Admin UI | `SIMULATION_KEYS` exported from registry, imported by admin resource edit page | Adding a simulation = code deploy + admin UI update. These must always stay in sync. |
+| Resource model → Simulation model | 1:1 optional relation; `resource.simulation` included in all queries | Simulation record deleted server-side if type changes away from SIMULATION |
+| Blog filter → Subject taxonomy | `getSubjects()` from `resource-queries.ts` called by both blog and resource list pages | Shared taxonomy; importing from resource-queries is correct (Subjects exist there) |
+| Resource purchase → Dashboard | `getUserResourcePurchases()` in `purchase-queries.ts` feeds "My Resources" on dashboard | No reading progress for resources (unlike books) |
+| Upload route → R2 | Single `/api/admin/upload-url` route handles all content types | `resourceId` OR `bookId` accepted as entity ID; route uses whichever is present |
 
-### Build Order Implications
+---
 
-Components must be built in dependency order:
+## Anti-Patterns
 
-```
-1. Database schema (Prisma)          ← Foundation for everything
-      ↓
-2. Auth (login/session)              ← Required before any user-specific data
-      ↓
-3. Manuscript ingest pipeline        ← Must produce content before reader can show anything
-      ↓
-4. Catalog (book browsing)           ← Can show open-access content; no payment needed
-      ↓
-5. Access control DAL                ← Required before any gated content
-      ↓
-6. Stripe integration + webhook      ← Required before paid content is purchasable
-      ↓
-7. Book reader (gated chapters)      ← Requires access DAL + content in DB
-      ↓
-8. Download endpoint (presigned URL) ← Requires purchase verification + S3 files
-      ↓
-9. Admin UI (book management)        ← Quality-of-life; ingest can use CLI until then
-```
+### Anti-Pattern 1: Trusting Client-Sent Prices
+
+**What people do:** Pass `amount` from client JS to the checkout server action.
+**Why it's wrong:** Any user can modify the DOM or intercept the network request to set the price to $0.01.
+**Do this instead:** `createResourceCheckoutSession` already fetches price exclusively from `prisma.resource.findUnique` on the server. Never accept `amount` as a parameter to the checkout action.
+
+### Anti-Pattern 2: Adding a Simulation Without Updating the Registry
+
+**What people do:** Create `src/simulations/NewSimulation.tsx` but forget to add the entry to `SIMULATION_REGISTRY`.
+**Why it's wrong:** The admin dropdown will not show the component. `SimulationEmbed` renders an error state ("component not found").
+**Do this instead:** The registry entry and the simulation file are an atomic two-file change. Never create one without the other.
+
+### Anti-Pattern 3: Using Admin Queries in Public Pages
+
+**What people do:** Reuse `getResourceAdmin()` (which fetches unpublished records) in public-facing pages.
+**Why it's wrong:** Exposes draft content to unauthenticated users.
+**Do this instead:** Public queries in `resource-queries.ts` always include `isPublished: true`. Admin queries in `resource-admin-queries.ts` omit this filter. These files must never be mixed.
+
+### Anti-Pattern 4: Rendering `dangerouslySetInnerHTML` on User-Generated Content
+
+**What people do:** Store raw HTML in content fields and render via `dangerouslySetInnerHTML` without sanitization.
+**Why it's acceptable now:** Blog post and resource content are admin-only input. This is safe for now.
+**Why it becomes dangerous:** If any non-admin content is ever rendered this way (user comments, submitted resources), it becomes an XSS vector.
+**Do this instead:** Continue restricting content creation to admin. If user-generated content is added, sanitize with `sanitize-html` before storing — the package is already in the project from the ingest pipeline.
+
+### Anti-Pattern 5: Importing `ResourceSearchInput` into Blog Pages
+
+**What currently exists:** The blog listing page (`/blog/page.tsx`) imports `ResourceSearchInput` from `src/components/resources/`. This works but creates a cross-module dependency.
+**Why it matters:** Confuses the component folder semantics. If blog search behavior diverges from resource search, there's now hidden coupling.
+**Do this instead:** Extract to `src/components/common/SearchInput.tsx` or create `src/components/blog/BlogSearchInput.tsx`. This is a low-priority cleanup item, not a blocker.
+
+### Anti-Pattern 6: In-Memory Rate Limiter at Multi-Instance Scale
+
+**What exists:** `src/app/api/resource-download/route.ts` uses an in-memory `Map` for rate limiting (10 req/min per user+resource).
+**Why it breaks:** Each serverless function instance has its own memory. A user can hit 10 requests per instance, not 10 requests total. At low traffic this is fine.
+**Do this instead:** Replace with Upstash Redis rate limiter before production traffic is significant. The interface is the same — swap `Map` operations for Redis INCR with TTL.
+
+---
+
+## Build Order Recommendation
+
+Dependencies between v1.1 components require this sequence:
+
+1. **Run Prisma migration** — creates `subjects`, `resources`, `resource_prices`, `resource_purchases`, `simulations`, `blog_posts`, `blog_post_subjects` tables. Seed initial subjects.
+
+2. **Subject infrastructure** — `Subject` is a shared dependency for both resources and blog. Test `SubjectSelect` + `createSubject` server action first.
+
+3. **Resource admin** — `ResourceEditForm`, `FileUploadField`, admin pages, `updateResource` server action. Verify: create resource, upload file, toggle publish, type=SIMULATION reveals Simulation tab.
+
+4. **Resource public** — `ResourceCard`, `ResourceFilters`, list page, detail page. Verify: published resource appears in listing, free download generates presigned URL, `getResourceBySlug` view count increments.
+
+5. **Resource purchase** — `ResourceBuyButton`, `createResourceCheckoutSession`, webhook handler extension, `/purchase/resource-success`. Verify: Stripe test mode purchase creates `ResourcePurchase` row, paid download gate enforces entitlement, confirmation email fires.
+
+6. **Simulation registry and components** — Register all 3 existing simulations. Verify `SimulationEmbed` renders each `componentKey`. Verify admin dropdown lists keys. Test `/simulations/[slug]` page loads and canvas renders.
+
+7. **Blog admin** — `BlogPostEditForm`, admin pages, `updateBlogPost` server action. Verify: create draft, upload cover image, set publish date, toggle published.
+
+8. **Blog public** — `BlogPostCard`, `BlogFilters`, list page, detail page. Verify: JSON-LD renders in page source, category and subject filters work, `isPublished: false` posts do not appear.
+
+9. **Dashboard integration** — Verify "My Resources" section shows paid purchases. Test with a purchase made in step 5.
+
+10. **Homepage integration** — Verify Resource Library and Simulations feature cards link correctly.
+
+---
+
+## Scaling Considerations
+
+| Scale | Architecture Adjustments |
+|-------|--------------------------|
+| 0-1k users | Current architecture is correct. In-memory rate limiting is acceptable. No caching layer needed. |
+| 1k-10k users | Add ISR (`export const revalidate`) to blog and resource list pages. Move in-memory rate limiter to Upstash Redis to avoid per-instance state. Consider pagination on resource/blog lists. |
+| 10k+ users | Add PostgreSQL indexes on `(isPublished, createdAt)` and `(isPublished, viewCount)` for resource queries. Consider Cloudflare edge caching for static blog content. |
+
+### Scaling Priorities
+
+1. **First bottleneck:** Resource/blog list pages load all matching records with full relations. At hundreds of resources, add `take`/`skip` pagination and database indexes on frequently-filtered columns.
+2. **Second bottleneck:** The in-memory rate limiter on `/api/resource-download` provides no real protection at multi-instance scale. Swap to Upstash Redis before launch if download volume is significant.
 
 ---
 
 ## Sources
 
-- [KaTeX Node.js server-side rendering](https://katex.org/docs/node) — HIGH confidence (official docs)
-- [KaTeX vs MathJax 2025 benchmarks](https://biggo.com/news/202511040733_KaTeX_MathJax_Web_Rendering_Comparison) — MEDIUM confidence (third-party benchmark)
-- [Backend math rendering architecture](https://danilafe.com/blog/backend_math_rendering/) — MEDIUM confidence (practitioner article, verified approach)
-- [CVE-2025-29927: Next.js Middleware Bypass](https://projectdiscovery.io/blog/nextjs-middleware-authorization-bypass) — HIGH confidence (official CVE documentation)
-- [Next.js Authorization patterns (Robin Wieruch)](https://www.robinwieruch.de/next-authorization/) — MEDIUM confidence (practitioner, widely cited)
-- [Stripe Checkout + Next.js 15 integration](https://vercel.com/kb/guide/getting-started-with-nextjs-typescript-stripe) — HIGH confidence (Vercel official)
-- [Presigned URLs for secure S3 downloads](https://neon.com/guides/next-upload-aws-s3) — MEDIUM confidence (Neon official guide)
-- [Pandoc universal document converter](https://pandoc.org/MANUAL.html) — HIGH confidence (official docs)
-- [Paywall architecture patterns (ePublishing)](https://www.epublishing.com/news/2025/may/13/integrating-paywall-solutions-your-cms/) — MEDIUM confidence (industry publication)
-- [LaTeX to HTML conversion for STEM books](https://lodepublishing.com/blog/converting-latex-to-html/) — MEDIUM confidence (practitioner article)
+All findings are from direct code inspection of the ScienceOne repository at commit `a7ee42c` (2026-02-22). No external sources consulted — this is codebase-specific architecture documentation.
 
 ---
-*Architecture research for: Online STEM book publishing platform (ScienceOne)*
-*Researched: 2026-02-18*
+*Architecture research for: ScienceOne v1.1 — blog, resource library, interactive simulations*
+*Researched: 2026-02-22*

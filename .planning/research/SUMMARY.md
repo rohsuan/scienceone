@@ -1,250 +1,223 @@
 # Project Research Summary
 
-**Project:** ScienceOne
-**Domain:** Online STEM book publishing platform (mathematics and physics)
-**Researched:** 2026-02-18
-**Confidence:** MEDIUM-HIGH
+**Project:** ScienceOne v1.1
+**Domain:** STEM education platform — blog, resource library, interactive physics simulations added to existing book platform
+**Researched:** 2026-02-22
+**Confidence:** HIGH — all findings from direct codebase inspection; no inference required
 
 ## Executive Summary
 
-ScienceOne is an online academic publishing platform for STEM books — specifically mathematics and physics — with three monetization models (open access, pay-per-book, pay-per-chapter) and three reading surfaces (browser reader, PDF download, EPUB download). Research across all four areas converges on a clear architecture: a Next.js 15 monolith with a Data Access Layer enforcing purchase checks, KaTeX math pre-rendered at ingest time (not client-side), Stripe webhooks as the sole access-grant mechanism, and Cloudflare R2 for file storage with presigned URLs. This stack is well-matched to the domain's core constraint: math-dense content that must load fast, render correctly, and stay behind a reliable paywall.
+ScienceOne v1.1 is not a greenfield build — it is a first-pass-code integration milestone. The parallel researcher agents found that substantially all of the blog, resource library, and simulation features have already been written and live in the codebase as untested first-pass code. The primary work is not building features from scratch but auditing, fixing, and verifying what already exists. The recommended approach is a structured verification and bug-fix pass across three feature areas in dependency order: resource infrastructure first (payment flow is the riskiest), simulations second (SSR bugs are blocking), and blog last (simpler data path, fewer cross-dependencies). No new npm packages are required.
 
-The most important recommendation from combined research is to treat the manuscript ingest pipeline as the highest-risk dependency and build it first. Every other feature — the reader, catalog, payment gate, downloads — depends on content being correctly ingested, math pre-rendered, and structured data written to the database. The ingest pipeline is also where the most irreversible decisions live: KaTeX vs MathJax (equation cross-referencing support), format support (LaTeX, Word, Markdown), and validation rigor. Cutting corners here creates technical debt that scales badly as the catalog grows.
+The most important finding across all four research areas is that first-pass code has well-documented bugs that will cause silent failures in production. The simulation registry uses `React.lazy` instead of `next/dynamic({ ssr: false })`, which will produce server-side errors when simulation pages load. `dangerouslySetInnerHTML` is called on database content without sanitization in four locations (XSS vector). The Stripe webhook handler has dead code and routes by metadata ID presence rather than explicit product type. Blog SEO will silently fail because `publishedAt` is nullable and `togglePublishBlogPost` doesn't revalidate the post's own detail URL. None of these are architectural missteps — they are tactical bugs in otherwise-sound code that must be fixed before anything is published.
 
-The three most serious risks are: (1) client-side math rendering, which causes layout flash and accessibility failures and is expensive to retrofit; (2) Stripe webhook race conditions, which generate "I paid but can't access" support tickets if entitlement is not idempotent and webhook-driven; and (3) silent ingestion corruption, where Pandoc converts LaTeX files that look correct in a browser but have broken equation cross-references, missing theorem boxes, or malformed figures. All three risks have well-documented prevention strategies that must be built in from the start, not patched later.
-
----
+The architectural decisions in the first-pass code are correct and should not be changed: Simulation as a Resource subtype avoids duplicating purchase/admin infrastructure; URL-param-driven server-side filtering is correct for current data volumes; the simulation component registry with `next/dynamic` (after the fix) is the right pattern for safe dynamic rendering. The shared Subject taxonomy across content types is a genuine asset that enables cross-linking features. The roadmap should focus on the build order prescribed in ARCHITECTURE.md: database schema migration, subject infrastructure, resource admin, resource public and purchase, simulations, blog admin, blog public, dashboard integration.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack centers on Next.js 15.5 with the App Router, TypeScript 5.9, Prisma 7 on PostgreSQL 16 (Neon serverless), Tailwind CSS 4, and shadcn/ui. This combination is well-suited to content-heavy publishing: SSG serves public catalog pages fast, Server Components enforce access control at render time, and App Router typed routes catch broken links at compile time. For math rendering, KaTeX 0.16.x with server-side `renderToString()` at ingest time is the correct choice — synchronous rendering eliminates layout shift on formula-dense pages. MathJax is the alternative only if manuscripts require `\label`/`\eqref` cross-references heavily and author pressure justifies the client-side performance trade-off.
+No new npm packages are required for v1.1. Every dependency needed for blog, resource library, and simulations is already installed. The stack is the existing production stack: Next.js 16 App Router, Prisma 7 on PostgreSQL, Better Auth, Tailwind v4, shadcn/ui, Stripe, Cloudflare R2, Resend, KaTeX, `sanitize-html`, `shiki`, `@tiptap/react`, `@tanstack/react-table`, `react-hook-form` + `zod`, `use-debounce`, `lucide-react`, `sonner`.
 
-Payments use Stripe with webhook-driven fulfillment. Authentication uses Auth.js v5 (NextAuth) with the Prisma adapter — keeping user data, session tokens, and purchase records in the same PostgreSQL database is a deliberate design choice for transactional access control. File storage uses Cloudflare R2 (S3-compatible, zero egress fees) with `@aws-sdk/client-s3` and presigned URL generation at download time. Manuscript conversion uses Pandoc (system binary) via `node-pandoc`, with Resend for transactional email. Notably, Prisma 7 drops MongoDB support entirely and Next.js 15 requires Node.js 20+.
+See `.planning/research/STACK.md` for full analysis.
 
-**Core technologies:**
-- Next.js 15.5: Full-stack framework — SSG for catalog, SSR for gated content, API routes for webhooks
-- TypeScript 5.9: Type safety — required for Prisma 7's typed queries and Next.js 15's typed routes
-- PostgreSQL 16 (Neon): Primary database — handles relational purchase/access data; JSONB for flexible book metadata
-- Prisma 7: ORM — Rust-free, 3x faster queries, type-safe; critical for preventing wrong-user-gets-wrong-content bugs
-- KaTeX 0.16.x: Math rendering — synchronous server-side pre-render at ingest; no client-side JS for math display
-- Stripe: Payments — webhook-driven access grants; supports pay-per-book and pay-per-chapter natively
-- Auth.js v5: Authentication — co-located with purchase data in same Postgres database
-- Cloudflare R2: File storage — zero egress fees; presigned URLs for gated PDF/EPUB delivery
-- Pandoc 3.x: Manuscript conversion — LaTeX/Word/Markdown to HTML/PDF/EPUB; system binary, not npm
+**Core technologies (existing, reused for v1.1):**
+- **Canvas API + `requestAnimationFrame`** — physics simulations are analytically simple 2D animations; no external physics library needed; all 3 simulations verified pure Canvas
+- **`next/dynamic({ ssr: false })`** — replaces the first-pass `React.lazy` in simulation registry; this is the fix that unblocks SSR safety for simulations
+- **`sanitize-html`** — already installed; must be applied before every `dangerouslySetInnerHTML` call (currently missing in 4 locations: blog content, resource content, simulation teacherGuide, simulation parameterDocs)
+- **`shiki` `highlightCodeBlocks()`** — already installed and used in the book reader; must be applied to blog post content before render (currently missing)
+- **URL params + Next.js Server Components** — for all filtering/search on blog, resources, simulations; no client-side state needed; already implemented
+- **Stripe Checkout + webhook** — reused identically from book purchases; the webhook handler needs an explicit `productType` routing fix
+
+**What NOT to add:** Physics engines (matter.js, cannon.js), p5.js, WebGL/Three.js, Markdown parsers (content is HTML not Markdown), headless CMS (data is in Prisma), react-query/SWR (filtering is server-driven), TipTap for blog admin (textarea is sufficient for single-founder use).
 
 ### Expected Features
 
-Research against Cambridge Core, Perlego, VitalSource, and LiveCarta identifies a clear MVP boundary. The admin ingestion dashboard is the highest-priority internal feature — the founder must publish books without engineering help. The browser reader with math rendering and the payment checkout are the core revenue-generating user-facing features.
+See `.planning/research/FEATURES.md` for full tables with complexity and status per feature.
 
-**Must have (table stakes):**
-- Book catalog with browse and search — primary discovery path for all sales
-- Book detail page with full metadata (cover, synopsis, author, TOC, ISBN, pricing) — the conversion page
-- User account and authentication — required for purchase tracking and content gating
-- Checkout with pay-per-book — the revenue mechanism
-- My Library (purchased books view) — users must re-access what they bought
-- Browser-based reader with math rendering — core value delivery for STEM
-- PDF download (secured via presigned URL) — professionals expect an offline copy
-- Open access book support — first-class model alongside paid
-- Admin ingestion dashboard — founder-managed catalog without engineering dependency
-- Schema.org Book structured data — organic SEO from day one
+**Already built — P1 verify, don't rebuild:**
+- Blog: listing page with cards, category/subject/sort/search filters, article detail with JSON-LD Article schema, SEO metadata, published/draft workflow, subject tags, author attribution
+- Resources: listing with subject/type/level/sort/search, detail page with free/paid signaling, secure presigned R2 download, Stripe purchase flow, post-purchase access, "My Resources" in dashboard, view count display
+- Simulations: gallery page, subject filtering, detail page with SimulationEmbed, Play/Reset/slider controls in all 3 simulations, teacher guide and parameter docs fields, free access convention, admin componentKey registry
 
-**Should have (competitive):**
-- EPUB download — standard for e-readers; add after PDF download is stable
-- Sample chapter / preview — reduces purchase hesitation; add when checkout conversion data shows need
-- Reading progress tracking — add when engagement data shows return readers
-- Dark mode / reading customization — add when session length signals deep engagement
-- Citation export (BibTeX, APA) — low effort, high value for academic users
-- Pay-per-chapter — evaluate after catalog has demand signals; conflicts with pay-per-book UX so apply per-book
+**Must fix before launch (blocking gaps):**
+- Pagination on blog listing — currently loads all posts with no LIMIT
+- Pagination on resource listing — same issue
+- Canvas responsive layout — 600px hardcoded breaks on mobile/iPad, which STEM teachers use in the classroom
+- Admin draft preview link — admin cannot verify how a post looks before publishing
 
-**Defer (v2+):**
-- In-browser highlights and bookmarks — high complexity; needs enough repeat readers to justify storage backend
-- Discount codes / institutional pricing — add when first university contact approaches
-- LMS integration (LTI 1.3) — only when first institutional deal is imminent
-- AI recommendations — catalog needs 50+ books minimum for recommendations to be meaningful
+**Add promptly after core is verified (high value, low cost):**
+- Reading time estimate on blog cards (trivial: word count / 200 wpm)
+- Prev/Next article navigation on blog posts (readers dead-end without it)
+- RSS feed for blog (educators and aggregators expect it; signals maintained platform)
+- File format and size label on resource detail ("PDF • 2.4 MB")
+- Subject cross-links: blog post to related resources (data model supports it; needs query and UI only)
+- Subject cross-links: simulation to matching lab guide (same; drives paid resource sales)
 
-**Explicit anti-features (do not build):**
-- Author self-service upload portal — contradicts the curator model; quality control degrades
-- DRM / copy-protect PDF — academic users strongly resent it; use watermarking (buyer email in PDF) instead
-- Subscription / all-access model — incoherent at <20 books; revisit only after 50+ book catalog
-- Offline reading mode — PDF download IS the offline solution; service worker approach is too complex
+**Defer to later:**
+- KaTeX math in blog post content (most posts will be prose; add when the author needs equations)
+- "Show Code" panel consistency across all 3 simulations (ProjectileMotion has it; others may not)
+- Canonical `<link rel="canonical">` meta tag (low SEO risk for a new platform)
+
+**Explicitly out of scope:**
+- Blog comments, guest posts, newsletter subscription, social share buttons
+- User-uploaded resources, ratings/reviews, bulk download
+- Simulation embed/iframe API, save-state presets, real-time multiplayer
 
 ### Architecture Approach
 
-The recommended architecture is a Next.js monolith with a strict Data Access Layer (DAL). All database reads flow through `lib/dal/` where access checks are embedded in fetch functions — not bolted on in middleware. This is the direct response to CVE-2025-29927, which demonstrated that Next.js middleware can be bypassed via header injection, making middleware-only access control insufficient for paid content. The manuscript ingest pipeline runs as offline admin scripts (`scripts/ingest/`), completely decoupled from the web application but sharing the same Prisma schema and S3 bucket.
+The first-pass architecture is sound and follows the patterns established in v1.0. Five key architectural patterns are in place and should be preserved. Simulation as Resource subtype: every simulation is a Resource with `type: SIMULATION` plus a linked Simulation record, eliminating duplicate admin/purchase/filter infrastructure. Static component registry: `simulation-registry.ts` maps string keys to dynamically-loaded components, with `SIMULATION_KEYS` driving the admin dropdown, making registry and simulation file an atomic two-file change. Shared Subject taxonomy: one Subject table used by both Resource and BlogPost, enabling cross-linking with no schema changes needed. URL-param-driven filtering: all filter state lives in URL params, server-rendered per request, bookmarkable, no client state management. Single upload URL route: `/api/admin/upload-url` handles all content types via a type union.
+
+See `.planning/research/ARCHITECTURE.md` for full component inventory and data flows.
 
 **Major components:**
-1. Catalog UI (Next.js SSG/ISR pages) — public book browsing, search, metadata display
-2. Book Reader (Next.js Server Components) — access-gated chapter reading with pre-rendered KaTeX HTML
-3. Data Access Layer (`lib/dal/`) — all DB queries with embedded purchase checks; cannot be bypassed
-4. Stripe webhook handler (`/api/stripe/webhook/`) — sole source of truth for access grant on purchase
-5. Download API (`/api/downloads/[id]/`) — purchase-verified presigned URL generation
-6. Manuscript Ingest Pipeline (`scripts/ingest/`) — Pandoc + KaTeX pre-render; offline admin tool
-7. Admin UI (`app/(admin)/`) — book management dashboard for founder
+1. **Server action and query layer** — feature-split into `{feature}-queries.ts` (public, `isPublished: true` enforced, React.cache) and `{feature}-admin-queries.ts` (all records, no filter); must never be mixed to prevent draft content leaking to public pages
+2. **Admin UI** — React Hook Form + Zod + tabbed shadcn/ui forms for BlogPostEditForm and ResourceEditForm; ResourceEditForm shows a conditional Simulation tab when type=SIMULATION is selected
+3. **Simulation system** — `SIMULATION_REGISTRY` (convert to `next/dynamic`) -> `SimulationEmbed` (Suspense boundary) -> canvas component in `src/simulations/`; each simulation is self-contained, no shared logic between them
+4. **Purchase and download flow** — `createResourceCheckoutSession` -> Stripe hosted checkout -> webhook `resourcePurchase.upsert()` -> entitlement check in `/api/resource-download` -> presigned R2 GET URL returned as JSON for client to redirect to
 
-**Build order (dependency-driven):**
-Database schema → Auth → Ingest pipeline → Catalog → Access DAL → Stripe + webhook → Reader → Downloads → Admin UI
+**Prescribed build order:**
+1. Prisma migration (new tables must exist first)
+2. Subject infrastructure (shared dependency for both resources and blog)
+3. Resource admin (file upload, CRUD, simulation tab)
+4. Resource public and purchase (buy flow, download, webhook)
+5. Simulation registry and components (convert to `next/dynamic`, verify all 3)
+6. Blog admin (simpler; no purchase flow)
+7. Blog public (listing, detail, SEO)
+8. Dashboard and homepage integration
 
 ### Critical Pitfalls
 
-1. **Client-side math rendering** — Never ship client-side-only KaTeX/MathJax. Pre-render all math with `katex.renderToString()` at ingest time; store rendered HTML in DB. Client receives static HTML; only KaTeX CSS is loaded in the browser. Retrofitting this after launch requires re-ingesting all books.
+See `.planning/research/PITFALLS.md` for all 9 pitfalls with recovery strategies. The top 5 that will cause production failures if not addressed:
 
-2. **KaTeX equation cross-reference gaps** — KaTeX does not support `\label`/`\eqref` natively. Audit manuscripts for these commands before committing to KaTeX. If physics manuscripts rely heavily on numbered equation cross-references, either switch to MathJax v3 or build a custom post-processor. Decide before any rendering work begins — switching libraries requires re-ingesting all content.
+1. **`React.lazy` in simulation registry will cause server-side errors** — `performance.now()`, `canvas.getContext()`, and `requestAnimationFrame` are browser APIs. Convert all registry entries to `next/dynamic(() => import(...), { ssr: false })` before loading any simulation page. This is the first task in the simulations phase. Warning signs: server errors with `performance is not defined` or hydration mismatch warnings.
 
-3. **Stripe webhook entitlement race conditions** — Never grant access from the payment success redirect. Use webhook handler exclusively (`checkout.session.completed`). Use `upsert` with `stripeSessionId` as idempotency key. Add a polling endpoint so the reader page can wait for access grant without requiring a manual refresh. Return HTTP 200 to Stripe always, even on internal failures.
+2. **`dangerouslySetInnerHTML` on unsanitized content in 4 locations** — blog post content, resource content, simulation teacherGuide, simulation parameterDocs are all rendered without passing through `sanitize-html`. Even with admin-only input today, this is a stored XSS vector. Create a shared `sanitizeHtml()` utility and wrap all four call sites. Must be done before any content is published.
 
-4. **Pandoc ingestion silent corruption** — Pandoc handles 80% of LaTeX well; the other 20% (custom macros, TikZ figures, theorem environments, bibliography cross-references) may fail silently. Build a manuscript validation step that outputs a "conversion health report" before ingestion. Require founder preview sign-off before any book goes live. Treat Pandoc warnings as errors requiring manual review.
+3. **Stripe webhook dead code and implicit routing will mask payment bugs** — the book branch has an unreachable `if (!bookId)` guard; routing is by ID presence, not explicit type. Add `productType: "book" | "resource"` to Stripe metadata in both checkout session creators. Route webhook by `metadata.productType`. Do this during resource purchase flow verification.
 
-5. **EU accessibility compliance (EAA effective June 28, 2025)** — EPUB files sold in the EU must meet WCAG 2.1 Level AA. Default Pandoc/LaTeX PDF output fails this. Use EPUB 3 with MathML (not images) for equations. Validate every generated EPUB with epubcheck and Ace by DAISY. Build accessibility structure (heading hierarchy, lang attributes, figure alt text) into the ingest pipeline from the start.
+4. **Blog SEO silent failures from nullable `publishedAt`** — `JSON.stringify` drops `undefined`, so `datePublished` disappears from JSON-LD when `publishedAt` is null. Fix: fall back to `createdAt` in the JSON-LD generator. In `togglePublishBlogPost`, only set `publishedAt` if not already populated (prevents date clobbering on re-publish). Also: no `app/sitemap.ts` exists — add it before publishing the first post.
 
----
+5. **`togglePublishBlogPost` doesn't revalidate the post's detail URL** — the action revalidates `/blog` and `/admin/blog` but not `/blog/${slug}`. Publishing a post and immediately visiting its URL may return a 404 or stale content. Fix: fetch the slug before updating, then `revalidatePath(\`/blog/${slug}\`)` after. The pattern already exists in `updateBlogPost`.
+
+**Additional pitfalls to address (not launch-blocking but important):**
+- RAF cancellation not verified in SpringMass and WaveInterference — potential memory leak at 60fps
+- `componentKey` registry drift produces silent broken simulation pages; add admin warning for mismatched keys
+- Resource success page has no user ownership check — information disclosure if session_id URL is shared
+- Old URLs not revalidated when slug changes in either blog posts or resources
 
 ## Implications for Roadmap
 
-Based on dependency analysis across all four research files, the architecture build order is deterministic. The ingest pipeline must produce content before the reader can show anything. Auth must exist before any user-specific data. Access control DAL must exist before gated content. Stripe must be integrated before paid content is purchasable. This constrains the phase structure significantly.
+Based on the combined research, the suggested phase structure follows ARCHITECTURE.md's build order, grouped to minimize integration risk and respect the dependency graph. The core insight: this is a verification and bug-fix project, not a build project. Phases should be structured as "fix and verify" passes over existing code, not feature development phases.
 
-### Phase 1: Foundation and Data Schema
+### Phase 1: Infrastructure — DB Migration and Subject System
 
-**Rationale:** Everything else depends on this. Database schema defines the shape of all data; auth provides the user identity that purchase records reference. No feature can be built without these.
-**Delivers:** PostgreSQL schema (User, Book, Chapter, Purchase), Prisma setup, Next.js 15 project scaffold, Auth.js v5 login/signup, basic session management
-**Addresses:** User account / authentication (table stakes)
-**Avoids:** Schema drift by getting relational model right before any content is stored
-**Research flag:** Standard patterns — well-documented Next.js + Prisma + Auth.js setup; skip phase research
+**Rationale:** The Prisma schema for all three feature areas must exist before any other work can run. The migration already exists at `prisma/migrations/20260222002050_add_resources_blog_simulations/` and may need review. Subject is a shared dependency for both resources and blog; it must be verified working before either admin form can be tested.
+**Delivers:** All new tables created and migrated. `SubjectSelect` component + `createSubject` server action verified working. Initial subjects seeded (Physics, Mathematics, Chemistry, etc.).
+**Addresses:** No user-facing features, but unblocks all subsequent phases.
+**Avoids:** Building admin UI before tables exist; blocking on shared dependency mid-phase.
 
-### Phase 2: Manuscript Ingest Pipeline
+### Phase 2: Resource Admin
 
-**Rationale:** The ingest pipeline is the highest-risk dependency in the project. Every reader, catalog, and download feature depends on correctly ingested content. Building it early allows the founder to populate the catalog while other phases proceed. Math rendering library decision (KaTeX vs MathJax for cross-references) must be locked in here.
-**Delivers:** Admin CLI that converts LaTeX/Word/Markdown manuscripts to pre-rendered HTML + chapters in DB, PDF/EPUB uploads to R2, cover image processing, book metadata record creation
-**Addresses:** Admin ingestion pipeline (P1), KaTeX server-side pre-rendering (architecture pattern 1)
-**Avoids:** Client-side math rendering pitfall, Pandoc silent corruption (validation step + founder sign-off required)
-**Research flag:** Needs deeper research — LaTeX-specific packages and custom macro handling for physics manuscripts; Pandoc filter ecosystem for theorem environments
+**Rationale:** Resource admin is the most complex admin form (4 tabs, file upload, simulation conditional tab, subject multi-select). Verifying it first surfaces any upload-route bugs before they affect the public side. Admin correctness gates Phase 3. The ImageUploadField prop naming bug (`bookId` used for blog/resource context) should be fixed here.
+**Delivers:** Admin can create/edit/publish/delete resources; upload file and cover image to R2; assign subjects; set type=SIMULATION and enter componentKey via dropdown; toggle publish.
+**Addresses:** Admin CRUD, FileUploadField, SubjectSelect, upload URL route extension for resource and blog upload types.
+**Avoids:** Draft/published query mixing (public queries must always enforce `isPublished: true`); trusting client-sent prices (server action fetches price from DB, never accepts client amount).
 
-### Phase 3: Book Catalog and Discovery
+### Phase 3: Resource Public and Purchase Flow
 
-**Rationale:** With content in the database, the catalog can be built against real books. This establishes the public-facing surface and enables SEO from day one. Open access books can go live here without any payment infrastructure.
-**Delivers:** Book catalog page (browse, filter, search via Postgres FTS), book detail page with full metadata, Schema.org structured data, open access book reading (no gate), cover images displayed
-**Addresses:** Book catalog (P1), book detail page (P1), search (P1), open access support (P1), Schema.org SEO (P1)
-**Avoids:** Missing structured data at launch; catalog without covers
-**Research flag:** Standard patterns — SSG pages with Postgres FTS are well-documented; skip phase research
+**Rationale:** The purchase flow (Stripe -> webhook -> entitlement) is the highest-risk path in the entire milestone. It touches external services, involves money, and has known bugs in the webhook handler. Verify it in test mode before simulations or blog, so it can be isolated and debugged without noise from other features.
+**Delivers:** Resource listing with filters and pagination, detail page, free download via client-side fetch of presigned URL, paid purchase via Stripe Checkout, post-purchase access gating, "My Resources" on dashboard.
+**Addresses:** Pagination (add `take: 12` + cursor pagination to resource listing query), download button client component fix (must fetch JSON then redirect, not navigate to API route directly), resource success page ownership check, Stripe webhook explicit `productType` routing.
+**Avoids:** Stripe webhook implicit routing pitfall — add `productType` metadata during this phase; the unreachable dead code `if (!bookId)` should be removed at the same time.
 
-### Phase 4: Browser Reader with Access Gating
+### Phase 4: Simulations
 
-**Rationale:** The reader is the core product. It must handle both open-access (no gate) and paid (purchase check) books. The Data Access Layer with embedded access checks is built here. This phase also surfaces any math rendering issues against real content before payment integration.
-**Delivers:** Chapter reader UI with pre-rendered math display, TOC navigation, table of contents sidebar, mobile-responsive layout, DAL with purchase check (initially returning "access granted" for open-access books), chapter-by-chapter navigation
-**Addresses:** Browser reader (P1), table of contents navigation (table stakes), mobile-responsive reader (table stakes)
-**Avoids:** Middleware-only access control (CVE-2025-29927), client-side math rendering, fixed-layout mobile reader
-**Research flag:** Standard patterns for reader UI; KaTeX CSS integration is documented; skip phase research
+**Rationale:** Simulations depend on resources (they are Resource records with type=SIMULATION). The registry-to-`next/dynamic` conversion must happen before any simulation page is loaded in production or it causes server errors. The canvas responsive layout fix is required before classroom use on iPads and phones.
+**Delivers:** Simulation gallery with subject filter, simulation detail with working embedded canvas, all 3 simulations rendering correctly with Play/Reset/sliders, teacher guide and parameter docs populated in admin, responsive canvas layout.
+**Addresses:** `React.lazy` -> `next/dynamic({ ssr: false })` conversion (first task, must not be skipped), RAF cancellation audit for SpringMass and WaveInterference, canvas 600px fixed-width responsive fix, componentKey error message replaced with generic text, admin dropdown labels improved from raw keys to human-readable names.
+**Avoids:** Simulation SSR errors; simulation component key drift (add admin validation banner for mismatched keys).
 
-### Phase 5: Payments and Access Entitlement
+### Phase 5: Blog Admin and Public
 
-**Rationale:** Stripe integration is the most business-critical feature but also the easiest to get wrong. Building it after the reader exists means payment can be tested against real book content. The webhook fulfillment pattern must be built correctly from the start — no retrofitting.
-**Delivers:** Stripe Checkout integration, pay-per-book payment flow, webhook handler with idempotent upsert, purchase record creation, access grant to reader post-webhook, My Library (purchased books list), purchase receipt email via Resend
-**Addresses:** Checkout / payment (P1), My Library (P1), purchase receipt (table stakes)
-**Avoids:** Stripe redirect-based access grant, webhook race conditions, non-idempotent entitlement records
-**Research flag:** Stripe webhook patterns are well-documented; idempotency implementation is standard; skip phase research
+**Rationale:** Blog has no purchase flow complexity, making it the safest phase to verify last. The sanitization and SEO fixes are the most important items and must be done before any content is published.
+**Delivers:** Admin can create/edit/publish blog posts with cover image, author photo, subject tags. Public blog listing with category/subject/sort/search and pagination. Article detail page with correct JSON-LD, Shiki-highlighted code blocks, working SEO metadata.
+**Addresses:** HTML sanitization via `sanitize-html` applied to `post.content` before render (Pitfall 1 — XSS), `app/sitemap.ts` covering all three content types (must exist before first publish), `publishedAt` fallback to `createdAt` in JSON-LD (Pitfall 5 — SEO), `togglePublishBlogPost` slug revalidation fix (Pitfall 8), old-slug revalidation on slug changes (Pitfall 9), Shiki `highlightCodeBlocks()` applied to blog post content before render.
+**Avoids:** Publishing a post with broken SEO; stale cache after slug changes; XSS from unsanitized admin HTML.
 
-### Phase 6: Secure File Downloads
+### Phase 6: Polish and Cross-Linking
 
-**Rationale:** PDF and EPUB downloads are blocked on: (a) files existing in R2 (from ingest pipeline), (b) purchase verification (from payment phase), and (c) presigned URL generation. This phase is short but must be done after Phases 2 and 5.
-**Delivers:** Download API endpoint with purchase verification, presigned URL generation (15-minute expiry), PDF download for purchased books, rate limiting on download endpoint, watermarking (buyer email embedded in PDF)
-**Addresses:** PDF download secured (P1)
-**Avoids:** Public file URLs in DB, permanent download links that bypass payment
-**Research flag:** Standard patterns — S3 presigned URLs are well-documented; skip phase research
-
-### Phase 7: Admin Dashboard
-
-**Rationale:** The ingest CLI works but the founder needs a UI for catalog management. This phase converts the CLI pipeline into a browser-based admin experience. It is lower risk because it is internal-only and non-customer-facing.
-**Delivers:** Book management UI (publish/unpublish, metadata editing, cover image upload), ingestion status visibility, book preview before publish, basic analytics (downloads, reader views)
-**Addresses:** Admin ingestion dashboard (P1)
-**Avoids:** Founder dependency on CLI for every catalog update
-**Research flag:** Standard CRUD admin patterns; skip phase research
-
-### Phase 8: Reader Enhancements (v1.x)
-
-**Rationale:** These features improve the reading experience and reduce checkout hesitation but are not required for revenue. Add after core product is validated with real users.
-**Delivers:** Sample chapter preview (first chapter free), EPUB download, reading progress tracking, dark mode / reader font settings, citation export (BibTeX, APA), pay-per-chapter evaluation
-**Addresses:** EPUB download (P2), sample chapter (P2), reading progress (P2), dark mode (P2), citation export (P2)
-**Avoids:** EPUB accessibility failures (run epubcheck + Ace by DAISY on all EPUBs)
-**Research flag:** EPUB generation with accessible math (MathML, not images) needs deeper research — EPUB 3 accessibility pipeline is less documented than PDF
+**Rationale:** Once all three content areas are verified in isolation, add the high-value low-cost features that connect them and complete the user experience. These features depend on all three content types existing and working, so they belong last.
+**Delivers:** Blog pagination, reading time estimates on blog cards, prev/next article navigation, RSS feed for blog, file format/size labels on resource detail, subject cross-links from blog posts to related resources, subject cross-links from simulation pages to related lab guides.
+**Addresses:** FEATURES.md P2 items — all high-value, low-implementation-cost improvements that require stable underlying content.
+**Avoids:** Shipping cross-links before the underlying content types are stable and verified.
 
 ### Phase Ordering Rationale
 
-- Schema must precede everything: User, Book, Chapter, Purchase tables are referenced by auth, ingest, catalog, reader, and payments
-- Ingest pipeline precedes catalog and reader: No content in DB means no pages to render; ingest is also where irreversible decisions (KaTeX vs MathJax) are locked
-- Catalog precedes reader: Reader assumes book detail page and slug routing already exist
-- Reader precedes payments: Payment integration is more valuable when tested against real content that will be gated
-- Payments precede downloads: Download endpoint requires purchase verification that payment phase creates
-- Admin UI follows CLI ingest: Founder can use CLI until UI is ready; CLI must work first
+- Database migration must come first — all other phases are blocked on tables existing.
+- Subject infrastructure before both resource admin and blog admin — it is a shared dependency for both forms.
+- Resource admin before resource public — cannot verify public pages without seed data created by admin.
+- Resource purchase before simulations — the purchase flow is the highest-risk integration point; isolating its verification prevents noise from simulation bugs.
+- Simulations after resource admin — simulations are a Resource subtype; they need resource infrastructure working first.
+- Blog last among content areas — fewest dependencies, no purchase flow, safest to verify in isolation.
+- Cross-linking polish last — requires all three content types to be stable before connecting them.
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-- **Phase 2 (Ingest Pipeline):** LaTeX-specific STEM packages (amsmath, amsthm, tikz, physics) and Pandoc filter support; custom theorem environments; bibliography handling via biblatex vs natbib; math cross-reference strategy (KaTeX vs MathJax decision needs validation against real manuscripts)
-- **Phase 8 (Reader Enhancements):** EPUB 3 with MathML accessibility pipeline; epubcheck integration; accessible EPUB generation from Pandoc
+Phases with well-documented patterns (standard — skip `/gsd:research-phase`):
+- **Phase 1 (Infrastructure):** Database migration is mechanical; schema already written in the migration file. Subject infrastructure reuses existing SubjectSelect pattern.
+- **Phase 2 (Resource Admin):** Admin form pattern is identical to existing BookEditForm in the codebase. No novel patterns.
+- **Phase 3 (Resource Purchase):** Stripe Checkout + webhook is the same pattern as the existing book purchase flow. The fix (explicit `productType`) is clearly prescribed.
+- **Phase 5 (Blog Admin and Public):** Blog follows a simpler path than resources; all patterns are established by resources phase.
+- **Phase 6 (Polish):** All items are well-understood features with clear implementation paths (RSS = route handler + XML, reading time = word count / 200, pagination = `take`/`skip`).
 
-Phases with standard patterns (skip phase research):
-- **Phase 1 (Foundation):** Next.js + Prisma + Auth.js scaffold is extremely well-documented
-- **Phase 3 (Catalog):** SSG + Postgres FTS + Schema.org is standard; no novel patterns
-- **Phase 4 (Reader):** Pre-rendered HTML reader with KaTeX CSS; component patterns are standard
-- **Phase 5 (Payments):** Stripe Checkout + webhook + idempotent upsert is Stripe's standard pattern
-- **Phase 6 (Downloads):** S3 presigned URL flow is standard infrastructure
-- **Phase 7 (Admin Dashboard):** Standard CRUD admin UI; no novel integration
-
----
+Phases that may benefit from targeted research during planning:
+- **Phase 4 (Simulations) — canvas responsive layout:** The research identifies the problem (600px hardcoded) but does not prescribe one canonical fix. The implementation phase should spike on CSS `aspect-ratio` container scaling vs. viewport-relative canvas dimensions vs. CSS `transform: scale()` to pick the approach that works consistently across all 3 different simulation layouts.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Core technologies (Next.js 15.5, Prisma 7, Tailwind 4, Auth.js 5, Stripe, R2) verified against official sources. KaTeX package identity (use `@matejmazur/react-katex`, not `react-katex`) is MEDIUM — npmjs verification needed |
-| Features | MEDIUM | Table stakes verified against Cambridge Core, Perlego, VitalSource. Anti-features are pattern extrapolation from feature-creep literature, not empirical data. Pay-per-chapter demand for this specific audience is unverified |
-| Architecture | HIGH | CVE-2025-29927 middleware bypass is documented fact that directly informs the DAL pattern. Webhook fulfillment pattern is Stripe-official. Presigned URL pattern is standard. Server-side KaTeX pre-rendering is verified in production by practitioner sources |
-| Pitfalls | MEDIUM-HIGH | KaTeX `\label`/`\eqref` limitation confirmed via GitHub issues. EAA June 2025 effective date verified. Stripe idempotency is Stripe-official. Pandoc LaTeX conversion limitations confirmed via GitHub issue tracker |
+| Stack | HIGH | All findings from direct `package.json` and source file inspection. Zero new dependencies needed — verified by checking every feature against installed packages. No inference. |
+| Features | HIGH | Table stakes verified against PhET, TPT, OER Commons. First-pass code status verified by direct file inspection for each feature row. Status is fact, not estimate. |
+| Architecture | HIGH | All findings from direct codebase inspection at commit `a7ee42c`. Data flows traced from source to destination. Anti-patterns identified from actual code, not hypotheticals. |
+| Pitfalls | HIGH | Bugs are directly observable in the code (grep for `React.lazy`, `dangerouslySetInnerHTML`, dead code in webhook). External sources cited for severity assessment (XSS, RAF leak, SSR errors). |
 
-**Overall confidence:** MEDIUM-HIGH
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **KaTeX vs MathJax final decision:** Audit actual manuscript samples for `\label`, `\eqref`, `\ref` usage before Phase 2. If physics manuscripts use these heavily, switch recommendation to MathJax v3 for the ingest pipeline despite the performance trade-off.
-- **LaTeX package allowlist:** The specific LaTeX packages used by prospective authors (amsmath, amsthm, tikz, physics, pgfplots, etc.) are unknown. Build an explicit allowlist during Phase 2 with the first real manuscript.
-- **Pay-per-chapter UX conflict:** Research flags that pay-per-chapter conflicts with pay-per-book UX. Defer to Phase 8 evaluation and decide per-book which model applies rather than supporting both simultaneously for the same title.
-- **`@matejmazur/react-katex` package identity:** STACK.md notes this needs npmjs verification. Confirm the package is the active maintained fork before installing.
-- **ISBN per-format requirement:** PITFALLS.md warns that separate ISBNs per format (web, PDF, EPUB) are required by retailers. Verify ISBN assignment workflow before first book goes live.
-
----
+- **Canvas responsive layout strategy:** Research identifies the problem clearly but does not prescribe one fix. The implementation phase should spike on the three candidate approaches before committing. Affects all 3 simulation components so the choice must work universally.
+- **Pagination UX pattern:** Research identifies pagination as missing and necessary but does not specify "load more" button vs. numbered pages vs. infinite scroll. For educators browsing a low-frequency-updated catalog, "load more" is likely correct (they want to see all), but confirm with the founder before building.
+- **Email template for resource purchases:** The current webhook reuses `PurchaseConfirmationEmail` with `bookSlug`/`bookTitle` fields repurposed for resource data. A dedicated `ResourcePurchaseConfirmationEmail` template is the correct fix but research did not determine whether this is blocking for v1.1 or can be deferred.
+- **Sitemap priority values:** Research flags the absence of a sitemap as critical but does not specify priority/changefreq values per content type. Standard practice: blog posts and resources at 0.8, simulations at 0.7, homepage at 1.0.
 
 ## Sources
 
-### Primary (HIGH confidence)
-- [Next.js 15.5 Blog](https://nextjs.org/blog/next-15-5) — version, Node.js 20 requirement, typed routes
-- [Prisma 7 Announcement](https://www.prisma.io/blog/announcing-prisma-orm-7-0-0) — Rust-free, MongoDB dropped
-- [Tailwind CSS v4.0 Release](https://tailwindcss.com/blog/tailwindcss-v4) — stable Jan 2025
-- [shadcn/ui Tailwind v4 Docs](https://ui.shadcn.com/docs/tailwind-v4) — full v4 compatibility
-- [Stripe Checkout + Next.js 15](https://vercel.com/kb/guide/getting-started-with-nextjs-typescript-stripe) — payment integration pattern
-- [Stripe idempotency docs](https://docs.stripe.com/api/idempotent_requests) — webhook deduplication
-- [CVE-2025-29927 Next.js Middleware Bypass](https://projectdiscovery.io/blog/nextjs-middleware-authorization-bypass) — DAL pattern rationale
-- [KaTeX Node.js server-side rendering](https://katex.org/docs/node) — pre-render approach
-- [KaTeX `\label`/`\eqref` limitation](https://github.com/KaTeX/KaTeX/issues/350) — cross-reference gap
-- [Cloudflare R2 Pricing](https://developers.cloudflare.com/r2/pricing/) — zero egress fees
-- [Pandoc official docs](https://pandoc.org/MANUAL.html) — multi-format conversion
-- [Google Book Schema structured data](https://developers.google.com/search/docs/appearance/structured-data/book) — SEO markup
-- [Perlego ebook features](https://help.perlego.com/en/articles/4450175-ebook-features-and-tools) — competitor feature baseline
-- [European Accessibility Act](https://publishdrive.com/accessibility-in-digital-publishing-2025-your-complete-guide-to-creating-inclusive-epubs-2.html) — June 28, 2025 effective date
+### Primary (HIGH confidence — direct codebase inspection)
 
-### Secondary (MEDIUM confidence)
-- [KaTeX vs MathJax 2025 benchmarks](https://biggo.com/news/202511040733_KaTeX_MathJax_Web_Rendering_Comparison) — performance trade-offs
-- [NextAuth.js vs Clerk comparison](https://medium.com/@sagarsangwan/next-js-authentication-showdown-nextauth-free-databases-vs-clerk-vs-auth0-in-2025-e40b3e8b0c45) — auth decision rationale
-- [Backend math rendering architecture](https://danilafe.com/blog/backend_math_rendering/) — practitioner validation of SSR pattern
-- [Paywall architecture patterns](https://www.epublishing.com/news/2025/may/13/integrating-paywall-solutions-your-cms/) — industry reference
-- [LaTeX to HTML conversion for STEM](https://lodepublishing.com/blog/converting-latex-to-html/) — ingestion pipeline patterns
-- [Stripe webhook best practices](https://www.stigg.io/blog-posts/best-practices-i-wish-we-knew-when-integrating-stripe-webhooks) — practitioner post-mortem
-- [Pandoc LaTeX HTML issues](https://github.com/jgm/pandoc/issues/10176) — conversion limitations
+- All source files in `src/app/(main)/blog/`, `src/app/(main)/resources/`, `src/app/(main)/simulations/`, `src/app/(admin)/admin/blog/`, `src/app/(admin)/admin/resources/`, `src/app/api/webhooks/stripe/route.ts`, `src/app/api/resource-download/route.ts`, `src/lib/simulation-registry.ts`, `src/components/simulations/SimulationEmbed.tsx`, `src/simulations/` — all directly inspected
+- `package.json` — all installed dependencies verified, confirming zero new packages needed
+- `prisma/migrations/20260222002050_add_resources_blog_simulations/` — schema migration already written
+- `git log` — commit `a7ee42c` documents `isomorphic-dompurify` removal and `sanitize-html` adoption
 
-### Tertiary (LOW confidence)
-- [KITABOO digital publishing](https://kitaboo.com/) — industry monetization patterns (vendor marketing)
-- Anti-feature analysis — pattern extrapolation from feature-creep literature, not empirical ScienceOne data
+### Secondary (MEDIUM confidence — official docs and established platforms)
+
+- [Next.js lazy loading guide](https://nextjs.org/docs/app/guides/lazy-loading) — `next/dynamic` vs `React.lazy`; `ssr: false` semantics
+- [Next.js `revalidatePath` docs](https://nextjs.org/docs/app/api-reference/functions/revalidatePath) — path-specific cache invalidation
+- [Next.js sitemap API reference](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap) — sitemap.ts file convention
+- [PhET Interactive Simulations](https://phet.colorado.edu/en/simulations/category/physics) — gallery patterns, teacher guide format, free access model
+- [Teachers Pay Teachers help docs](https://help.teacherspayteachers.com/hc/en-us/articles/360042469472) — "My Purchases" pattern, post-purchase access expectations
+- [Stripe metadata documentation](https://docs.stripe.com/metadata) — explicit `productType` routing pattern
+- [Google Search Central — pagination best practices](https://developers.google.com/search/docs/specialty/ecommerce/pagination-and-incremental-page-loading) — SEO implications of load-all vs. paginated
+- [Yoast — estimated reading time](https://yoast.com/features/estimated-reading-time/) — 200 wpm standard, UX pattern
+
+### Tertiary (supporting context)
+
+- [Sourcery XSS vulnerability database](https://www.sourcery.ai/vulnerabilities/typescript-react-security-audit-react-dangerouslysetinnerhtml) — `dangerouslySetInnerHTML` XSS severity framing
+- [RAF memory leak empirical study](https://stackinsight.dev/blog/memory-leak-empirical-study) — 1,230 instances of missing cancellation in OSS repos; validates prioritization
+- [OER Commons](https://oercommons.org/) — resource library filter taxonomy patterns for educational platforms
 
 ---
-*Research completed: 2026-02-18*
+*Research completed: 2026-02-22*
 *Ready for roadmap: yes*
