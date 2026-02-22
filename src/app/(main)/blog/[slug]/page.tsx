@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getBlogPostBySlug } from "@/lib/blog-queries";
 import { sanitizeHtml } from "@/lib/sanitize-html";
+import { highlightCodeBlocks } from "@/lib/highlight-code";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -45,16 +46,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   if (!post) notFound();
 
+  const highlightedContent = post.content
+    ? await highlightCodeBlocks(post.content)
+    : null;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
-    description: post.excerpt ?? undefined,
+    description: post.excerpt ?? "",
     author: {
       "@type": "Person",
       name: post.authorName,
     },
-    datePublished: post.publishedAt?.toISOString(),
+    datePublished: (post.publishedAt ?? post.createdAt).toISOString(),
     dateModified: post.updatedAt.toISOString(),
     publisher: {
       "@type": "Organization",
@@ -140,10 +145,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <Separator className="mb-8" />
 
       {/* Content */}
-      {post.content && (
+      {highlightedContent && (
         <article
           className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-serif"
-          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(highlightedContent) }}
         />
       )}
 
