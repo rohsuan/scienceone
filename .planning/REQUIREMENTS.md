@@ -19,8 +19,8 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 ### Resources
 
-- [ ] **RES-01**: Admin can create, edit, and delete resources with type, level, and subject metadata
-- [ ] **RES-02**: Admin can upload resource files and cover images to R2
+- [x] **RES-01**: Admin can create, edit, and delete resources with type, level, and subject metadata
+- [x] **RES-02**: Admin can upload resource files and cover images to R2
 - [ ] **RES-03**: Visitor can browse published resources with filtering by subject, type, and level
 - [ ] **RES-04**: Visitor can search resources by keyword
 - [ ] **RES-05**: Visitor can download free resources without purchase
@@ -93,8 +93,8 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 | BLOG-05 | Phase 14 | Pending |
 | BLOG-06 | Phase 14 | Pending |
 | BLOG-07 | Phase 14 | Pending |
-| RES-01 | Phase 11 | Pending |
-| RES-02 | Phase 11 | Pending |
+| RES-01 | Phase 11 | Complete |
+| RES-02 | Phase 11 | Complete |
 | RES-03 | Phase 12 | Pending |
 | RES-04 | Phase 12 | Pending |
 | RES-05 | Phase 12 | Pending |

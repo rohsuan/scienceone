@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Educators and students can discover STEM content — books, resources, simulations, and articles — with properly rendered math, directly in their browser
-**Current focus:** v1.1 Content Hub — Phase 10: Infrastructure
+**Current focus:** v1.1 Content Hub — Phase 11: Resource Admin
 
 ## Current Position
 
-Phase: 10 of 15 (Infrastructure)
-Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-02-22 — Phase 10 Plan 01 complete
+Phase: 11 of 15 (Resource Admin)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-22 — Phase 11 Plan 01 complete
 
-Progress: [█░░░░░░░░░] 17% (v1.1) — Phase 10 complete (1/6 phases)
+Progress: [██░░░░░░░░] 25% (v1.1) — Phase 11 Plan 1 complete (1/2 in phase)
 
 ## Performance Metrics
 
@@ -28,6 +28,7 @@ Progress: [█░░░░░░░░░] 17% (v1.1) — Phase 10 complete (1/6
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | Phase 10: Infrastructure | 1 | 3 min | 3 min |
+| Phase 11: Resource Admin | 1 | 2 min | 2 min |
 
 *Updated after each plan completion*
 
@@ -43,6 +44,9 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Research]: Build order: Infrastructure → Resource Admin → Resource Public/Purchase → Simulations → Blog → Polish
 - [Phase 10-01]: Four subjects: Physics, Mathematics, Chemistry, Computer Science (replaces six granular subjects)
 - [Phase 10-01]: Single shared sanitizeHtml utility in src/lib/sanitize-html.ts — no inline sanitize-html config anywhere else
+- [Phase 11-01]: ImageUploadField uses entityId+uploadType generic interface — supports books, resources, blog in one component
+- [Phase 11-01]: Full public URL stored on upload via NEXT_PUBLIC_R2_PUBLIC_URL prefix; bare R2 key as fallback
+- [Phase 11-01]: SubjectSelect is read-only — createSubject server action removed, subjects are seeded only
 
 ### Pending Todos
 
@@ -59,5 +63,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 10-01-PLAN.md — Phase 10 Infrastructure complete
-Resume file: None — start with `/gsd:plan-phase 11`
+Stopped at: Completed 11-01-PLAN.md — Phase 11 Plan 01 complete
+Resume file: None — continue with 11-02-PLAN.md
