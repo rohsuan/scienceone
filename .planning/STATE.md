@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Educators and students can discover STEM content — books, resources, simulations, and articles — with properly rendered math, directly in their browser
-**Current focus:** v1.1 Content Hub — Phase 11: Resource Admin
+**Current focus:** v1.1 Content Hub — Phase 12: Resource Public/Purchase
 
 ## Current Position
 
 Phase: 11 of 15 (Resource Admin)
-Plan: 1 of 2 in current phase
+Plan: 2 of 2 in current phase — Phase 11 COMPLETE
 Status: In progress
-Last activity: 2026-02-22 — Phase 11 Plan 01 complete
+Last activity: 2026-02-22 — Phase 11 Plan 02 complete
 
-Progress: [██░░░░░░░░] 25% (v1.1) — Phase 11 Plan 1 complete (1/2 in phase)
+Progress: [███░░░░░░░] 37% (v1.1) — Phase 11 complete (2/2 plans done)
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: [██░░░░░░░░] 25% (v1.1) — Phase 11 Plan 1 comple
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | Phase 10: Infrastructure | 1 | 3 min | 3 min |
-| Phase 11: Resource Admin | 1 | 2 min | 2 min |
+| Phase 11: Resource Admin | 2 | 3 min | 1.5 min |
 
 *Updated after each plan completion*
 
@@ -47,6 +47,8 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Phase 11-01]: ImageUploadField uses entityId+uploadType generic interface — supports books, resources, blog in one component
 - [Phase 11-01]: Full public URL stored on upload via NEXT_PUBLIC_R2_PUBLIC_URL prefix; bare R2 key as fallback
 - [Phase 11-01]: SubjectSelect is read-only — createSubject server action removed, subjects are seeded only
+- [Phase 11]: ResourceRowActions extracted as named component to enable useTransition hook usage inside ColumnDef cell
+- [Phase 11]: Single isPending from one useTransition covers both toggle and delete actions — sequential operations, no parallelism needed
 
 ### Pending Todos
 
@@ -63,5 +65,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 11-01-PLAN.md — Phase 11 Plan 01 complete
-Resume file: None — continue with 11-02-PLAN.md
+Stopped at: Completed 11-02-PLAN.md — Phase 11 complete
+Resume file: None — continue with Phase 12
