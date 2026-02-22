@@ -119,3 +119,55 @@ export const hasResourcePurchase = cache(
     return !!purchase;
   }
 );
+
+export async function getRelatedBlogPosts(subjectIds: string[], limit = 4) {
+  if (subjectIds.length === 0) return [];
+
+  return prisma.blogPost.findMany({
+    where: {
+      isPublished: true,
+      subjects: { some: { subjectId: { in: subjectIds } } },
+    },
+    take: limit,
+    orderBy: { publishedAt: "desc" },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      excerpt: true,
+      coverImage: true,
+      category: true,
+      publishedAt: true,
+    },
+  });
+}
+
+export async function getRelatedLabGuides(
+  subjectIds: string[],
+  excludeResourceId?: string,
+  limit = 4
+) {
+  if (subjectIds.length === 0) return [];
+
+  const where: Prisma.ResourceWhereInput = {
+    isPublished: true,
+    type: "LAB_GUIDE",
+    subjects: { some: { subjectId: { in: subjectIds } } },
+  };
+
+  if (excludeResourceId) {
+    where.id = { not: excludeResourceId };
+  }
+
+  return prisma.resource.findMany({
+    where,
+    take: limit,
+    orderBy: { viewCount: "desc" },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+    },
+  });
+}

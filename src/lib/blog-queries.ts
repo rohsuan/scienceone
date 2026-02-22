@@ -94,3 +94,36 @@ export async function getRecentBlogPosts(limit = 3) {
     },
   });
 }
+
+export async function getRelatedResources(
+  subjectIds: string[],
+  excludeId?: string,
+  limit = 4
+) {
+  if (subjectIds.length === 0) return [];
+
+  const where: Prisma.ResourceWhereInput = {
+    isPublished: true,
+    type: { not: "SIMULATION" },
+    subjects: { some: { subjectId: { in: subjectIds } } },
+  };
+
+  if (excludeId) {
+    where.id = { not: excludeId };
+  }
+
+  return prisma.resource.findMany({
+    where,
+    take: limit,
+    orderBy: { viewCount: "desc" },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      type: true,
+      description: true,
+      coverImage: true,
+      isFree: true,
+    },
+  });
+}
