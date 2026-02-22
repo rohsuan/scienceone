@@ -67,7 +67,7 @@ export async function getPublishedResources({
     orderBy,
     include: {
       subjects: { include: { subject: true } },
-      pricing: { where: { isActive: true } },
+      pricing: true,
       simulation: { select: { componentKey: true } },
     },
   });
@@ -78,7 +78,7 @@ export const getResourceBySlug = cache(async (slug: string) => {
     where: { slug, isPublished: true },
     include: {
       subjects: { include: { subject: true } },
-      pricing: { where: { isActive: true } },
+      pricing: true,
       simulation: true,
     },
   });

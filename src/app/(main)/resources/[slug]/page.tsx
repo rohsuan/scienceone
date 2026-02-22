@@ -69,6 +69,8 @@ export default async function ResourceDetailPage({
     : false;
 
   const canAccess = resource.isFree || purchased;
+  // Only show pricing for active prices — treat inactive pricing as null
+  const activePricing = resource.pricing?.isActive ? resource.pricing : null;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -140,9 +142,9 @@ export default async function ResourceDetailPage({
               <Badge className="bg-green-600 hover:bg-green-700 text-white">
                 Free Resource
               </Badge>
-            ) : resource.pricing ? (
+            ) : activePricing ? (
               <p className="text-lg font-semibold">
-                ${Number(resource.pricing.amount).toFixed(2)}
+                ${Number(activePricing.amount).toFixed(2)}
               </p>
             ) : null}
 
@@ -155,12 +157,12 @@ export default async function ResourceDetailPage({
             )}
 
             {/* Buy button */}
-            {!canAccess && resource.pricing && (
+            {!canAccess && activePricing && (
               <>
                 {session ? (
                   <ResourceBuyButton
                     resourceId={resource.id}
-                    price={Number(resource.pricing.amount)}
+                    price={Number(activePricing.amount)}
                   />
                 ) : (
                   <Button className="w-full" asChild>
