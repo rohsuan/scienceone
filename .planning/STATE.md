@@ -2,16 +2,16 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-20)
+See: .planning/PROJECT.md (updated 2026-02-22)
 
-**Core value:** Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser
-**Current focus:** v1.0 complete — planning next milestone
+**Core value:** Educators and students can discover STEM content — books, resources, simulations, and articles — with properly rendered math, directly in their browser
+**Current focus:** v1.1 Content Hub — polish and ship blog, resources, simulations
 
 ## Current Position
 
-Phase: v1.0 complete (9 phases, 19 plans, 27/27 requirements)
-Status: Milestone archived, ready for next milestone
-Last activity: 2026-02-20 — v1.0 milestone completed and archived
+Phase: Not started (defining requirements)
+Status: Defining requirements
+Last activity: 2026-02-22 — Milestone v1.1 started
 
 ## Accumulated Context
 
@@ -31,6 +31,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: v1.0 milestone completion and archival
-Resume: Start next milestone with /gsd:new-milestone
+Last session: 2026-02-22
+Stopped at: v1.1 milestone initialization
+Resume: Continue with requirements definition

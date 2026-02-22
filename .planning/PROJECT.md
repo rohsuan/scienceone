@@ -2,11 +2,21 @@
 
 ## What This Is
 
-ScienceOne is an online publishing platform for STEM books — particularly mathematics and physics — with first-class LaTeX formula rendering via server-side KaTeX. The founder manages a curated multi-author catalog where readers can browse, read chapters in-browser with properly rendered equations, and download books as PDF/EPUB. Two monetization models (pay-per-book, open access) give flexibility to adapt to market demand. An admin dashboard provides full book lifecycle management without touching the command line.
+ScienceOne is a STEM education platform built by a university physics instructor. It combines a curated book catalog (with server-side KaTeX math rendering), a resource library (free and paid lesson plans, problem sets, lab guides), interactive physics simulations, and a blog. The platform sits at the intersection of physics, math, computation, and AI — targeting teachers and students from AP/K-12 through university level.
 
 ## Core Value
 
-Readers can discover and read STEM books with properly rendered mathematical formulas, directly in their browser — no clunky PDFs, no broken equations.
+Educators and students can discover STEM content — books, resources, simulations, and articles — with properly rendered math, directly in their browser.
+
+## Current Milestone: v1.1 Content Hub
+
+**Goal:** Polish and ship the existing blog, resources, and simulations features to production quality.
+
+**Target features:**
+- Blog with CRUD, filtering, categories, SEO
+- Resource library with filtering, free/paid support, file downloads
+- Interactive physics simulations gallery with dynamic component loading
+- Admin management for all three content types
 
 ## Requirements
 
@@ -23,7 +33,10 @@ Readers can discover and read STEM books with properly rendered mathematical for
 
 ### Active
 
-(None — planning next milestone)
+- Blog with admin CRUD, public listing/filtering, article pages with SEO — v1.1
+- Resource library with admin CRUD, public listing/filtering, free/paid support — v1.1
+- Interactive physics simulations gallery with dynamic component loading — v1.1
+- Resource purchase flow via Stripe (nice-to-have) — v1.1
 
 ### Out of Scope
 
@@ -41,7 +54,7 @@ Readers can discover and read STEM books with properly rendered mathematical for
 
 ## Context
 
-**Current state:** v1.0 shipped (2026-02-20). 32,689 LOC TypeScript across 215 files.
+**Current state:** v1.0 shipped (2026-02-20). Blog, resources, and simulations features exist as untested first-pass code (uncommitted). Schema and migrations in place.
 
 **Tech stack:** Next.js 16, Prisma 7, Better Auth, Tailwind v4, shadcn/ui (canary), Stripe, Cloudflare R2, KaTeX, Pandoc, Resend
 
@@ -88,4 +101,4 @@ Readers can discover and read STEM books with properly rendered mathematical for
 | z.union for NaN-to-null Zod coercion | z.preprocess breaks @hookform/resolvers type inference in Zod 4 | Good — union preserves types |
 
 ---
-*Last updated: 2026-02-20 after v1.0 milestone*
+*Last updated: 2026-02-22 after v1.1 milestone start*
