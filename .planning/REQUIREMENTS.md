@@ -9,8 +9,8 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 ### Blog
 
-- [ ] **BLOG-01**: Admin can create, edit, and delete blog posts
-- [ ] **BLOG-02**: Admin can publish/unpublish blog posts with draft workflow
+- [x] **BLOG-01**: Admin can create, edit, and delete blog posts
+- [x] **BLOG-02**: Admin can publish/unpublish blog posts with draft workflow
 - [ ] **BLOG-03**: Visitor can browse published blog posts with category and subject filtering
 - [ ] **BLOG-04**: Visitor can search blog posts by keyword
 - [ ] **BLOG-05**: Blog post pages render with SEO metadata (JSON-LD, Open Graph)
@@ -86,8 +86,8 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BLOG-01 | Phase 14 | Pending |
-| BLOG-02 | Phase 14 | Pending |
+| BLOG-01 | Phase 14 | Complete |
+| BLOG-02 | Phase 14 | Complete |
 | BLOG-03 | Phase 14 | Pending |
 | BLOG-04 | Phase 14 | Pending |
 | BLOG-05 | Phase 14 | Pending |

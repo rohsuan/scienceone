@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 
 ## Current Position
 
-Phase: 13 of 15 (Simulations) — COMPLETE, advancing to Phase 14
-Plan: 2 of 2 in current phase — Phase 13 Plan 02 complete
+Phase: 14 of 15 (Blog) — In progress
+Plan: 1 of 2 in current phase — Phase 14 Plan 01 complete
 Status: In progress
-Last activity: 2026-02-22 — Phase 13 Plan 02 complete (verification)
+Last activity: 2026-02-22 — Phase 14 Plan 01 complete (blog admin actions fix)
 
-Progress: [██████░░░░] 60% (v1.1) — Phase 13 complete (2/2 plans done)
+Progress: [███████░░░] 65% (v1.1) — Phase 14 Plan 01 complete (1/2 plans done)
 
 ## Performance Metrics
 
@@ -31,11 +31,13 @@ Progress: [██████░░░░] 60% (v1.1) — Phase 13 complete (2/2
 | Phase 11: Resource Admin | 2 | 3 min | 1.5 min |
 | Phase 12: Resource Public/Purchase | 2 | 4 min | 2 min |
 | Phase 13: Simulations | 2 | 15 min | 7.5 min |
+| Phase 14: Blog | 1 | 3 min | 3 min |
 
 *Updated after each plan completion*
 | Phase 12-resource-public-purchase P01 | 6 | 2 tasks | 3 files |
 | Phase 13-simulations P01 | 9 | 3 tasks | 9 files |
 | Phase 13-simulations P02 | 6 | 1 tasks | 0 files |
+| Phase 14-blog P01 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -63,6 +65,9 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Phase 13-01]: simulation-registry.tsx extension required for JSX in dynamic loading option
 - [Phase 13-01]: Neon DB seeding requires a separate seed-neon.ts — Next.js reads .env.local (Neon), prisma.config.ts reads .env (local)
 - [Phase 13-simulations]: Rodney CLI unavailable — simulation verification performed via curl HTTP checks and source code analysis, all 5 criteria confirmed
+- [Phase 14-01]: BlogRowActions follows ResourceRowActions verbatim — same useTransition/startTransition/try-catch pattern
+- [Phase 14-01]: publishedAt clobber guard: `publish && !existing?.publishedAt` — only sets date on first publish, preserves original on re-publish
+- [Phase 14-01]: revalidatePath(/blog/{slug}) called after toggle — blog detail page immediately accessible after publish
 
 ### Pending Todos
 
@@ -73,11 +78,11 @@ None.
 - [RESOLVED Phase 13-01]: React.lazy in simulation registry causes server-side errors — FIXED by splitting into simulation-keys.ts + simulation-registry.tsx with next/dynamic
 - [RESOLVED Phase 10-01]: dangerouslySetInnerHTML called without sanitize-html in 4 locations — XSS vector fixed
 - [RESOLVED Phase 12-02]: Stripe webhook routes by ID presence (dead code), not explicit productType — FIXED with productType metadata routing
-- [CRITICAL]: togglePublishBlogPost does not revalidate /blog/{slug} — fix in Phase 14
+- [RESOLVED Phase 14-01]: togglePublishBlogPost did not revalidate /blog/{slug} — FIXED with slug prefetch and revalidatePath
 - [USER SETUP]: PostgreSQL must be running and migrations applied before Phase 10 work begins
 
 ## Session Continuity
 
-Last session: 2026-02-22T03:23:00Z
-Stopped at: Completed 13-02-PLAN.md — Phase 13 Plan 02 complete (verification), Phase 13 fully complete
-Resume file: None — continue with Phase 14 (Blog)
+Last session: 2026-02-22T04:03:00Z
+Stopped at: Completed 14-01-PLAN.md — Phase 14 Plan 01 complete (blog admin actions fix)
+Resume file: None — continue with Phase 14 Plan 02 (if any) or Phase 15
