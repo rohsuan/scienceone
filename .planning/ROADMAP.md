@@ -124,11 +124,11 @@ Plans:
   3. A blog post detail page shows a "Related Resources" section listing resources that share at least one subject tag with the post
   4. A resource detail page shows a "Related Articles" section listing blog posts that share at least one subject tag with the resource
   5. A simulation detail page shows links to related lab guide resources that share the simulation's subject
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 15-01: Add pagination to resource and blog listing queries and UI
-- [ ] 15-02: Add subject-based cross-link sections to blog post, resource, and simulation detail pages
+- [ ] 15-01-PLAN.md — Add offset pagination to resource and blog listing queries, create shared Pagination component, fix filter/search page reset
+- [ ] 15-02-PLAN.md — Add subject-based cross-link query functions and UI sections to blog post, resource, and simulation detail pages
 
 ## Progress
 
