@@ -7,17 +7,17 @@ import { Button } from "@/components/ui/button";
 interface ImageUploadFieldProps {
   label: string;
   currentUrl: string | null;
-  onUpload: (r2Key: string) => void;
-  bookId: string;
-  type: "cover" | "author";
+  onUpload: (url: string) => void;
+  entityId: string;
+  uploadType: "cover" | "author" | "resource-cover" | "blog-cover" | "blog-author";
 }
 
 export default function ImageUploadField({
   label,
   currentUrl,
   onUpload,
-  bookId,
-  type,
+  entityId,
+  uploadType,
 }: ImageUploadFieldProps) {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -34,11 +34,20 @@ export default function ImageUploadField({
     setError(null);
 
     try {
+      // Determine the correct ID field based on upload type
+      const isResource = uploadType === "resource-cover";
+      const isBlog = uploadType === "blog-cover" || uploadType === "blog-author";
+      const idField = isResource || isBlog ? "resourceId" : "bookId";
+
       // Step 1: Get presigned upload URL from our API
       const res = await fetch("/api/admin/upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookId, fileName: file.name, type }),
+        body: JSON.stringify({
+          [idField]: entityId,
+          fileName: file.name,
+          type: uploadType,
+        }),
       });
 
       if (!res.ok) {
@@ -76,9 +85,11 @@ export default function ImageUploadField({
         xhr.send(file);
       });
 
-      // Step 3: Update parent form state with the r2Key
+      // Step 3: Construct full public URL and update parent form state
       setPreviewUrl(URL.createObjectURL(file));
-      onUpload(r2Key);
+      const publicBaseUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+      const fullUrl = publicBaseUrl ? `${publicBaseUrl}/${r2Key}` : r2Key;
+      onUpload(fullUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {

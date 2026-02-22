@@ -190,9 +190,9 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
               <ImageUploadField
                 label="Cover Image"
                 currentUrl={field.value ?? null}
-                bookId={book.id}
-                type="cover"
-                onUpload={(r2Key) => setValue("coverImage", r2Key, { shouldDirty: true })}
+                entityId={book.id}
+                uploadType="cover"
+                onUpload={(url) => setValue("coverImage", url, { shouldDirty: true })}
               />
             )}
           />
@@ -205,7 +205,7 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
                 className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
               >
                 <FileUp className="size-4" />
-                Upload Manuscript
+                Edit Manuscript
               </Link>
               {book.manuscriptKey && (
                 <DownloadFileButton r2Key={book.manuscriptKey} label="Download manuscript" />
@@ -237,9 +237,9 @@ export default function BookEditForm({ book, categories }: BookEditFormProps) {
               <ImageUploadField
                 label="Author Photo"
                 currentUrl={field.value ?? null}
-                bookId={book.id}
-                type="author"
-                onUpload={(r2Key) => setValue("authorImage", r2Key, { shouldDirty: true })}
+                entityId={book.id}
+                uploadType="author"
+                onUpload={(url) => setValue("authorImage", url, { shouldDirty: true })}
               />
             )}
           />
