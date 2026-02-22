@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import ResourceBuyButton from "@/components/resources/ResourceBuyButton";
-import { Download } from "lucide-react";
+import ResourceDownloadButton from "@/components/resources/ResourceDownloadButton";
 
 const TYPE_LABELS: Record<string, string> = {
   LESSON_PLAN: "Lesson Plan",
@@ -148,12 +148,10 @@ export default async function ResourceDetailPage({
 
             {/* Download button */}
             {canAccess && resource.fileKey && (
-              <Button className="w-full" asChild>
-                <a href={`/api/resource-download?resourceId=${resource.id}`}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download {resource.fileName ?? "File"}
-                </a>
-              </Button>
+              <ResourceDownloadButton
+                resourceId={resource.id}
+                fileName={resource.fileName}
+              />
             )}
 
             {/* Buy button */}
