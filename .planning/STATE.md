@@ -32,6 +32,7 @@ Progress: [████░░░░░░] 43% (v1.1) — Phase 12 Plan 02 compl
 | Phase 12: Resource Public/Purchase | 2 | 4 min | 2 min |
 
 *Updated after each plan completion*
+| Phase 12-resource-public-purchase P01 | 6 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -50,6 +51,8 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Phase 11-01]: SubjectSelect is read-only — createSubject server action removed, subjects are seeded only
 - [Phase 11]: ResourceRowActions extracted as named component to enable useTransition hook usage inside ColumnDef cell
 - [Phase 11]: Single isPending from one useTransition covers both toggle and delete actions — sequential operations, no parallelism needed
+- [Phase 12-01]: Prisma where filter in include is invalid for one-to-one optional relations (ResourcePrice?) — filter isActive at application level using activePricing computed variable
+- [Phase 12-01]: Neon production DB migration must be deployed separately from local — prisma.config.ts reads .env (local), Next.js reads .env.local (Neon)
 - [Phase 12-02]: Stripe webhook routes by productType first (explicit intent), then validates IDs exist (defensive)
 - [Phase 12-02]: Unknown/legacy productType logs warning but returns 200 per Stripe best practice
 - [Phase 12-02]: No backward compatibility needed for productType — clean cutover, no real users yet
