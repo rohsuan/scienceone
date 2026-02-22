@@ -31,7 +31,7 @@
 - [x] **Phase 12: Resource Public and Purchase** - Resource listing, free downloads, and end-to-end Stripe purchase flow (completed 2026-02-22)
 - [x] **Phase 13: Simulations** - Simulation gallery and detail pages with SSR-safe dynamic loading and responsive canvas (completed 2026-02-22)
 - [x] **Phase 14: Blog** - Blog admin CRUD and public listing with SEO, sitemap, and sanitized content rendering (completed 2026-02-22)
-- [ ] **Phase 15: Polish and Cross-linking** - Pagination on all listings and subject-based cross-links between content types
+- [x] **Phase 15: Polish and Cross-linking** - Pagination on all listings and subject-based cross-links between content types (completed 2026-02-22)
 
 ## Phase Details
 
@@ -148,4 +148,4 @@ Plans:
 | 12. Resource Public and Purchase | 2/2 | Complete    | 2026-02-22 | - |
 | 13. Simulations | 2/2 | Complete    | 2026-02-22 | - |
 | 14. Blog | 2/2 | Complete   | 2026-02-22 | - |
-| 15. Polish and Cross-linking | 1/2 | In Progress|  | - |
+| 15. Polish and Cross-linking | 2/2 | Complete   | 2026-02-22 | - |

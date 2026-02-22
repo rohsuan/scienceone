@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-22)
 
 ## Current Position
 
-Phase: 15 of 15 (Polish and Cross-Linking) — In progress
-Plan: 1 of 2 in current phase — Phase 15 Plan 01 complete
-Status: In progress
-Last activity: 2026-02-22 — Phase 15 Plan 01 complete (pagination for resource and blog listing pages)
+Phase: 15 of 15 (Polish and Cross-Linking) — Complete
+Plan: 2 of 2 in current phase — Phase 15 Plan 02 complete
+Status: Complete
+Last activity: 2026-02-22 — Phase 15 Plan 02 complete (cross-link sections on detail pages)
 
-Progress: [█████████░] 85% (v1.1) — Phase 15 Plan 01 complete (1/2 plans done)
+Progress: [██████████] 100% (v1.1) — All phases complete (2/2 plans done in Phase 15)
 
 ## Performance Metrics
 
@@ -32,7 +32,7 @@ Progress: [█████████░] 85% (v1.1) — Phase 15 Plan 01 compl
 | Phase 12: Resource Public/Purchase | 2 | 4 min | 2 min |
 | Phase 13: Simulations | 2 | 15 min | 7.5 min |
 | Phase 14: Blog | 2 | 4 min | 2 min |
-| Phase 15: Polish | 1 | 2 min | 2 min |
+| Phase 15: Polish | 2 | 4 min | 2 min |
 
 *Updated after each plan completion*
 | Phase 12-resource-public-purchase P01 | 6 | 2 tasks | 3 files |
@@ -41,6 +41,7 @@ Progress: [█████████░] 85% (v1.1) — Phase 15 Plan 01 compl
 | Phase 14-blog P01 | 3 | 2 tasks | 2 files |
 | Phase 14-blog P02 | 1 | 2 tasks | 2 files |
 | Phase 15-polish P01 | 2 | 2 tasks | 8 files |
+| Phase 15-polish P02 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,9 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table.
 - [Phase 15-01]: Pagination component uses conditional rendering (not disabled) to avoid asChild + disabled anchor pitfall
 - [Phase 15-01]: PAGE_SIZE = 12 exported from each query module so listing pages can compute totalPages without separate constant import
 - [Phase 15-01]: simulations/page.tsx destructures { items } from updated getPublishedResources — no pagination added (simulations are few)
+- [Phase 15-02]: getRelatedResources excludes SIMULATION type — simulations have dedicated /simulations/{slug} pages, blog cross-links always route to /resources/{slug}
+- [Phase 15-02]: getRelatedLabGuides passes resource.id as excludeResourceId — simulations and lab guides share the Resource table, self-exclusion required
+- [Phase 15-02]: Related Articles placed full-width below the two-column grid on resource detail page for readability
 
 ### Pending Todos
 
@@ -92,6 +96,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-22T05:21:22Z
-Stopped at: Completed 15-01-PLAN.md — Phase 15 Plan 01 complete (pagination for resource and blog listing pages)
-Resume file: None — continue with Phase 15 Plan 02
+Last session: 2026-02-22T05:26:00Z
+Stopped at: Completed 15-02-PLAN.md — Phase 15 Plan 02 complete (cross-link sections on detail pages)
+Resume file: None — v1.1 Content Hub milestone complete

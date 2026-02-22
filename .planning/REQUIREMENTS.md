@@ -28,7 +28,7 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 - [x] **RES-07**: Paid resource checkout via Stripe works end-to-end
 - [x] **RES-08**: Stripe webhook creates ResourcePurchase records correctly
 - [x] **RES-09**: Purchased resources can be downloaded via presigned R2 URL
-- [ ] **RES-10**: Resource and blog listings have pagination
+- [x] **RES-10**: Resource and blog listings have pagination
 
 ### Simulations
 
@@ -41,9 +41,9 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 
 ### Cross-Linking
 
-- [ ] **XLINK-01**: Blog posts show related resources based on shared subjects
-- [ ] **XLINK-02**: Resource pages show related blog posts based on shared subjects
-- [ ] **XLINK-03**: Simulation pages link to related resources
+- [x] **XLINK-01**: Blog posts show related resources based on shared subjects
+- [x] **XLINK-02**: Resource pages show related blog posts based on shared subjects
+- [x] **XLINK-03**: Simulation pages link to related resources
 
 ## Future Requirements
 
@@ -102,16 +102,16 @@ Requirements for v1.1 Content Hub. Each maps to roadmap phases.
 | RES-07 | Phase 12 | Complete |
 | RES-08 | Phase 12 | Complete |
 | RES-09 | Phase 12 | Complete |
-| RES-10 | Phase 15 | Pending |
+| RES-10 | Phase 15 | Complete |
 | SIM-01 | Phase 13 | Complete |
 | SIM-02 | Phase 13 | Complete |
 | SIM-03 | Phase 13 | Complete |
 | SIM-04 | Phase 13 | Complete |
 | SIM-05 | Phase 13 | Complete |
 | SIM-06 | Phase 13 | Complete |
-| XLINK-01 | Phase 15 | Pending |
-| XLINK-02 | Phase 15 | Pending |
-| XLINK-03 | Phase 15 | Pending |
+| XLINK-01 | Phase 15 | Complete |
+| XLINK-02 | Phase 15 | Complete |
+| XLINK-03 | Phase 15 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 26 total
