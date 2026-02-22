@@ -58,11 +58,11 @@ Plans:
   3. Admin can set resource type to SIMULATION, choose a componentKey from the dropdown, and save — the Simulation record is created or updated
   4. Admin can toggle publish/unpublish on a resource and see the status change reflected immediately in the table
   5. Admin can delete a resource and it is removed from the admin table
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 11-01: Audit and fix ResourceEditForm, FileUploadField, and upload URL route
-- [ ] 11-02: Verify simulation tab, componentKey dropdown, and admin table actions
+- [ ] 11-01-PLAN.md — Fix ImageUploadField for resource covers, store full R2 public URL, remove SubjectSelect create UI
+- [ ] 11-02-PLAN.md — Extract ResourceRowActions with useTransition + toast for publish/delete feedback
 
 ### Phase 12: Resource Public and Purchase
 **Goal**: Visitors can browse and search published resources with filtering, download free resources instantly, and purchase paid resources through Stripe with correct webhook-driven access gating
@@ -144,7 +144,7 @@ Plans:
 | 8. Reader Enhancements | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 9. Audit Gap Closure | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 10. Infrastructure | 1/1 | Complete    | 2026-02-22 | - |
-| 11. Resource Admin | v1.1 | 0/2 | Not started | - |
+| 11. Resource Admin | v1.1 | 0/2 | Planned | - |
 | 12. Resource Public and Purchase | v1.1 | 0/2 | Not started | - |
 | 13. Simulations | v1.1 | 0/2 | Not started | - |
 | 14. Blog | v1.1 | 0/2 | Not started | - |
