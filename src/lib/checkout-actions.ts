@@ -55,6 +55,7 @@ export async function createCheckoutSession(bookId: string): Promise<void> {
       },
     ],
     metadata: {
+      productType: "book",
       userId: session.user.id,
       bookId: book.id,
       bookSlug: book.slug,
