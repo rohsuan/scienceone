@@ -75,11 +75,11 @@ Plans:
   4. Visitor sees the price and a "Purchase" button on paid resources; clicking it redirects to Stripe Checkout
   5. After Stripe payment succeeds, the webhook creates a ResourcePurchase record and the resource becomes downloadable for the purchasing user
   6. The Stripe webhook routes by explicit `productType` metadata ("book" vs "resource"), eliminating the dead-code implicit routing bug
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 12-01: Verify resource listing, search, filtering, and free download flow
-- [ ] 12-02: Verify Stripe checkout, webhook routing fix, and post-purchase access
+- [ ] 12-01-PLAN.md — Fix download button, isActive pricing filter, and verify listing/search/filter/download
+- [ ] 12-02-PLAN.md — Add productType metadata to checkouts, fix webhook routing, verify purchase flow
 
 ### Phase 13: Simulations
 **Goal**: The simulation gallery and detail pages load without server-side errors, all three simulations render correctly in the browser with working interactive controls, and the canvas layout is responsive across desktop, tablet, and mobile
