@@ -2,12 +2,15 @@ import { cache } from "react";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 
+export const PAGE_SIZE = 12;
+
 interface GetPublishedResourcesParams {
   subject?: string;
   type?: string;
   level?: string;
   sort?: string;
   q?: string;
+  page?: number;
 }
 
 export async function getPublishedResources({
@@ -16,6 +19,7 @@ export async function getPublishedResources({
   level,
   sort,
   q,
+  page = 1,
 }: GetPublishedResourcesParams = {}) {
   const where: Prisma.ResourceWhereInput = {
     isPublished: true,
@@ -62,15 +66,24 @@ export async function getPublishedResources({
     orderBy = { title: "asc" };
   }
 
-  return prisma.resource.findMany({
-    where,
-    orderBy,
-    include: {
-      subjects: { include: { subject: true } },
-      pricing: true,
-      simulation: { select: { componentKey: true } },
-    },
-  });
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const [items, totalCount] = await Promise.all([
+    prisma.resource.findMany({
+      where,
+      orderBy,
+      skip,
+      take: PAGE_SIZE,
+      include: {
+        subjects: { include: { subject: true } },
+        pricing: true,
+        simulation: { select: { componentKey: true } },
+      },
+    }),
+    prisma.resource.count({ where }),
+  ]);
+
+  return { items, totalCount };
 }
 
 export const getResourceBySlug = cache(async (slug: string) => {
