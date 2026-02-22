@@ -144,7 +144,7 @@ Plans:
 | 8. Reader Enhancements | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 9. Audit Gap Closure | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 10. Infrastructure | 1/1 | Complete    | 2026-02-22 | - |
-| 11. Resource Admin | 2/2 | Complete   | 2026-02-22 | - |
+| 11. Resource Admin | 2/2 | Complete    | 2026-02-22 | - |
 | 12. Resource Public and Purchase | v1.1 | 0/2 | Not started | - |
 | 13. Simulations | v1.1 | 0/2 | Not started | - |
 | 14. Blog | v1.1 | 0/2 | Not started | - |
