@@ -35,6 +35,25 @@ async function main() {
 
   console.log("Categories created:", { physics, math, chemistry, cs });
 
+  // ---- Subjects (Resource Library taxonomy) ----
+  // Four top-level subjects per user decision (v1.1)
+  const subjectData = [
+    { name: "Physics", slug: "physics" },
+    { name: "Mathematics", slug: "mathematics" },
+    { name: "Chemistry", slug: "chemistry" },
+    { name: "Computer Science", slug: "computer-science" },
+  ];
+
+  for (const s of subjectData) {
+    await prisma.subject.upsert({
+      where: { slug: s.slug },
+      update: {},
+      create: s,
+    });
+  }
+
+  console.log("Subjects seeded:", subjectData.map((s) => s.name));
+
   // ---- Users ----
   // Note: Seed users do not have passwords — they are display/test data.
   // For login testing, use Better Auth's API to create accounts with passwords.
@@ -125,13 +144,10 @@ async function main() {
     },
   ];
 
-  for (const ch of book1Chapters) {
-    await prisma.chapter.upsert({
-      where: { bookId_slug: { bookId: book1.id, slug: ch.slug } },
-      update: {},
-      create: { bookId: book1.id, ...ch },
-    });
-  }
+  await prisma.chapter.createMany({
+    data: book1Chapters.map((ch) => ({ bookId: book1.id, ...ch })),
+    skipDuplicates: true,
+  });
 
   // ---- Book 2: Linear Algebra (published, open access) ----
   const book2 = await prisma.book.upsert({
@@ -168,7 +184,25 @@ async function main() {
       isFreePreview: true,
       content: `<h2>Vector Spaces</h2>
 <p>A vector space is a set V equipped with two operations — addition and scalar multiplication — satisfying eight axioms. These axioms abstract the essential properties of arrows in the plane and lists of real numbers.</p>
-<p>Important examples include: R^n, the set of polynomials of degree at most n, and the set of continuous functions on a closed interval.</p>`,
+<p>Important examples include: R^n, the set of polynomials of degree at most n, and the set of continuous functions on a closed interval.</p>
+<h3>Computing with Vectors in Python</h3>
+<p>We can represent vectors as NumPy arrays and verify the vector space axioms computationally:</p>
+<pre><code class="language-python">import numpy as np
+
+# Define two vectors in R³
+u = np.array([1, 2, 3])
+v = np.array([4, 5, 6])
+
+# Vector addition is commutative: u + v == v + u
+print("u + v =", u + v)
+print("v + u =", v + u)
+
+# Scalar multiplication distributes over addition
+alpha = 2.0
+print("α(u + v) =", alpha * (u + v))
+print("αu + αv =", alpha * u + alpha * v)
+</code></pre>
+<p>Running this code confirms that both the commutativity of addition and the distributive property of scalar multiplication hold for these vectors in R³.</p>`,
     },
     {
       title: "Finite-Dimensional Subspaces",
@@ -188,13 +222,10 @@ async function main() {
     },
   ];
 
-  for (const ch of book2Chapters) {
-    await prisma.chapter.upsert({
-      where: { bookId_slug: { bookId: book2.id, slug: ch.slug } },
-      update: {},
-      create: { bookId: book2.id, ...ch },
-    });
-  }
+  await prisma.chapter.createMany({
+    data: book2Chapters.map((ch) => ({ bookId: book2.id, ...ch })),
+    skipDuplicates: true,
+  });
 
   // ---- Book 3: Statistical Thermodynamics (unpublished draft) ----
   const book3 = await prisma.book.upsert({
@@ -238,13 +269,10 @@ async function main() {
     },
   ];
 
-  for (const ch of book3Chapters) {
-    await prisma.chapter.upsert({
-      where: { bookId_slug: { bookId: book3.id, slug: ch.slug } },
-      update: {},
-      create: { bookId: book3.id, ...ch },
-    });
-  }
+  await prisma.chapter.createMany({
+    data: book3Chapters.map((ch) => ({ bookId: book3.id, ...ch })),
+    skipDuplicates: true,
+  });
 
   console.log("Books and chapters created:", {
     book1: book1.title,
