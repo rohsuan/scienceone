@@ -26,7 +26,7 @@
 
 **Milestone Goal:** Polish and ship blog, resource library, and interactive simulations to production quality — verifying, bug-fixing, and wiring existing first-pass code.
 
-- [ ] **Phase 10: Infrastructure** - Verify DB migration, subject system, and shared XSS sanitization utility
+- [x] **Phase 10: Infrastructure** - Verify DB migration, subject system, and shared XSS sanitization utility (completed 2026-02-22)
 - [ ] **Phase 11: Resource Admin** - Admin CRUD for resources with file upload, simulation tab, and subject tagging
 - [ ] **Phase 12: Resource Public and Purchase** - Resource listing, free downloads, and end-to-end Stripe purchase flow
 - [ ] **Phase 13: Simulations** - Simulation gallery and detail pages with SSR-safe dynamic loading and responsive canvas
@@ -143,7 +143,7 @@ Plans:
 | 7. Admin Dashboard | v1.0 | 3/3 | Complete | 2026-02-19 |
 | 8. Reader Enhancements | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 9. Audit Gap Closure | v1.0 | 1/1 | Complete | 2026-02-20 |
-| 10. Infrastructure | v1.1 | 0/1 | Not started | - |
+| 10. Infrastructure | 1/1 | Complete   | 2026-02-22 | - |
 | 11. Resource Admin | v1.1 | 0/2 | Not started | - |
 | 12. Resource Public and Purchase | v1.1 | 0/2 | Not started | - |
 | 13. Simulations | v1.1 | 0/2 | Not started | - |
